@@ -4,7 +4,8 @@
 
 ".conflicts.OK" <- TRUE
 ## need DBI and methods *prior* to having library.dynam() invoked!
-require(DBI, quietly = TRUE, warn.conflicts = FALSE)
+library(methods)
+library(DBI, quietly = TRUE, warn.conflicts = FALSE)
 
 ".First.lib" <- 
 function(lib, pkg) 

@@ -19,7 +19,7 @@
 ##
 
 "mysqlInitDriver" <- 
-function(max.con=10, fetch.default.rec = 500, force.reload=F)
+function(max.con=16, fetch.default.rec = 500, force.reload=F)
 ## create a MySQL database connection manager.  By default we allow
 ## up to "max.con" connections and single fetches of up to "fetch.default.rec"
 ## records.  These settings may be changed by re-loading the driver
@@ -443,14 +443,15 @@ function(con, name, row.names = "row.names", check.names = T, ...)
 "mysqlWriteTable" <-
 function(con, name, value, field.types, row.names = TRUE, 
    overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE)
-## TODO: This function should execute its sql as a single transaction,
-## and allow converter functions.
 ## Create table "name" (must be an SQL identifier) and populate
 ## it with the values of the data.frame "value"
-## BUG: In the unlikely event that value has a field called "row.names"
-## we could inadvertently overwrite it (here the user should set row.names=F)
-## (I'm reluctantly adding the code re: row.names -- I'm not 100% comfortable
-## using data.frames as the basic data for relations.)
+## TODO: This function should execute its sql as a single transaction,
+##       and allow converter functions.
+## TODO: In the unlikely event that value has a field called "row.names"
+##       we could inadvertently overwrite it (here the user should set 
+##       row.names=F)  I'm (very) reluctantly adding the code re: row.names,
+##       because I'm not 100% comfortable using data.frames as the basic 
+##       data for relations.
 {
    if(overwrite && append)
       stop("overwrite and append cannot both be TRUE")
@@ -465,7 +466,9 @@ function(con, name, value, field.types, row.names = TRUE,
       ## also, need to use converter functions (for dates, etc.)
       field.types <- sapply(value, dbDataType, dbObj = con)
    } 
+
    ## Do we need to coerce any field prior to write it out?
+   ## TODO: MySQL 4.1 introduces the boolean data type.  
    for(i in seq(along = value)){
       if(is(value[[i]], "logical"))
          value[[i]] <- as(value[[i]], "integer")
@@ -475,7 +478,6 @@ function(con, name, value, field.types, row.names = TRUE,
       field.types[i] <- dbDataType(dbObj=con, field.types$row.names)
    names(field.types) <- make.db.names(con, names(field.types), 
                              allow.keywords = allow.keywords)
-
    ## Do we need to clone the connection (ie., if it is in use)?
    if(length(dbListResults(con))!=0){ 
       new.con <- dbConnect(con)              ## there's pending work, so clone
@@ -519,8 +521,7 @@ function(con, name, value, field.types, row.names = TRUE,
    fn <- tempfile("rsdbi")
    fn <- gsub("\\\\", "/", fn)  # Since MySQL on Windows wants \ double (BDR)
    safe.write(value, file = fn)
-   cat("temp file:", fn, "\n")  ##debug
-   #on.exit(unlink(fn), add = T)##debug
+   on.exit(unlink(fn), add = T)
    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
                   " INTO TABLE ", name, 
                   " LINES TERMINATED BY '\n' ", sep="")
