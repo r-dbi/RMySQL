@@ -193,11 +193,11 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
   int       i; 
   Sint      ngroups;
   char      **groups;
-#ifdef WIN32
-  char  *tmp;  /* we'll have to peek into the MYSQL connection obj, darn!*/
-#else
+#if HAVE_GETOPT_LONG
   int   argc, option_index;    /* TODO: What about Mac OS, OS X??     */
   char  **argv;                /* we do have MySQL's load_defaults() */
+#else
+  char  *tmp;  /* we'll have to peek into the MYSQL connection obj, darn!*/
 #endif
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
@@ -240,8 +240,7 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
     groups[i+2] = RS_DBI_copyString(CHR_EL(MySQLgroups,i));
     mysql_options(my_connection, MYSQL_READ_DEFAULT_GROUP,  groups[i+2]);
   }
-#ifndef WIN32
-  /* What about Mac OS 9 and/or OS X? */
+#if HAVE_GETOPT_LONG
   argc = 1;
   argv = (char **) S_alloc((long) 1, (int) sizeof(char **));
   argv[0] = (char *) RS_DBI_copyString("dummy"); 
@@ -273,7 +272,7 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
     case 's': unix_socket = optarg;  break;
     }
   }
-#endif    /* WIN32 */
+#endif  /* HAVE_GETOPT_LONG */
   
 #define IS_EMPTY(s1)   !strcmp((s1), "")
 
@@ -304,7 +303,7 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
 
   conParams = RS_mysql_allocConParams();
 
-#ifdef WIN32
+#if ! HAVE_GETOPT_LONG
   /* On Windows, MySQL (3.23+?) doesn't have the load_defaults() function
    * included in the shared libMySQL.dll lib (only in the static, threaded
    * mysqlclient.lib.) Thus we need to extract the host/dbname/user/passwd
@@ -326,7 +325,7 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
          user[i] = '\0';
          break;
       }
-#endif    /* WIN32 */
+#endif    /* ! HAVE_GETOPT_LONG */
   /* save actual connection parameters */
   if(!user) 
      user = ""; 
@@ -425,8 +424,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
   if(con->num_res>0){
     res_id = (Sint) con->resultSetIds[0]; /* recall, MySQL has only 1 res */
     rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle), 
-	                          CON_ID(conHandle),
-				  res_id);
+	                          CON_ID(conHandle), res_id);
     result = RS_DBI_getResultSet(rsHandle);
     if(result->completed == 0){
       free(dyn_statement);

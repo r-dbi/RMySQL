@@ -24,9 +24,17 @@
 extern  "C" {
 #endif
 
+/* We use HAVE_GETOPT_LONG to signal we can use getopt_long() 
+ * (by default we assume we're running on a GNU-aware system)
+ */
+#ifndef HAVE_GETOPT_LONG
+#   define HAVE_GETOPT_LONG 1
+#endif
+
 #ifdef WIN32
-#include <windows.h>
-#undef ERROR
+#   include <windows.h>
+#   define HAVE_GETOPT_LONG 0
+#   undef ERROR
 #endif
 
 #include <mysql.h>
