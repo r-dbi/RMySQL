@@ -33,7 +33,7 @@
 }
 \usage{
    ## MySQLDriver-related
-   mysqlInitDriver(max.con=10, fetch.default.rec = 500, force.reload=FALSE)
+   mysqlInitDriver(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
    mysqlDriverInfo(obj, what, ...)
    mysqlDescribeDriver(obj, verbose = FALSE, ...)
    mysqlCloseDriver(drv, ...)
