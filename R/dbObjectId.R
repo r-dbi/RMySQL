@@ -9,55 +9,42 @@
 ## This class and its derived classes <driver-manager>Object need to 
 ## be VIRTUAL to avoid coercion (green book, p.293) during method dispatching.
 
-if(usingV4()){
-   setClass("dbObjectId", representation(Id = "integer", "VIRTUAL"))
-   ## coercion methods 
-   setAs("dbObjectId", "integer", 
-      def = function(from) as(slot(from,"Id"), "integer")
-   )
-   setAs("dbObjectId", "numeric",
-      def = function(from) as(slot(from, "Id"), "integer")
-   )
-   setAs("dbObjectId", "character",
-      def = function(from) as(slot(from, "Id"), "character")
-   )   
-   ## formating, showing, printing,...
-   setMethod("format", "dbObjectId", 
-      def = function(x, ...) format.dbObjectId(x, ...),
-      valueClass = "character"
-   )
-   setMethod("print", "dbObjectId",
-      def = function(x, ...) print.dbObjectId(x, ...)
-   )
-   setMethod("show", "dbObjectId",
-      def = function(object) print.dbObjectId(object)
-   )
-} else {
-   new.dbObjectId <- function(Id, ...)
-   {
-      new("dbObjectId", Id = Id)
-   }
-   ## Coercion: the trick as(dbObject, "integer") is very useful
-   "as.integer.dbObjectId" <- 
-   function(x, ...) as.integer(attr(x,"Id")) 
-   "as.numeric.dbObjectId" <- 
-   function(x, ...) as.numeric(attr(x,"Id")) 
-   "as.character.dbObjectId" <- 
-   function(x, ...) as.character(attr(x,"Id")) 
+NEW.dbObjectId <- function(Id, ...)
+{
+   NEW("dbObjectId", Id = Id)
+}
+
+## Coercion: the trick as(dbObject, "integer") is very useful
+"as.integer.dbObjectId" <- 
+function(x, ...) 
+{
+   as.integer(attr(x,"Id")) 
+}
+
+"as.numeric.dbObjectId" <- 
+function(x, ...) 
+{
+   as.numeric(attr(x,"Id")) 
+}
+
+"as.character.dbObjectId" <- 
+function(x, ...) 
+{
+   as.character(attr(x,"Id")) 
 }
 
 "isIdCurrent" <- 
 function(obj)
 ## verify that obj refers to a currently open/loaded database
 { 
-   obj <- as(obj, "integer")
+   obj <- as.integer(obj)
    .Call("RS_DBI_validHandle", obj)
 }
 
 "format.dbObjectId" <- 
 function(x, ...)
 {
-   id <- as(x, "integer")
+   id <- as.integer(x)
    paste("(", paste(id, collapse=","), ")", sep="")
 }
 
@@ -65,9 +52,9 @@ function(x, ...)
 function(x, ...)
 {
    if(isIdCurrent(x))
-      str <- paste("<", class(x), ":", format(x), ">", sep="")
+      str <- paste("<", class(x)[1], ":", format(x), ">", sep="")
    else 
-      str <- paste("<Expired ",class(x), ":", format(x), ">", sep="")
+      str <- paste("<Expired ",class(x)[1], ":", format(x), ">", sep="")
    cat(str, "\n")
    invisible(NULL)
 }
