@@ -23,7 +23,7 @@
 
 .MySQLRCS <- "$Id$"
 .MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
-.MySQLVersion <- "0.5-0" #package.description(.MySQLPkgName, field = "Version")
+.MySQLVersion <- package.description(.MySQLPkgName, field = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
@@ -321,26 +321,8 @@ setMethod("isSQLKeyword",
    },
    valueClass = "character"
 )
-
-## R Bug:  I cannot setGeneric() and have the function save in 
-## package:RMySQL -- why?
-#setGeneric("dbApply", def = function(res, ...) standardGeneric("dbApply"))
-#setMethod("dbApply", "MySQLResult",
-#   def = function(res, ...)  mysqlDBApply(res, ...),
-#)
-
-"dbApply" <-
-function(res, ...) 
-{
-   UseMethod("dbApply")
-}
-
-"dbApply.default" <- 
-function(res, ...) 
-{
-   if(!is(res, "MySQLResult"))
-      stop("object must be a MySQLResult")
-   if(!isIdCurrent(res))
-      stop(paste("expired", class(res)))
-   mysqlDBApply(res, ...)
-}
+## extension to the DBI 0.1-4
+setGeneric("dbApply", def = function(res, ...) standardGeneric("dbApply"))
+setMethod("dbApply", "MySQLResult",
+   def = function(res, ...)  mysqlDBApply(res, ...),
+)
