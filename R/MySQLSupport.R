@@ -26,70 +26,67 @@
 
 .MySQL.NA.string <- "\\N"  ## on input, MySQL interprets \N as NULL (NA)
 
-if(!usingV4()){
+#"format.MySQLManager" <- 
+#"format.MySQLConnection" <-
+#"format.MySQLResultSet" <- 
+#function(x, ...)
+#{
+#   format.dbObjectId(x)
+#}
 
-   "format.MySQLManager" <- 
-   "format.MySQLConnection" <-
-   "format.MySQLResultSet" <- 
-   function(x, ...)
-   {
-      format.dbObjectId(x)
-   }
+#"print.MySQLManager" <- 
+#"print.MySQLConnection" <-
+#"print.MySQLResultSet" <- 
+#function(x, ...)
+#{
+#   print.dbObjectId(x, ...)
+#}
 
-   "print.MySQLManager" <- 
-   "print.MySQLConnection" <-
-   "print.MySQLResultSet" <- 
-   function(x, ...)
-   {
-      print.dbObjectId(x, ...)
-   }
+#"as.integer.MySQLManager" <- 
+#"as.integer.MySQLConnection" <-
+#"as.integer.MySQLResultSet" <- 
+#function(x, ...)
+#{
+#   as.integer(attr(x,"Id"))
+#}
 
-   "as.integer.MySQLManager" <- 
-   "as.integer.MySQLConnection" <-
-   "as.integer.MySQLResultSet" <- 
-   function(x, ...)
-   {
-      as.integer(attr(x,"Id"))
-   }
+"as.MySQLManager" <- 
+function(obj)
+{
+   NEW("MySQLManager", Id =AS(obj,"integer")[1])
+}
 
-   "as.MySQLManager" <- 
-   function(obj)
-   {
-      new("MySQLManager", Id =as(obj,"integer")[1])
-   }
+"as.MySQLConnection" <- 
+function(obj)
+{
+   NEW("MySQLConnection", Id = AS(obj, "integer")[1:2])
+} 
 
-   "as.MySQLConnection" <- 
-   function(obj)
-   {
-      new("MySQLConnection", Id = as(obj, "integer")[1:2])
-   } 
+"as.MySQLResultSet" <- 
+function(obj)
+{
+   NEW("MySQLResultSet", Id = AS(obj, "integer")[1:3])
+}
 
-   "as.MySQLResultSet" <- 
-   function(obj)
-   {
-      new("MySQLResultSet", Id = as(obj, "integer")[1:3])
-   }
+## these, again, are needed only because virtual classes (dbObject)
+## are not available in R prior to 1.4
 
-   ## these, again, are needed only because virtual classes (dbObject)
-   ## are not available in R prior to 1.4
+"getTable.MySQLConnection" <- 
+function(con, name, ...)
+{
+   getTable.dbConnection(con, name, ...)
+}
 
-   "getTable.MySQLConnection" <- 
-   function(con, name, ...)
-   {
-      getTable.dbConnection(con, name, ...)
-   }
+"existsTable.MySQLConnection" <- 
+function(con, name, ...)
+{
+   existsTable.dbConnection(con, name, ...)
+}
 
-   "existsTable.MySQLConnection" <- 
-   function(con, name, ...)
-   {
-      existsTable.dbConnection(con, name, ...)
-   }
-
-   "removeTable.MySQLConnection" <- 
-   function(con, name, ...)
-   {
-      removeTable.dbConnection(con, name, ...)
-   }
+"removeTable.MySQLConnection" <- 
+function(con, name, ...)
+{
+   removeTable.dbConnection(con, name, ...)
 }
 
 "load.MySQLManager" <- 
@@ -106,7 +103,7 @@ function(obj, verbose = F, ...)
 ## Print out nicely a brief description of the connection Manager
 {
    info <- getInfo.MySQLManager(obj)
-   show(obj)
+   print(obj)
    cat("  Driver name: ", info$drvName, "\n")
    cat("  Max  connections:", info$length, "\n")
    cat("  Conn. processed:", info$counter, "\n")
@@ -119,7 +116,7 @@ function(obj, verbose = F, ...)
    if(verbose && !is.null(info$connectionIds)){
       for(i in seq(along = info$connectionIds)){
          cat("   ", i, " ")
-         show(info$connectionIds[[i]])
+         print(info$connectionIds[[i]])
       }
    }
    invisible(NULL)
@@ -130,23 +127,23 @@ function(mgr, ...)
 {
    if(!isIdCurrent(mgr))
       return(TRUE)
-   mgrId <- as(mgr, "integer")
+   mgrId <- AS(mgr, "integer")
    .Call("RS_MySQL_closeManager", mgrId, PACKAGE = "RMySQL")
 }
 
 "getInfo.MySQLManager" <- 
 function(obj, what="", ...)
 {
-   mgrId <- as(obj, "integer")[1]
+   mgrId <- AS(obj, "integer")[1]
    info <- .Call("RS_MySQL_managerInfo", mgrId, PACKAGE = "RMySQL")  
    mgrId <- info$managerId
    ## replace mgr/connection id w. actual mgr/connection objects
    conObjs <- vector("list", length = info$"num_con")
    ids <- info$connectionIds
    for(i in seq(along = ids))
-      conObjs[[i]] <- new("MySQLConnection", Id = c(mgrId, ids[i]))
+      conObjs[[i]] <- NEW("MySQLConnection", Id = c(mgrId, ids[i]))
    info$connectionIds <- conObjs
-   info$managerId <- new("MySQLManager", Id = mgrId)
+   info$managerId <- NEW("MySQLManager", Id = mgrId)
    if(length(what)==1 && what=="")
       return(info)
    info <- info[what]
@@ -182,11 +179,13 @@ function(mgr, dbname = "", username="",
    unix.socket = "", port = 0, client.flag = 0, 
    groups = NULL)
 {
+   if(!isIdCurrent(mgr))
+      stop("expired manager")
    con.params <- as.character(c(username, password, host, 
                                 dbname, unix.socket, port, 
                                 client.flag))
    groups <- as.character(groups)
-   mgrId <- as(mgr, "integer")
+   mgrId <- AS(mgr, "integer")
    .Call("RS_MySQL_newConnection", mgrId, con.params, groups, 
          PACKAGE = "RMySQL")
 }
@@ -204,7 +203,7 @@ function(con)
 function(obj, verbose = F, ...)
 {
    info <- getInfo(obj)
-   show(obj)
+   print(obj)
    cat("  User:", info$user, "\n")
    cat("  Host:", info$host, "\n")
    cat("  Dbname:", info$dbname, "\n")
@@ -212,14 +211,14 @@ function(obj, verbose = F, ...)
    if(verbose){
       cat("  MySQL server version: ", info$serverVersion, "\n")
       cat("  MySQL client version: ", 
-         getInfo(as(obj, "MySQLManager"),what="clientVersion"), "\n")
+         getInfo(AS(obj, "MySQLManager"),what="clientVersion"), "\n")
       cat("  MySQL protocol version: ", info$protocolVersion, "\n")
       cat("  MySQL server thread id: ", info$threadId, "\n")
    }
    if(length(info$rsId)>0){
       for(i in seq(along = info$rsId)){
          cat("   ", i, " ")
-         show(info$rsId[[i]])
+         print(info$rsId[[i]])
       }
    } else 
       cat("  No resultSet available\n")
@@ -231,7 +230,14 @@ function(con, ...)
 {
    if(!isIdCurrent(con))
       return(TRUE)
-   conId <- as(con, "integer")
+   rs <- getResultSets(con)
+   if(length(rs)>0){
+      if(hasCompleted(rs[[1]]))
+         close(rs[[1]])
+      else
+         stop("connection has pending rows (close open results set first)")
+   }
+   conId <- AS(con, "integer")
    .Call("RS_MySQL_closeConnection", conId, PACKAGE = "RMySQL")
 }
 
@@ -240,12 +246,12 @@ function(obj, what="", ...)
 {
    if(!isIdCurrent(obj))
       stop(paste("expired", class(obj), deparse(substitute(obj))))
-   id <- as(obj, "integer")
+   id <- AS(obj, "integer")
    info <- .Call("RS_MySQL_connectionInfo", id, PACKAGE = "RMySQL")
    if(length(info$rsId)){
       rsId <- vector("list", length = length(info$rsId))
       for(i in seq(along = info$rsId))
-         rsId[[i]] <- new("MySQLResultSet", Id = c(id, info$rsId[i]))
+         rsId[[i]] <- NEW("MySQLResultSet", Id = c(id, info$rsId[i]))
       info$rsId <- rsId
    }
    else
@@ -266,14 +272,10 @@ function(con, statement)
 ## output, otherwise it produces a resultSet that can
 ## be used for fetching rows.
 {
-   conId <- as(con, "integer")
-   statement <- as(statement, "character")
+   conId <- AS(con, "integer")
+   statement <- AS(statement, "character")
    rsId <- .Call("RS_MySQL_exec", conId, statement, PACKAGE = "RMySQL")
-   #out <- new("MySQLdbResult", Id = rsId)
-   #if(getInfo(out, what="isSelect")
-   #   out <- new("MySQLResultSet", Id = rsId)
-   #out
-   out <- new("MySQLResultSet", Id = rsId)
+   out <- NEW("MySQLResultSet", Id = rsId)
    out
 }
 
@@ -379,7 +381,7 @@ function(rs, INDEX, FUN = stop("must specify FUN"),
    group.end <- null.or.fun(FUN)     ## probably this is the most important
    end <- null.or.fun(end)
    new.record <- null.or.fun(new.record)
-   rsId <- as(rs, "integer")
+   rsId <- AS(rs, "integer")
    con <- getConnection(rs)
    on.exit({
       rc <- getException(con)
@@ -420,8 +422,8 @@ function(res, n=0)
 ## an object whose size exceeds option("object.size").  Also,
 ## are we sure we want to return a data.frame?
 {    
-   n <- as(n, "integer")
-   rsId <- as(res, "integer")
+   n <- AS(n, "integer")
+   rsId <- AS(res, "integer")
    rel <- .Call("RS_MySQL_fetch", rsId, nrec = n, PACKAGE = "RMySQL")
    if(length(rel)==0 || length(rel[[1]])==0) 
       return(NULL)
@@ -430,7 +432,10 @@ function(res, n=0)
    nrec <- length(rel[[1]])
    indx <- seq(from = cnt - nrec + 1, length = nrec)
    attr(rel, "row.names") <- as.character(indx)
-   oldClass(rel) <- "data.frame"
+   if(usingR())
+      class(rel) <- "data.frame"
+   else
+      oldClass(rel) <- "data.frame"
    rel
 }
 
@@ -444,7 +449,7 @@ function(obj, what = "", ...)
 {
    if(!isIdCurrent(obj))
       stop(paste("expired", class(obj), deparse(substitute(obj))))
-   id <- as(obj, "integer")
+   id <- AS(obj, "integer")
    info <- .Call("RS_MySQL_resultSetInfo", id, PACKAGE = "RMySQL")
    if(length(what)==1 && what=="")
       return(info)
@@ -461,10 +466,10 @@ if(FALSE){
    function(obj, verbose = F, ...)
    {
       if(!isIdCurrent(obj)){
-         show(obj)
+         print(obj)
          invisible(return(NULL))
       }
-      show(obj)
+      print(obj)
       cat("  Statement:", getStatement(obj), "\n")
       cat("  Has completed?", if(hasCompleted(obj)) "yes" else "no", "\n")
       cat("  Affected rows:", getRowsAffected(obj), "\n")
@@ -477,10 +482,10 @@ function(obj, verbose = F, ...)
 {
 
    if(!isIdCurrent(obj)){
-      show(obj)
+      print(obj)
       invisible(return(NULL))
    }
-   show(obj)
+   print(obj)
    cat("  Statement:", getStatement(obj), "\n")
    cat("  Has completed?", if(hasCompleted(obj)) "yes" else "no", "\n")
    cat("  Affected rows:", getRowsAffected(obj), "\n")
@@ -498,7 +503,7 @@ function(con, ...)
 {
    if(!isIdCurrent(con))
       return(TRUE)
-   rsId <- as(con, "integer")
+   rsId <- AS(con, "integer")
    .Call("RS_MySQL_closeResultSet", rsId, PACKAGE = "RMySQL")
 }
 
