@@ -201,7 +201,7 @@ Sint  RS_DBI_listEntries(Sint *table, Sint length, Sint *entries);
 void  RS_DBI_freeEntry(Sint *table, Sint indx);
 
 /* description of the fields in a result set */
-RS_DBI_fields *RS_DBI_allocFields(Sint num_fields);
+RS_DBI_fields *RS_DBI_allocFields(int num_fields);
 s_object      *RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);
 void           RS_DBI_freeFields(RS_DBI_fields *flds);
 

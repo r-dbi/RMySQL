@@ -342,7 +342,7 @@ RS_DBI_freeResultSet(Res_Handle *rsHandle)
 }
 
 RS_DBI_fields *
-RS_DBI_allocFields(Sint num_fields)
+RS_DBI_allocFields(int num_fields)
 {
   RS_DBI_fields *flds;
   size_t n;
@@ -444,7 +444,8 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
 		   Sint num_rec, Sint  expand)
 {
   s_object *names, *s_tmp;
-  Sint   j, num_fields;
+  Sint   j; 
+  int    num_fields;
   Stype  *fld_Sclass;
 
 #ifndef USING_R
@@ -459,7 +460,7 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
 
   num_fields = flds->num_fields;
   if(expand){
-    for(j = 0; j < num_fields; j++){
+    for(j = 0; j < (Sint) num_fields; j++){
       /* Note that in R-1.2.3 (at least) we need to protect SET_LENGTH */
       s_tmp = LST_EL(output,j);
       MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));  
@@ -474,7 +475,7 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
   }
 
   fld_Sclass = flds->Sclass;
-  for(j = 0; j < num_fields; j++){
+  for(j = 0; j < (Sint) num_fields; j++){
     switch((int)fld_Sclass[j]){
     case LOGICAL_TYPE:    
       SET_ELEMENT(output, j, NEW_LOGICAL(num_rec));
@@ -501,8 +502,8 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
     }
   }
 
-  MEM_PROTECT(names = NEW_CHARACTER(num_fields));
-  for(j = 0; j<num_fields; j++){
+  MEM_PROTECT(names = NEW_CHARACTER((Sint) num_fields));
+  for(j = 0; j< (Sint) num_fields; j++){
     SET_CHR_EL(names,j, C_S_CPY(flds->name[j]));
   }
   SET_NAMES(output, names);
@@ -653,7 +654,7 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
 
   num_fields = flds->num_fields;
   for(j = 0; j < n; j++) 
-    lengths[j] = num_fields;
+    lengths[j] = (Sint) num_fields;
   S_fields =  RS_DBI_createNamedList(desc, types, lengths, n);
 #ifndef USING_R
   if(IS_LIST(S_fields))
@@ -1077,11 +1078,12 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   Stype types[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
 		   INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
 		   LOGICAL_TYPE};
-  Sint   i, j, num_fields;
+  Sint   i, j;
+  int    num_fields;
 
   num_fields = flds->num_fields;
   for(j = 0; j < n; j++) 
-    lengths[j] = num_fields;
+    lengths[j] = (Sint) num_fields;
   S_fields =  RS_DBI_createNamedList(desc, types, lengths, n);
 #ifndef USING_R
   if(IS_LIST(S_fields))
@@ -1091,7 +1093,7 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 			RS_DBI_ERROR);
 #endif
   /* copy contentes from flds into an R/S list */
-  for(i = 0; i < num_fields; i++){
+  for(i = 0; i < (Sint) num_fields; i++){
     SET_LST_CHR_EL(S_fields,0,i,C_S_CPY(flds->name[i]));
     LST_INT_EL(S_fields,1,i) = (Sint) flds->Sclass[i];
     LST_INT_EL(S_fields,2,i) = (Sint) flds->type[i];
