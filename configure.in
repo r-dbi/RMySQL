@@ -28,6 +28,10 @@ dnl    subdirectories;  individual locations of these two may be
 dnl    specified independently through <include-inc> and <library-dir>,
 dnl    respectively.  If we found these, we exit.
 dnl
+dnl 4. We check for the GNU implementation of getopt_long and set the
+dnl    C preprocessor macro HAVE_GETOPT_LONG accordingly.  On windows
+dnl    (including MinGW) should be false. 
+dnl
 dnl Global variables: The following variables may be set and exported 
 dnl prior to running configure:
 dnl    PKG_CPPFLAGS, PKG_LIBS, MYSQL_DIR, MYSQL_INC, MYSQL_LIB
@@ -36,6 +40,20 @@ dnl
 AC_INIT(src/RS-MySQL.c)
 
 AC_PROG_CPP
+
+# Some people have reported not having libz (which we clearly is needed
+# in the INSTALL file).  Oh well.
+#
+AC_CHECK_LIB(z, compress,
+             HAVE_COMPRESS="yes",
+             HAVE_COMPRESS="no")
+
+# Do we have access to GNU's getopt_long (problem on some systems, e.g.,
+# FreeBDS, Mac OS/X, Windows/MinGW)
+#
+AC_CHECK_LIB(c, getopt_long,
+             HAVE_GETOPT_LONG="yes",
+             HAVE_GETOPT_LONG="no")
 
 # can we find MySQL in the system directories? (users may still want/need
 # to use another version/installation)
@@ -108,6 +126,10 @@ if test -z "${PKG_CPPFLAGS}" ; then
    fi
 fi
 
+if test "${HAVE_GETOPT_LONG}" = "no" ; then
+   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DHAVE_GETOPT_LONG=0 "
+fi
+
 # if above fails, do a more exhaustive search into potential mysql
 # subdirectories of the system directories.
 if test -z "${HAVE_MYSQL_LIB}" -a -z "${PKG_LIBS}" ; then
@@ -120,6 +142,7 @@ if test -z "${HAVE_MYSQL_LIB}" -a -z "${PKG_LIBS}" ; then
                     HAVE_MYSQL_LIB="",
                     [-L${candidate}])
        if test -n "${HAVE_MYSQL_LIB}" ; then
+          echo "             mysqlclient found in -L${HAVE_MYSQL_LIB}"
           PKG_LIBS="-L${HAVE_MYSQL_LIB} -lmysqlclient"
           break
        fi
@@ -141,6 +164,28 @@ if test -z "${HAVE_MYSQL_INC}" -a -z "${PKG_CPPFLAGS}" ; then
        fi
    done
 fi
+
+# don't go any further if don't have libz
+if test "${HAVE_COMPRESS}" = "no" ; then 
+   echo ""
+   echo "Configuration error:"
+   echo '   Could not locate the library "libz" required by MySQL.'
+   echo ""
+   echo "INSTRUCTIONS:" 
+   echo ""
+   echo '   The "libz" library is required by the MySQL client library'
+   echo "   in order to compress/uncompress connections between clients"
+   echo "   and the MySQL engine."
+   echo ""
+   echo '   Make sure you have "libz" installed properly and/or included'
+   echo '   in your $LD_LIBRARY_PATH.  Perhaps it is not in any of the'
+   echo "   standard directories (e.g., /usr/lib/, /usr/local/lib)?"
+   echo ""
+   echo "Aborting the installation of RMySQL."
+   echo ""
+   exit 1
+fi
+
 
 # If we stil haven't set PKG_*, error
 if test "${FOUND_INC}" = "no" -o -z "${PKG_LIBS}" ; then
