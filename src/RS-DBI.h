@@ -238,7 +238,7 @@ struct data_types {
 };
 
 /* return the primitive type name for a primitive type id */
-char     *RS_DBI_getTypeName(Sint typeCode, struct data_types table[]);
+char     *RS_DBI_getTypeName(Sint typeCode, const struct data_types table[]);
 /* same, but callable from S/R and vectorized */
 s_object *RS_DBI_SclassNames(s_object *types);  
 
@@ -248,50 +248,8 @@ s_object *RS_DBI_createNamedList(char  **names,
 				 Sint  n);
 s_object *RS_DBI_copyFields(RS_DBI_fields *flds);
 
-#ifdef USING_R
-/* the codes come from from R/src/main/util.c */
-static struct data_types RS_dataTypeTable[] = {
-    { "NULL",		NILSXP	   },  /* real types */
-    { "symbol",		SYMSXP	   },
-    { "pairlist",	LISTSXP	   },
-    { "closure",	CLOSXP	   },
-    { "environment",	ENVSXP	   },
-    { "promise",	PROMSXP	   },
-    { "language",	LANGSXP	   },
-    { "special",	SPECIALSXP },
-    { "builtin",	BUILTINSXP },
-    { "char",		CHARSXP	   },
-    { "logical",	LGLSXP	   },
-    { "integer",	INTSXP	   },
-    { "double",		REALSXP	   }, /*-  "real", for R <= 0.61.x */
-    { "complex",	CPLXSXP	   },
-    { "character",	STRSXP	   },
-    { "...",		DOTSXP	   },
-    { "any",		ANYSXP	   },
-    { "expression",	EXPRSXP	   },
-    { "list",		VECSXP	   },
-    /* aliases : */
-    { "numeric",	REALSXP	   },
-    { "name",		SYMSXP	   },
-    { (char *)0,	-1	   }
-};
-
-#else
-
-static struct data_types RS_dataTypeTable[] = {
-    { "logical",	LGL	  },
-    { "integer",	INT	  },
-    { "single",		REAL	  },
-    { "numeric",	DOUBLE	  },
-    { "character",	CHAR	  },
-    { "list",		LIST	  },
-    { "complex",	COMPLEX	  },
-    { "raw",		RAW	  },
-    { "any",		ANY	  },
-    { "structure",	STRUCTURE },
-    { (char *)0,	-1	  }
-};
-#endif
+void RS_na_set(void *ptr, Stype type);
+extern const struct data_types RS_dataTypeTable[];
 
 #ifdef __cplusplus 
 }

@@ -728,14 +728,15 @@ RS_DBI_SclassNames(s_object *type)
   s_object *typeNames;
   Sint *typeCodes;
   Sint n;
-  int i;
+  int  i;
+  char *s;
   
   n = LENGTH(type);
   typeCodes = INTEGER_DATA(type);
   MEM_PROTECT(typeNames = NEW_CHARACTER(n));
   for(i = 0; i < n; i++) {
-    SET_CHR_EL(typeNames, i,
-      C_S_CPY(RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable)));
+    s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
+    SET_CHR_EL(typeNames, i, C_S_CPY(s));
   }
   MEM_UNPROTECT(1);
   return typeNames;
@@ -817,7 +818,6 @@ RS_DBI_getResultSet(Res_Handle *rsHandle)
 {
   RS_DBI_connection *con;
   Sint indx;
-  char buf[128];
   
   con = RS_DBI_getConnection(rsHandle);
   indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
@@ -1109,7 +1109,7 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 /* given a type id return its human-readable name.
  * We define an RS_DBI_dataTypeTable */
 char *
-RS_DBI_getTypeName(Sint t, struct data_types table[])
+RS_DBI_getTypeName(Sint t, const struct data_types table[])
 {
   int i;
   char buf[128];
@@ -1232,3 +1232,43 @@ RS_is_na(void *ptr, Stype type)
    return out;
 }
 #endif
+/* the codes come from from R/src/main/util.c */
+const struct data_types RS_dataTypeTable[] = {
+#ifdef USING_R
+    { "NULL",		NILSXP	   },  /* real types */
+    { "symbol",		SYMSXP	   },
+    { "pairlist",	LISTSXP	   },
+    { "closure",	CLOSXP	   },
+    { "environment",	ENVSXP	   },
+    { "promise",	PROMSXP	   },
+    { "language",	LANGSXP	   },
+    { "special",	SPECIALSXP },
+    { "builtin",	BUILTINSXP },
+    { "char",		CHARSXP	   },
+    { "logical",	LGLSXP	   },
+    { "integer",	INTSXP	   },
+    { "double",		REALSXP	   }, /*-  "real", for R <= 0.61.x */
+    { "complex",	CPLXSXP	   },
+    { "character",	STRSXP	   },
+    { "...",		DOTSXP	   },
+    { "any",		ANYSXP	   },
+    { "expression",	EXPRSXP	   },
+    { "list",		VECSXP	   },
+    /* aliases : */
+    { "numeric",	REALSXP	   },
+    { "name",		SYMSXP	   },
+    { (char *)0,	-1	   }
+#else
+    { "logical",	LGL	  },
+    { "integer",	INT	  },
+    { "single",		REAL	  },
+    { "numeric",	DOUBLE	  },
+    { "character",	CHAR	  },
+    { "list",		LIST	  },
+    { "complex",	COMPLEX	  },
+    { "raw",		RAW	  },
+    { "any",		ANY	  },
+    { "structure",	STRUCTURE },
+    { (char *)0,	-1	  }
+#endif
+};
