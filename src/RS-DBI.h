@@ -29,6 +29,7 @@ extern "C" {
 #endif
 
 #include "S4R.h"
+#include <unistd.h>
 
 pid_t getpid(); 
 
@@ -225,21 +226,30 @@ void  RS_DBI_setException(Db_Handle *handle,
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 char     *RS_DBI_nCopyString(const char *str, size_t len, int del_blanks);
-char     *RS_DBI_dataTypeName(Sint typeCode);   /* R/S data types not DBMS*/
-s_object *RS_DBI_SclassNames(s_object *types);  /* same, but callable
-						   from S/R */
+
+/* We now define a generic data type name-Id mapping struct
+ * and initialize the RS_dataTypeTable[].  Each driver could
+ * define similar table for generating friendly type names
+ */
+struct data_types {
+    char *typeName;
+    Sint typeId;
+};
+
+/* return the primitive type name for a primitive type id */
+char     *RS_DBI_getTypeName(Sint typeCode, struct data_types table[]);
+/* same, but callable from S/R and vectorized */
+s_object *RS_DBI_SclassNames(s_object *types);  
+
 s_object *RS_DBI_createNamedList(char  **names, 
 				 Stype *types,
 				 Sint  *lengths,
 				 Sint  n);
 s_object *RS_DBI_copyFields(RS_DBI_fields *flds);
-/* the following is just S and R tables of data type codes and names */
+
 #ifdef USING_R
 /* the codes come from from R/src/main/util.c */
-static struct {
-  char *typeName;
-  Sint typeId;
-} RS_dataTypeTable[] = {
+static struct data_types RS_dataTypeTable[] = {
     { "NULL",		NILSXP	   },  /* real types */
     { "symbol",		SYMSXP	   },
     { "pairlist",	LISTSXP	   },
@@ -266,11 +276,8 @@ static struct {
 };
 
 #else
-/* the following S type names are from "S.h" */
-static struct {
-    char *typeName;
-    Sint typeId;
-} RS_dataTypeTable[] = {
+
+static struct data_types RS_dataTypeTable[] = {
     { "logical",	LGL	  },
     { "integer",	INT	  },
     { "single",		REAL	  },
