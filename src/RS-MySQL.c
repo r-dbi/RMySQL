@@ -183,7 +183,7 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
   char      **groups;
 #ifndef __CYGWIN__
   int       argc, option_index;
-  char      **argv, **groups;
+  char      **argv;
 #endif
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
@@ -939,35 +939,19 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
   return output;
 }
 
-
-char *
-RS_MySQL_getFieldTypeName(Sint t)
-{
-  int i;
-  char buf[512];
-
-  for (i = 0; RS_MySQL_fieldTypes[i].typeName; i++) {
-    if (RS_MySQL_fieldTypes[i].typeId == t)
-      return RS_MySQL_fieldTypes[i].typeName;
-  }
-  sprintf(buf, "unknown data type: %ld", (long)t);
-  RS_DBI_errorMessage(buf, RS_DBI_ERROR);
-  return (char *) 0; /* for -Wall */
-}
-
 s_object *
-RS_MySQL_getFieldTypeNames(s_object *type)
+RS_MySQL_typeNames(s_object *type)
 {
   s_object *typeNames;
-  Sint n;
-  Sint *typeCodes;
+  Sint n, *typeCodes;
   int i;
   
   n = LENGTH(type);
   typeCodes = INTEGER_DATA(type);
   MEM_PROTECT(typeNames = NEW_CHARACTER(n));
   for(i = 0; i < n; i++) {
-    SET_CHR_EL(typeNames,i,C_S_CPY(RS_MySQL_getFieldTypeName(typeCodes[i])));
+    SET_CHR_EL(typeNames, i,
+          C_S_CPY(RS_DBI_getTypeName(typeCodes[i], RS_MySQL_dataTypes)));
   }
   MEM_UNPROTECT(1);
   return typeNames;
