@@ -133,8 +133,10 @@ setMethod("summary", "MySQLConnection",
 ## convenience methods 
 setMethod("dbListTables", "MySQLConnection",
    def = function(conn, ...){
-      tbls <- dbGetQuery(conn, "show tables")[,1]
-      if(is.null(tbls)) 
+      tbls <- dbGetQuery(conn, "show tables")
+      if(length(tbls)>0) 
+         tbls <- tbls[,1]
+      else
          tbls <- character()
       tbls
    },
@@ -158,7 +160,9 @@ setMethod("dbExistsTable",
    signature(conn="MySQLConnection", name="character"),
    def = function(conn, name, ...){
       ## TODO: find out the appropriate query to the MySQL metadata
-      match(tolower(name), tolower(dbListTables(conn)), nomatch=0)>0
+      avail <- dbListTables(conn)
+      if(length(avail)==0) avail <- ""
+      match(tolower(name), tolower(avail), nomatch=0)>0
    },
    valueClass = "logical"
 )
