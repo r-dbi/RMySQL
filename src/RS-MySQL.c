@@ -1,7 +1,8 @@
-/* $Id$
+/* 
+ * $Id$
  *
  *
- * Copyright (C) 1999 The Omega Project for Statistical Computing.
+ * Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -358,8 +359,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
   RS_DBI_resultSet  *result;
   MYSQL             *my_connection;
   MYSQL_RES         *my_result;
-  unsigned int   num_fields;
-  int      state;
+  int      num_fields, state;
   Sint     res_id, is_select;
   char     *dyn_statement;
 
@@ -406,7 +406,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
   if(!my_result)
     my_result = (MYSQL_RES *) NULL;
     
-  num_fields = mysql_field_count(my_connection);
+  num_fields = (int) mysql_field_count(my_connection);
   is_select = (Sint) TRUE;
   if(!my_result){
     if(num_fields>0){
@@ -502,7 +502,11 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
     case FIELD_TYPE_SHORT:           /* 2-byte SMALLINT  */
     case FIELD_TYPE_INT24:           /* 3-byte MEDIUMINT */
     case FIELD_TYPE_LONG:            /* 4-byte INTEGER   */
-      flds->Sclass[j] = INTEGER_TYPE;
+    /* if unsigned, turn into numeric (may be too large for ints/long)*/
+      if(select_dp[j].flags & UNSIGNED_FLAG)
+        flds->Sclass[j] = NUMERIC_TYPE;
+      else
+        flds->Sclass[j] = INTEGER_TYPE;
       break;
     case FIELD_TYPE_LONGLONG:        /* TODO: can we fit these in R/S ints? */
       if(sizeof(Sint)>=8)            /* Arg! this ain't pretty:-( */
@@ -573,7 +577,8 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
   int    i, j, null_item, expand;
   Sint   *fld_nullOk, completed;
   Stype  *fld_Sclass;
-  Sint   num_rec, num_fields;
+  Sint   num_rec; 
+  int    num_fields;
 
   result = RS_DBI_getResultSet(rsHandle);
   flds = result->fields;
@@ -996,7 +1001,7 @@ RS_MySQL_typeNames(s_object *type)
 
 s_object    *expand_list(s_object *old, Sint new_len);
 void         add_group(s_object *group_names, s_object *data, 
-		             Sint fld_Sclass[], Sint group, 
+		             Stype *fld_Sclass, Sint group, 
 			     Sint ngroup, Sint i);
 unsigned int check_groupEvents(s_object *data, Stype fld_Sclass[], 
                           Sint row, Sint col);
@@ -1106,10 +1111,11 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 #ifndef USING_R
    s_object  *raw_obj, *raw_container;
 #endif
-   unsigned long  *lens = (long *)0;
+   unsigned long  *lens = (unsigned long *)0;
    Stype  *fld_Sclass;
    Sint   i, j, null_item, expand, *fld_nullOk, completed;
-   Sint   num_rec, num_fields, num_groups;
+   Sint   num_rec, num_groups;
+   int    num_fields;
    Sint   max_rec = INT_EL(s_max_rec,0);     /* max rec per group */
    Sint   ngroup = 0, group_field = INT_EL(s_group_field,0);
    long   total_records;
@@ -1124,16 +1130,20 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
    int        invoke_endGroup   = (GET_LENGTH(endGroupFun)>0);
    int        invoke_newRecord  = (GET_LENGTH(newRecordFun)>0);
 
+   row = NULL;
+   beginGroupCall = R_NilValue;    /* -Wall */
    if(invoke_beginGroup){
       MEM_PROTECT(beginGroupCall=lang2(beginGroupFun, R_NilValue));
       ++np;
    }
+   endGroupCall = R_NilValue;    /* -Wall */
    if(invoke_endGroup){
       /* TODO: append list(...) to the call object */
       MEM_PROTECT(endGroupCall = lang4(endGroupFun, R_NilValue, 
 	          R_NilValue, R_NilValue));
       ++np;
    }
+   newRecordCall = R_NilValue;    /* -Wall */
    if(invoke_newRecord){
       MEM_PROTECT(newRecordCall = lang2(newRecordFun, R_NilValue));
       ++np;
@@ -1147,8 +1157,8 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
    num_fields = flds->num_fields;
    fld_Sclass = flds->Sclass;
    fld_nullOk = flds->nullOk;
-   MEM_PROTECT(data = NEW_LIST(num_fields));     /* buffer records */
-   MEM_PROTECT(cur_rec = NEW_LIST(num_fields));  /* current record */
+   MEM_PROTECT(data = NEW_LIST((Sint) num_fields));     /* buffer records */
+   MEM_PROTECT(cur_rec = NEW_LIST((Sint) num_fields));  /* current record */
    np += 2;
    RS_DBI_allocOutput(cur_rec, flds, (Sint) 1, 1);
    RS_DBI_makeDataFrame(cur_rec);
@@ -1440,11 +1450,11 @@ check_groupEvents(s_object *data, Stype fld_Sclass[], Sint irow, Sint jcol)
 /* append current group (as character) to the vector of group names */
 void
 add_group(s_object *group_names, s_object *data, 
-		Sint fld_Sclass[], Sint group_field, Sint ngroup, Sint i)
+		Stype *fld_Sclass, Sint group_field, Sint ngroup, Sint i)
 {
    char  buff[1024];   
 
-   switch(fld_Sclass[group_field]){
+   switch((int) fld_Sclass[group_field]){
 
       case LOGICAL_TYPE:
 	 (void) sprintf(buff, "%ld", (long) LST_LGL_EL(data,group_field,i));

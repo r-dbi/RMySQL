@@ -1,8 +1,9 @@
 #ifndef _RS_MYSQL_H
 #define _RS_MYSQL_H 1
-/*  $Id$
+/*  
+ *  $Id$
  *
- * Copyright (C) 1999 The Omega Project for Statistical Computing.
+ * Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -87,10 +88,7 @@ s_object *RS_MySQL_connectionInfo(Con_Handle *conHandle);
 s_object *RS_MySQL_resultSetInfo(Res_Handle *rsHandle);
 
 /* the following type names are from "mysql_com.h" */
-struct {
-   char *typeName;
-   int  typeId;
-} RS_MySQL_fieldTypes[] = {
+static struct data_types RS_MySQL_dataTypes[] = {
     { "FIELD_TYPE_DECIMAL",	FIELD_TYPE_DECIMAL	},
     { "FIELD_TYPE_TINY",	FIELD_TYPE_TINY		},
     { "FIELD_TYPE_SHORT",	FIELD_TYPE_SHORT	},
@@ -117,8 +115,8 @@ struct {
     { (char *) 0,			-1		}
 };
 
-s_object *RS_MySQL_getFieldTypeNames(s_object *typeIds);
-char     *RS_MySQL_getFieldTypeName(Sint typeId);
+s_object *RS_MySQL_typeNames(s_object *typeIds);
+extern const struct data_types RS_dataTypeTable[];
 
 #ifdef _cplusplus
 }
