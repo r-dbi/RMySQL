@@ -182,9 +182,11 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
   int       i; 
   Sint      ngroups;
   char      **groups;
-#ifndef __CYGWIN__
-  int       argc, option_index;
-  char      **argv;
+#ifdef WIN32
+  char  *tmp;  /* we'll have to peek into the MYSQL connection obj, darn!*/
+#else
+  int   argc, option_index;    /* TODO: What about Mac OS, OS X??     */
+  char  **argv;                /* we do have MySQL's load_defaults() */
 #endif
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
@@ -192,15 +194,25 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
 
   my_connection = mysql_init(NULL);
 
+#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID > 32339
+  /* (BDR's fix)
+   * Starting w.  MySQL 3.23.39, LOAD DATA INFILE may be disabled (although
+   * the default is enabled);  since assignTable() depends on it,
+   * we unconditionally enable it.
+   */
+  mysql_options(my_connection, MYSQL_OPT_LOCAL_INFILE, 0);
+#endif
+
   /* Load MySQL default connection values from the [client] and
    * [rs-dbi] sections of the MySQL configuration files.  We
    * recognize options in the [client] and [rs-dbi] sections, plus any
-   * other passed from S in the MySQLgroups character vector.  
+   * other passed from S/R in the MySQLgroups character vector.  
    * Note that we're faking the argc and argv -- it just simpler (and the
    * recommended way from MySQL perspective).  Re-initialize the
    * getopt_long buffers by setting optind = 0 (defined in getopt.h),
    * this is needed to avoid getopt_long "remembering" options from
    * one invocation to the next.  
+   * TODO: This can't be thread-safe, can it?
    *
    */
   ngroups = GET_LENGTH(MySQLgroups);
@@ -208,12 +220,17 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
   groups[0] = RS_DBI_copyString("client");  
   groups[1] = RS_DBI_copyString("rs-dbi");
   groups[ngroups+2] = NULL;       /* required sentinel */
-  for(i=0; i<ngroups; i++)
+
+  /* the MySQL doc asserts that the [client] group is always processed,
+   * so we skip it...
+  */
+  mysql_options(my_connection, MYSQL_READ_DEFAULT_GROUP,  groups[1]);
+  for(i=0; i<ngroups; i++){
     groups[i+2] = RS_DBI_copyString(CHR_EL(MySQLgroups,i));
-#ifndef __CYGWIN__
-  /* apparently, Win32 MySQL (3.23) doesn't have the load_defaults
-   * included in the client libs, thus the __CYGWIN__.
-   */
+    mysql_options(my_connection, MYSQL_READ_DEFAULT_GROUP,  groups[i+2]);
+  }
+#ifndef WIN32
+  /* What about Mac OS 9 and/or OS X? */
   argc = 1;
   argv = (char **) S_alloc((long) 1, (int) sizeof(char **));
   argv[0] = (char *) RS_DBI_copyString("dummy"); 
@@ -245,8 +262,8 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
     case 's': unix_socket = optarg;  break;
     }
   }
-#endif    /* __CYGWIN__ */
-
+#endif    /* WIN32 */
+  
 #define IS_EMPTY(s1)   !strcmp((s1), "")
 
   /* R/S arguments take precedence over configuration file defaults. */
@@ -275,7 +292,31 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
   }
 
   conParams = RS_mysql_allocConParams();
-  /* connection parameters */
+
+#ifdef WIN32
+  /* On Windows, MySQL (3.23+?) doesn't have the load_defaults() function
+   * included in the shared libMySQL.dll lib (only in the static, threaded
+   * mysqlclient.lib.) Thus we need to extract the host/dbname/user/passwd
+   * from the (non-API) internals of the MYSQL connection object (we're
+   * on thin ice here...) to put it in our internal conParams object.
+   * This is needed in the RS_DBI_connection object in order to clone 
+   * connections (for instance, in quickSQL, getInfo).
+   */
+   host = my_connection->host;
+   dbname = my_connection->db;
+   unix_socket = my_connection->unix_socket;   /* may be null */
+   passwd = my_connection->passwd;
+   tmp = my_connection->user;        /* possibly as 'user@machinename' */
+   user = (char *) S_alloc((long)strlen(tmp)+1, (int)sizeof(char));
+   for(i=0; tmp[i]; i++)
+      if(tmp[i]!='@') 
+         user[i] = tmp[i];
+      else {
+         user[i] = '\0';
+         break;
+      }
+#endif    /* WIN32 */
+  /* save actual connection parameters */
   if(!user) 
      user = ""; 
   conParams->user = RS_DBI_copyString(user);
@@ -882,6 +923,7 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
 			RS_DBI_ERROR);
 #endif
   conParams = (RS_MySQL_conParams *) con->conParams;
+  
   SET_LST_CHR_EL(output,0,0,C_S_CPY(conParams->host));
   SET_LST_CHR_EL(output,1,0,C_S_CPY(conParams->user));
   SET_LST_CHR_EL(output,2,0,C_S_CPY(conParams->dbname));
