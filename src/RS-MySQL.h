@@ -24,6 +24,11 @@
 extern  "C" {
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#undef ERROR
+#endif
+
 #include <mysql.h>
 #include <mysql_com.h>
 #include "getopt.h"             /* NOTE: this comes from mysql/include */
@@ -50,14 +55,15 @@ typedef struct st_sdbi_conParams {
 RS_MySQL_conParams *RS_MySQL_allocConParams(void);
 void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
 
-/* The following functions are the S/R entry into the C implementation
+/* The following functions are the S/R entry points into the C implementation
  * (i.e., these are the only ones visible from R/S) we use the prefix
  * "RS_MySQL" in function names to denote this.
  * These functions are  built on top of the underlying RS_DBI manager, 
  * connection, and resultsets structures and functions (see RS-DBI.h).
  * 
  * Note: A handle is just an R/S object (see RS-DBI.h for details), i.e.,
- *       Mgr_Handle, Con_Handle, Res_Handle, Db_Handle are s_object.
+ *       Mgr_Handle, Con_Handle, Res_Handle, Db_Handle are s_object 
+ *       (integer vectors, to be precise).
  */
   
 /* dbManager */
