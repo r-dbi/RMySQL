@@ -1,5 +1,7 @@
 dnl
 dnl RMySQL
+dnl 
+dnl $Id$
 dnl
 dnl Generate a "configure" script that will install the RMySQL package.
 dnl
@@ -14,7 +16,7 @@ dnl    found, we use these (provide the user does not explicitly request
 dnl    another version, see below).  Notice that the MySQL source distribution
 dnl    installs by default to /usr/local/lib/mysql and /usr/local/include/mysql
 dnl
-dnl 3. Alternatively, if the user specifies explicitly a particular SQLite
+dnl 3. Alternatively, if the user specifies explicitly a particular MySQL
 dnl    installation we use that version. This can be requested through 
 dnl         --with-mysql-dir=DIR 
 dnl         --with-mysql-inc=<include-DIR>
