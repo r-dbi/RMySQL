@@ -1,4 +1,5 @@
 /* $Id$
+ *
  * S4 (Splus5+) and R portability macros.
  *
  * This file provides additional macros to the ones in Rdefines.h (in R)
@@ -14,21 +15,39 @@
 #ifndef S4R_H
 #define S4R_H
 
-#include "S.h" 
-
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/*
+ * If using SPLUS, you *need* to define the macro USING_SPLUS=[5|6] 
+ * (probably in the compiler command line) to trigger the right 
+ * sequence of definitions (we can no longer simply rely on S.h --- 
+ * we may need to avoid S.h altogether!)
+ *
+ * Some of these come from MASS, some from packages developed under
+ * the Omega project, and some from RS-DBI itself.
+ * 
+ */
+#ifdef USING_SPLUS
+#  if USING_SPLUS == 6
+#    define S_COMPATIBILITY 10     /* changing to the "new" API may be too */
+#    include "S_engine.h"          /* time-consuming. */
+#  else
+#    include "S.h"
+#  endif
+#else                              /* not Splus, is it S4 or R? */
+#  include "S.h"
+#  if (defined(S_VERSION)) 
+#    define USING_S4               /* do we really need S4 any more? */
+#  else
+#    define USING_R
+#  endif
 #endif
 
 /* Some of these come from MASS, some from packages developed under
  * the Omega project, and some from RS-DBI itself.
  */
-
-#if (defined(SPLUS_VERSION) && SPLUS_VERSION >= 5000 )
-#  define USING_SP5
-#elif (defined(S_VERSION)) /* && S_VERSION = "4-M" )  */
-#  define USING_S4
-#endif
 
 #ifdef USING_R
 #  include "Rversion.h"
@@ -50,7 +69,7 @@ extern "C" {
 #  define MEM_PROTECT(x) PROTECT(x)
 #  define MEM_UNPROTECT(n) UNPROTECT(n)
 #  define MEM_UNPROTECT_PTR(x) UNPROTECT_PTR(x)
-#elif (defined(USING_S4) || defined(USING_SP5))
+#elif (defined(USING_S4) || defined(USING_SPLUS))
 #  define singl float
 #  define Sint long
 #  define charPtr char **
@@ -175,8 +194,7 @@ extern "C" {
 #endif
 
 
-/* SET_ROWNAMES() and SET_CLASS_NAME() don't exist in S4 
- */
+/* SET_ROWNAMES() and SET_CLASS_NAME() don't exist in S4 */
 #ifdef USING_R
 #  define SET_ROWNAMES(df,n)  setAttrib(df, R_RowNamesSymbol, n)
 #  define GET_CLASS_NAME(x)   GET_CLASS(x)
