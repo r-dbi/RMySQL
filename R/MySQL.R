@@ -23,7 +23,7 @@
 
 .MySQLRCS <- "$Id$"
 .MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
-.MySQLVersion <- package.description(.MySQLPkgName, field = "Version")
+.MySQLVersion <- "0.5-3"       ##package.description(.MySQLPkgName, fields = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
@@ -38,7 +38,7 @@ setClass("MySQLObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 ##
 
 "MySQL" <- 
-function(max.con=10, fetch.default.rec = 500, force.reload=F)
+function(max.con=16, fetch.default.rec = 500, force.reload=F)
 {
    mysqlInitDriver(max.con = max.con, fetch.default.rec = fetch.default.rec,
       force.reload = force.reload)
