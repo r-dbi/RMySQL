@@ -30,13 +30,16 @@ extern  "C" {
 #endif
 
 #include <mysql.h>
+#include <mysql_version.h>
 #include <mysql_com.h>
 #include "getopt.h"             /* NOTE: this comes from mysql/include */
 #include <string.h>
 
 #include "RS-DBI.h"
 
-#define RS_MYSQL_MAX_CON 100    /* typically we alloc a max of 16 */
+/* Note that MySQL client/server buffers are limited to 16MB and 1MB,
+ * respectively (MySQL 4.1.1-alpha manual).  So plan accordingly!
+ */
 
 /* MySQL connection parameters struct, allocating and freeing 
  * methods. See mysql_real_connect() for details on the params 
