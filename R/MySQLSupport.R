@@ -467,13 +467,12 @@ function(con, name, value, field.types, row.names = T,
    if(missing(field.types) || is.null(field.types)){
       ## the following mapping should be coming from some kind of table
       ## also, need to use converter functions (for dates, etc.)
-      field.types <- sapply(value, SQLDataType, mgr = con)
+      field.types <- sapply(value, dbDataType, dbObj = con)
    } 
    i <- match("row.names", names(field.types), nomatch=0)
    if(i>0) ## did we add a row.names value?  If so, it's a text field.
-      field.types[i] <- SQLDataType(mgr=con, field.types$row.names)
-   names(field.types) <- make.SQL.names(names(field.types), 
-                             keywords = .MySQLKeywords,
+      field.types[i] <- dbDataType(dbObj=con, field.types$row.names)
+   names(field.types) <- make.db.names(con, names(field.types), 
                              allow.keywords=F)
 
    ## Do we need to clone the connection (ie., if it is in use)?
@@ -485,9 +484,9 @@ function(con, name, value, field.types, row.names = T,
       new.con <- con
    }
 
-   if(existsTable(con,name)){
+   if(dbExistsTable(con,name)){
       if(overwrite){
-         if(!removeTable(con, name)){
+         if(!dbRemoveTable(con, name)){
          warning(paste("table", name, "couldn't be overwritten"))
          return(F)
          }
@@ -497,7 +496,7 @@ function(con, name, value, field.types, row.names = T,
          return(F)
       }
    } 
-   if(!existsTable(con,name)){      ## need to re-test table for existance 
+   if(!dbExistsTable(con,name)){      ## need to re-test table for existance 
       ## need to create a new (empty) table
       sql1 <- paste("create table ", name, "\n(\n\t", sep="")
       sql2 <- paste(paste(names(field.types), field.types), collapse=",\n\t",
