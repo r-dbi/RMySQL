@@ -54,8 +54,8 @@
   }
 \item{allow.keywords}{
    \code{dbWriteTable} accepts a logical \code{allow.keywords} 
-   (\code{FALSE} by default) to prevent or allow MySQL reserved 
-   identifiers to be used as column names.
+    to allow or prevent MySQL reserved identifiers to be used as 
+    column names. By default it is \code{FALSE}.
    }
 }
 }
@@ -65,8 +65,25 @@
    indicating whether the operation was successful.  
 }
 \note{
-   Note that the data.frame returned by \code{dbReadTable} only has
-   primitive data, e.g., it does not coerce character data to factors.
+   Note that data.frames are only approximately analogous to tables
+   (relations) in relational DBMS, and thus you should not expect
+   complete agreement in their semantics.  Tables in RDBMS are
+   best thought of as \emph{relations} with a number of constraints
+   imposed by the relational database model, and data.frames, with
+   their roots in statistical modeling, as self-contained "sequence
+   of observations on some chosen variables" (Chambers and Hastie
+   (1992), p.46). 
+   In particular the \code{data.frame} returned by \code{dbReadTable}
+   only has primitive data, e.g., it does not coerce character data
+   to factors.
+   Also, column names in a data.frame are \emph{not} guaranteed to be 
+   equal to the column names in a MySQL exported/imported table
+   (e.g., by default MySQL reserved identifiers may not be used
+   as column names --- and with 218 keywords like \code{"BEFORE"},
+   \code{"DESC"}, and \code{"FROM"} the likelihood of name conflicts
+   is not small.) Use \code{isSQLKeyword(con, names(value))} to check
+   whether the data.frame names in \code{value} coincide with 
+   MySQL reserver words.
 
    MySQL table names are \emph{not} case sensitive, e.g., table
    names \code{ABC} and \code{abc} are considered equal.  
@@ -78,6 +95,7 @@
 }
 \seealso{
   \code{\link{MySQL}},
+  \code{\link[DBI]{isSQLKeyword}},
   \code{\link[DBI]{dbDriver}},
   \code{\link[DBI]{dbConnect}},
   \code{\link[DBI]{dbSendQuery}},
