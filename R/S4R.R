@@ -18,26 +18,3 @@ if(usingR()){
 } else {
   ErrorClass <- "Error"  
 }
-
-if(TRUE){
-   ## When we move to version 4 style classes, we should replace 
-   ## the calls to the following by their lower-case counerpart, 
-   ## as defined in library(methods)
-   AS <- function(object, classname)
-   {
-     get(paste("as", as.character(classname), sep = "."))(object)
-   }
-
-   NEW <- function(classname, ...)
-   {
-     if(!is.character(classname))
-       stop("classname must be a character string")
-     do.call(paste("NEW", classname[1], sep="."), list(...))
-   }
-
-   NEW.default <- function(classname, ...)
-   {
-     structure(list(...), class = unclass(classname))
-   }
-
-}
