@@ -308,7 +308,7 @@ function(res, INDEX, FUN = stop("must specify FUN"),
    end <- null.or.fun(end)
    new.record <- null.or.fun(new.record)
    rsId <- as(res, "integer")
-   con <- dbGetConnection(res)
+   con <- as(res, "MySQLConnection")
    on.exit({
       rc <- dbGetException(con)
       if(!is.null(rc$errorNum) && rc$errorNum!=0)
@@ -441,8 +441,8 @@ function(con, name, row.names = "row.names", check.names = T, ...)
 } 
 
 "mysqlWriteTable" <-
-function(con, name, value, field.types, row.names = T, 
-   overwrite=F, append=F, ...)
+function(con, name, value, field.types, row.names = TRUE, 
+   overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE)
 ## TODO: This function should execute its sql as a single transaction,
 ## and allow converter functions.
 ## Create table "name" (must be an SQL identifier) and populate
@@ -474,7 +474,7 @@ function(con, name, value, field.types, row.names = T,
    if(i>0) ## did we add a row.names value?  If so, it's a text field.
       field.types[i] <- dbDataType(dbObj=con, field.types$row.names)
    names(field.types) <- make.db.names(con, names(field.types), 
-                             allow.keywords=F)
+                             allow.keywords = allow.keywords)
 
    ## Do we need to clone the connection (ie., if it is in use)?
    if(length(dbListResults(con))!=0){ 
@@ -519,7 +519,8 @@ function(con, name, value, field.types, row.names = T,
    fn <- tempfile("rsdbi")
    fn <- gsub("\\\\", "/", fn)  # Since MySQL on Windows wants \ double (BDR)
    safe.write(value, file = fn)
-   on.exit(unlink(fn), add = T)
+   cat("temp file:", fn, "\n")  ##debug
+   #on.exit(unlink(fn), add = T)##debug
    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
                   " INTO TABLE ", name, 
                   " LINES TERMINATED BY '\n' ", sep="")
@@ -536,7 +537,7 @@ function(con, name, value, field.types, row.names = T,
 ## the following is almost exactly from the ROracle driver 
 "safe.write" <- 
 function(value, file, batch, ...)
-## safe.write makes sure write.table don't exceed available memory by batching
+## safe.write makes sure write.table doesn't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
 {  
    N <- nrow(value)
@@ -552,11 +553,11 @@ function(value, file, batch, ...)
    to <- min(batch, N)
    while(from<=N){
       if(usingR())
-         write.table(value[from:to, drop=FALSE], file = file, append = TRUE, 
+         write.table(value[from:to,, drop=FALSE], file = file, append = TRUE, 
                quote = FALSE, sep="\t", na = .MySQL.NA.string,
                row.names=FALSE, col.names=FALSE, eol = '\n', ...)
       else
-         write.table(value[from:to, drop=FALSE], file = file, append = TRUE, 
+         write.table(value[from:to,, drop=FALSE], file = file, append = TRUE, 
                quote.string = FALSE, sep="\t", na = .MySQL.NA.string,
                dimnames.write=FALSE, end.of.row = '\n', ...)
       from <- to+1
@@ -591,41 +592,45 @@ function(obj, ...)
    sql.type
 }
 
-## Additional MySQL keywords that are not part of the SQL92 standard
-## TODO: we're introducing some SQL92 keywords that  are *not* keywords 
-## in MySQL strictly speaking. Need to delete those.
+## the following reserved words were taken from Section 6.1.7
+## of the MySQL Manual, Version 4.1.1-alpha, html format.
 
-".MySQLKeywords" <- 
-sort(c(.SQL92Keywords,
-   "ACTION", "AFTER", "AGGREGATE", "AUTO_INCREMENT", "AVG_ROW_LENGTH",
-   "BIGINT", "BINARY", "BLOB", "BOOL", "BOTH", 
-   "CHANGE", "CHECKSUM", "COLUMNS", "COMMENT", "CROSS", 
-   "DATA", "DATABASE", "DATABASES", "DATETIME", "DAY_HOUR", "DAY_MINUTE",
-   "DAY_SECOND", "DAYOFMONTH", "DAYOFWEEK", "DAYOFYEAR", "DALAY_KEY_WRITE",
-   "ENCLOSED", "ENUM", "ESCAPED", "EXPLAIN",
-   "FIELDS", "FILE", "FLOAT4", "FLOAT8", "FLUSH", "FUNCTION",
-   "GRANT", "GRANTS", "GROUP",
-   "HEAP", "HIGH_PRIORITY", "HOSTS", "HOUR_MINUTE", "HOUR_SECOND", 
-   "IDENDIFIED", "IF", "IGNORE", "INFILE", "INSERT_ID", "INT1", "INT2", 
-   "INT3", "INT4", "INT8", "ISAM",
-   "KEYS", "KILL",
-   "LEADING", "LEFT", "LENGTH", "LIMIT", "LINES", "LOAD", "LOCK", "LOGS",
-   "LONG", "LONGBLOB", "LONGTEXT", "LOW_PRIORITY", 
-   "MAX_ROWS", "MEDIUMBLOB", "MEDIUMINT", "MEDIUMTEXT", "MIDDLEINT", 
-   "MIN_ROWS", "MINUTE_SECOND", "MODIFY", "MONTHNAME", "MYISAM",
-   "NATURAL", "NO",
-   "ON", "OPTIMIZE", "OPIONALLY", "OUTFILE",
-   "PACK_KEYS", "PASSWORD", "PROCESS", "PROCESSLIST",
-   "REGEXP", "RELOAD", "RENAME", "REPLACE", "RESTRICT", "RETURNS", 
-   "RLIKE", "ROW",
-   "SHUTDOWN", "SONAME", "SQL_BIG_RESULT", "SQL_BIG_SELECTS",
-   "SQL_BIG_TABLES", "SQL_LOG_OFF", "SQL_LOG_UPDATE", 
-   "SQL_LOW_PRIORITY_UPDATES", "SQL_SELECT_LIMIT", "SQL_SMALL_RESULT", 
-   "SQL_WARNINGS", "STARTING", "STATUS", "STRAIGHT_JOIN", "STRING", 
-   "SQL_SMALL_RESULT",
-   "TABLES", "TERMINATES", "TEXT", "TINYINT", "TINYTEXT", "TRAILING", "TYPE",
-   "UNLOCK", "UNSIGNED", "USAGE", "USE", 
-   "VARBINARY", "VARIABLES", 
-   "ZEROFILL")
-)
-
+".MySQLKeywords" <-
+c("ADD", "ALL", "ALTER", "ANALYZE", "AND", "AS", "ASC", "ASENSITIVE", 
+  "AUTO_INCREMENT", "BDB", "BEFORE", "BERKELEYDB", "BETWEEN", "BIGINT", 
+  "BINARY", "BLOB", "BOTH", "BY", "CALL", "CASCADE", "CASE", "CHANGE", 
+  "CHAR", "CHARACTER", "CHECK", "COLLATE", "COLUMN", "COLUMNS", 
+  "CONDITION", "CONNECTION", "CONSTRAINT", "CONTINUE", "CREATE", 
+  "CROSS", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", 
+  "CURSOR", "DATABASE", "DATABASES", "DAY_HOUR", "DAY_MICROSECOND", 
+  "DAY_MINUTE", "DAY_SECOND", "DEC", "DECIMAL", "DECLARE", "DEFAULT", 
+  "DELAYED", "DELETE", "DESC", "DESCRIBE", "DISTINCT", "DISTINCTROW", 
+  "DIV", "DOUBLE", "DROP", "ELSE", "ELSEIF", "ENCLOSED", "ESCAPED", 
+  "EXISTS", "EXIT", "EXPLAIN", "FALSE", "FETCH", "FIELDS", "FLOAT", 
+  "FOR", "FORCE", "FOREIGN", "FOUND", "FROM", "FULLTEXT", "GRANT", 
+  "GROUP", "HAVING", "HIGH_PRIORITY", "HOUR_MICROSECOND", "HOUR_MINUTE", 
+  "HOUR_SECOND", "IF", "IGNORE", "IN", "INDEX", "INFILE", "INNER", 
+  "INNODB", "INOUT", "INSENSITIVE", "INSERT", "INT", "INTEGER", 
+  "INTERVAL", "INTO", "IO_THREAD", "IS", "ITERATE", "JOIN", "KEY", 
+  "KEYS", "KILL", "LEADING", "LEAVE", "LEFT", "LIKE", "LIMIT", 
+  "LINES", "LOAD", "LOCALTIME", "LOCALTIMESTAMP", "LOCK", "LONG", 
+  "LONGBLOB", "LONGTEXT", "LOOP", "LOW_PRIORITY", "MASTER_SERVER_ID", 
+  "MATCH", "MEDIUMBLOB", "MEDIUMINT", "MEDIUMTEXT", "MIDDLEINT", 
+  "MINUTE_MICROSECOND", "MINUTE_SECOND", "MOD", "NATURAL", "NOT", 
+  "NO_WRITE_TO_BINLOG", "NULL", "NUMERIC", "ON", "OPTIMIZE", "OPTION", 
+  "OPTIONALLY", "OR", "ORDER", "OUT", "OUTER", "OUTFILE", "PRECISION", 
+  "PRIMARY", "PRIVILEGES", "PROCEDURE", "PURGE", "READ", "REAL", 
+  "REFERENCES", "REGEXP", "RENAME", "REPEAT", "REPLACE", "REQUIRE", 
+  "RESTRICT", "RETURN", "RETURNS", "REVOKE", "RIGHT", "RLIKE", 
+  "SECOND_MICROSECOND", "SELECT", "SENSITIVE", "SEPARATOR", "SET", 
+  "SHOW", "SMALLINT", "SOME", "SONAME", "SPATIAL", "SPECIFIC", 
+  "SQL", "SQLEXCEPTION", "SQLSTATE", "SQLWARNING", "SQL_BIG_RESULT", 
+  "SQL_CALC_FOUND_ROWS", "SQL_SMALL_RESULT", "SSL", "STARTING", 
+  "STRAIGHT_JOIN", "STRIPED", "TABLE", "TABLES", "TERMINATED", 
+  "THEN", "TINYBLOB", "TINYINT", "TINYTEXT", "TO", "TRAILING", 
+  "TRUE", "TYPES", "UNDO", "UNION", "UNIQUE", "UNLOCK", "UNSIGNED", 
+  "UPDATE", "USAGE", "USE", "USER_RESOURCES", "USING", "UTC_DATE", 
+  "UTC_TIME", "UTC_TIMESTAMP", "VALUES", "VARBINARY", "VARCHAR", 
+  "VARCHARACTER", "VARYING", "WHEN", "WHERE", "WHILE", "WITH", 
+  "WRITE", "XOR", "YEAR_MONTH", "ZEROFILL"
+  )
