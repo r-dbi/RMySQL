@@ -323,6 +323,7 @@ function(con, name, value, field.types, row.names = T,
    ## LOAD DATA thru pipes; if so, should open the pipe instead of a file.
 
    fn <- tempfile("rsdbi")
+   fn <- gsub("\\\\", "/", fn)  # Since MySQL on Windows wants \ double (BDR)
    if(usingR())
       write.table(value, file = fn, quote = F, sep="\t", 
                   na = .MySQL.NA.string, row.names=F, col.names=F, eol = '\n')
