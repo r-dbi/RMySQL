@@ -73,16 +73,18 @@ function(obj, verbose = F, ...)
 "mysqlDriverInfo" <-
 function(obj, what="", ...)
 {
-   mgrId <- as(obj, "integer")[1]
-   info <- .Call("RS_MySQL_managerInfo", mgrId, PACKAGE = .MySQLPkgName)  
-   mgrId <- info$managerId
-   ## replace mgr/connection id w. actual mgr/connection objects
+   if(!isIdCurrent(obj))
+      stop(paste("expired", class(obj)))
+   drvId <- as(obj, "integer")[1]
+   info <- .Call("RS_MySQL_managerInfo", drvId, PACKAGE = .MySQLPkgName)  
+   drvId <- info$managerId
+   ## replace drv/connection id w. actual drv/connection objects
    conObjs <- vector("list", length = info$"num_con")
    ids <- info$connectionIds
    for(i in seq(along = ids))
-      conObjs[[i]] <- new("MySQLConnection", Id = c(mgrId, ids[i]))
+      conObjs[[i]] <- new("MySQLConnection", Id = c(drvId, ids[i]))
    info$connectionIds <- conObjs
-   info$managerId <- new("MySQLDriver", Id = mgrId)
+   info$managerId <- new("MySQLDriver", Id = drvId)
    if(!missing(what))
       info[what]
    else
@@ -94,19 +96,19 @@ function(obj, what="", ...)
 ## The distinction between "" and NULL is that "" is interpreted by 
 ## the MySQL API as the default database (MySQL config specific)
 ## while NULL means "no database".
-function(mgr, dbname = "", username="",
+function(drv, dbname = "", username="",
    password="", host="",
    unix.socket = "", port = 0, client.flag = 0, 
    groups = NULL)
 {
-   if(!isIdCurrent(mgr))
+   if(!isIdCurrent(drv))
       stop("expired manager")
    con.params <- as.character(c(username, password, host, 
                                 dbname, unix.socket, port, 
                                 client.flag))
    groups <- as.character(groups)
-   mgrId <- as(mgr, "integer")
-   conId <- .Call("RS_MySQL_newConnection", mgrId, con.params, groups, 
+   drvId <- as(drv, "integer")
+   conId <- .Call("RS_MySQL_newConnection", drvId, con.params, groups, 
                PACKAGE = .MySQLPkgName)
    new("MySQLConnection", Id = conId)
 }
@@ -237,14 +239,8 @@ function(res, ...)
    else data.frame(flds)
 }
 
-## Experimental dbApply (should it be seqApply?)
-setGeneric("dbApply", def = function(rs, ...) standardGeneric("dbApply"))
-setMethod("dbApply", "MySQLResult",
-   def = function(rs, ...)  mysqlDBApply(rs, ...),
-)
-
 "mysqlDBApply" <-
-function(rs, INDEX, FUN = stop("must specify FUN"), 
+function(res, INDEX, FUN = stop("must specify FUN"), 
          begin = NULL, 
          group.begin =  NULL, 
          new.record = NULL, 
@@ -290,10 +286,10 @@ function(rs, INDEX, FUN = stop("must specify FUN"),
 ##           big for R (as in incrementatl quantiles).
 ##       (6) Highly R-dependent, not sure yet how to port it to S-plus.
 {
-   if(dbHasCompleted(rs))
+   if(dbHasCompleted(res))
       stop("result set has completed")
    if(is.character(INDEX)){
-      flds <- tolower(as.character(dbColumnInfo(rs)$name))
+      flds <- tolower(as.character(dbColumnInfo(res)$name))
       INDEX <- match(tolower(INDEX[1]), flds, 0)
    }
    if(INDEX<1)
@@ -311,8 +307,8 @@ function(rs, INDEX, FUN = stop("must specify FUN"),
    group.end <- null.or.fun(FUN)     ## probably this is the most important
    end <- null.or.fun(end)
    new.record <- null.or.fun(new.record)
-   rsId <- as(rs, "integer")
-   con <- dbGetConnection(rs)
+   rsId <- as(res, "integer")
+   con <- dbGetConnection(res)
    on.exit({
       rc <- dbGetException(con)
       if(!is.null(rc$errorNum) && rc$errorNum!=0)
@@ -321,7 +317,7 @@ function(rs, INDEX, FUN = stop("must specify FUN"),
 
       })
    ## BEGIN event handler (re-entrant, only prior to reading first row)
-   if(!is.null(begin) && dbGetRowCount(rs)==0) 
+   if(!is.null(begin) && dbGetRowCount(res)==0) 
       begin()
    rho <- environment()
    funs <- list(begin = begin, end = end,
@@ -332,7 +328,7 @@ function(rs, INDEX, FUN = stop("must specify FUN"),
 		INDEX = as.integer(INDEX-1),
 		funs, rho, as.integer(batchSize), as.integer(maxBatch),
                 PACKAGE = .MySQLPkgName)
-   if(!is.null(end) && dbHasCompleted(rs))
+   if(!is.null(end) && dbHasCompleted(res))
       end()
    out
 }
@@ -341,7 +337,7 @@ function(rs, INDEX, FUN = stop("must specify FUN"),
 function(res, n=0, ...)
 ## Fetch at most n records from the opened resultSet (n = -1 means
 ## all records, n=0 means extract as many as "default_fetch_rec",
-## as defined by MySQLDriver (see describe(mgr, T)).
+## as defined by MySQLDriver (see describe(drv, T)).
 ## The returned object is a data.frame. 
 ## Note: The method dbHasCompleted() on the resultSet tells you whether
 ## or not there are pending records to be fetched. 
