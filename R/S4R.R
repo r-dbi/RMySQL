@@ -1,8 +1,7 @@
 ## 
 ## $Id$
 ##
-## This file defines some functions that mimic S4 functionality,
-## namely:  new, as, show.
+## R/S-Plus compatibility 
 
 usingR <- function(major=0, minor=0){
   if(is.null(version$language))
