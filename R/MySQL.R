@@ -18,37 +18,54 @@
 
 ## Class: dbManager
 
-if(!usingV4()){
+"NEW.MySQLObject" <- 
+function(Id)
+{
+   out <- as.integer(Id)
+   class(out) <- c("MySQLObject", "dbObjectId")
+   out
+}
 
-   "new.MySQLObject" <- 
-   function(Id)
-   {
-      out <- as.integer(Id)
-      class(out) <- c("MySQLObject", "dbObjectId")
-      out
-   }
+"NEW.MySQLManager" <- 
+function(Id)
+{
+   out <- list()
+   attr(out, "Id") <- Id
+   class(out) <- c("MySQLManager", "dbManger", "MySQLObject", "dbObjectId")
+   out
+}
 
-   "new.MySQLManager" <- 
-   function(Id)
-   {
-      out <- list()
-      attr(out, "Id") <- Id
-      class(out) <- c("MySQLManager", "dbManger", "MySQLObject", "dbObjectId")
-      out
-   }
+"NEW.MySQLConnection" <- 
+function(Id)
+{
+   out <- list()
+   attr(out, "Id") <- Id
+   class(out) <- c("MySQLConnection", "dbConnection", 
+                    "MySQLObject", "dbObjectId")
+   out
+}
 
-   "as.integer.dbObjectId" <- 
-   function(x, ...)
-   {
-      x <- attr(x, "Id")
-      NextMethod("as.integer")
-   }
+"NEW.MySQLResultSet" <- 
+function(Id)
+{
+   out <- list()
+   attr(out, "Id") <- Id
+   class(out) <- c("MySQLResultSet", "dbResultSet", 
+                    "MySQLObject", "dbObjectId")
+   out
+}
 
-   "as.MySQLManager" <- 
-   function(object)
-   {
-      new("MySQLManger", Id = as(object, "integer")[1])
-   }
+"as.integer.dbObjectId" <- 
+function(x, ...)
+{
+   x <- attr(x, "Id")
+   NextMethod("as.integer")
+}
+
+"as.MySQLManager" <- 
+function(object)
+{
+   NEW("MySQLManger", Id = AS(object, "integer")[1])
 }
 
 "MySQL" <- 
@@ -65,7 +82,7 @@ function(max.con=10, fetch.default.rec = 500, force.reload=F)
    if(fetch.default.rec<=0)
       stop("default num of records per fetch must be positive")
    id <- load.MySQLManager(max.con, fetch.default.rec, force.reload)
-   new("MySQLManager", Id = id)
+   NEW("MySQLManager", Id = id)
 }
 
 "loadManager.MySQLManager" <- 
@@ -80,15 +97,17 @@ function(mgr, ...)
 function(mgr, ...)
 {
    id <- newConnection.MySQLManager(mgr, ...)
-   new("MySQLConnection",Id = id)
+   NEW("MySQLConnection",Id = id)
 }
 
 "dbConnect.MySQLConnection" <- 
 function(mgr, ...)
 {
-   con.id <- as(mgr, "integer")
+   if(!isIdCurrent(mgr))
+      stop("expired connection")
+   con.id <- AS(mgr, "integer")
    con <- .Call("RS_MySQL_cloneConnection", con.id)
-   new("MySQLConnection", Id = con)
+   NEW("MySQLConnection", Id = con)
 }
 
 "dbConnect.default" <- 
@@ -111,7 +130,7 @@ function(mgr, ...)
 "getManager.MySQLConnection" <- "getManager.MySQLResultSet" <-
 function(obj, ...)
 {
-   as(obj, "MySQLManager")
+   AS(obj, "MySQLManager")
 }
 
 "quickSQL" <- 
@@ -138,21 +157,11 @@ function(con, statement, ...)
 
 ## Class: resultSet
 
-if(!usingV4()){
-   "new.MySQLResultSet" <- 
-   function(Id) 
-   {
-      out <- as.integer(Id)
-      class(out) <- c("MySQLResultSet","dbResultSet","MySQLObject","dbObjectId")
-      out
-   }
-}
-
 "getConnection.MySQLConnection" <-
 "getConnection.MySQLResultSet" <- 
 function(object)
 {
-   new("MySQLConnection", Id=as(object, "integer")[1:2])
+   NEW("MySQLConnection", Id=AS(object, "integer")[1:2])
 }
 
 "getStatement.MySQLResultSet" <- 
@@ -275,11 +284,11 @@ function(con, name, value, field.types, row.names = T,
 
    ## Do we need to clone the connection (ie., if it is in use)?
    if(length(getResultSets(con))!=0){ 
-      new.con <- dbConnect(con)              ## there's pending work, so clone
-      on.exit(close(new.con))
+      NEW.con <- dbConnect(con)              ## there's pending work, so clone
+      on.exit(close(NEW.con))
    } 
    else {
-      new.con <- con
+      NEW.con <- con
    }
 
    if(existsTable(con,name)){
@@ -301,7 +310,7 @@ function(con, name, value, field.types, row.names = T,
                           sep="")
       sql3 <- "\n)\n"
       sql <- paste(sql1, sql2, sql3, sep="")
-      rs <- try(dbExecStatement(new.con, sql))
+      rs <- try(dbExecStatement(NEW.con, sql))
       if(inherits(rs, ErrorClass)){
          warning("could not create table: aborting assignTable")
          return(F)
@@ -324,7 +333,7 @@ function(con, name, value, field.types, row.names = T,
    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
                   " INTO TABLE ", name, 
                   " LINES TERMINATED BY '\n' ", sep="")
-   rs <- try(dbExecStatement(new.con, sql4))
+   rs <- try(dbExecStatement(NEW.con, sql4))
    if(inherits(rs, ErrorClass)){
       warning("could not load data into table")
       return(F)
