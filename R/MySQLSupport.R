@@ -465,6 +465,11 @@ function(con, name, value, field.types, row.names = T,
       ## also, need to use converter functions (for dates, etc.)
       field.types <- sapply(value, dbDataType, dbObj = con)
    } 
+   ## Do we need to coerce any field prior to write it out?
+   for(i in seq(along = value)){
+      if(is(value[[i]], "logical"))
+         value[[i]] <- as(value[[i]], "integer")
+   }
    i <- match("row.names", names(field.types), nomatch=0)
    if(i>0) ## did we add a row.names value?  If so, it's a text field.
       field.types[i] <- dbDataType(dbObj=con, field.types$row.names)
@@ -578,7 +583,7 @@ function(obj, ...)
    else {
       sql.type <- switch(rs.class,
                      character = "text",
-                     logical = "tinyint",
+                     logical = "tinyint",  ## but we need to coerce to int!!
                      factor = "text",      ## up to 65535 characters
                      ordered = "text",
                      "text")
