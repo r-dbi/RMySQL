@@ -158,7 +158,7 @@ setMethod("dbExistsTable",
    signature(conn="MySQLConnection", name="character"),
    def = function(conn, name, ...){
       ## TODO: find out the appropriate query to the MySQL metadata
-      match(tolower(name), tolower(dbListTables(con)), nomatch=0)>0
+      match(tolower(name), tolower(dbListTables(conn)), nomatch=0)>0
    },
    valueClass = "logical"
 )
