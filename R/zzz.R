@@ -10,6 +10,6 @@ require(DBI, quietly = TRUE, warn.conflicts = FALSE)
 function(lib, pkg) 
 {
    library(methods)
-   require(DBI, quietly = TRUE, warn.conflicts = FALSE)
+   library(DBI, warn.conflicts = FALSE)
    library.dynam("RMySQL", pkg, lib)
 }
