@@ -30,7 +30,15 @@ extern "C" {
 #endif
 
 #include "S4R.h"
+
+/* Microsoft Visual C++ uses int _getpid()  */
+#ifdef MSVC
+#include <process.h>
+#define getpid _getpid
+#define pid_t int
+#else           
 #include <unistd.h>
+#endif
 
 pid_t getpid(); 
 
@@ -249,6 +257,7 @@ s_object *RS_DBI_createNamedList(char  **names,
 s_object *RS_DBI_copyFields(RS_DBI_fields *flds);
 
 void RS_na_set(void *ptr, Stype type);
+int  RS_is_na(void *ptr, Stype type);
 extern const struct data_types RS_dataTypeTable[];
 
 #ifdef __cplusplus 
