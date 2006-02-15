@@ -33,7 +33,9 @@ extern  "C" {
 
 #ifdef WIN32
 #   include <windows.h>
-#   define HAVE_GETOPT_LONG 0
+#   ifndef HAVE_GETOPT_LONG
+#      define HAVE_GETOPT_LONG 0
+#   endif
 #   undef ERROR
 #endif
 
@@ -84,7 +86,8 @@ s_object   *RS_MySQL_close(Mgr_Handle *mgrHandle);
 /* dbConnection */
 Con_Handle *RS_MySQL_newConnection(Mgr_Handle *mgrHandle, 
 				   s_object *con_params,
-				   s_object *MySQLgroups);
+				   s_object *MySQLgroups,
+				   s_object *s_mysql_default_file);
 Con_Handle *RS_MySQL_cloneConnection(Con_Handle *conHandle);
 s_object   *RS_MySQL_closeConnection(Con_Handle *conHandle);
 s_object   *RS_MySQL_getException(Con_Handle *conHandle);    /* err No, Msg */

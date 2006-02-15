@@ -23,7 +23,7 @@
 
 .MySQLRCS <- "$Id$"
 .MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
-.MySQLVersion <- "0.5-3"       ##package.description(.MySQLPkgName, fields = "Version")
+.MySQLVersion <- "0.5-8"       ##package.description(.MySQLPkgName, fields = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
@@ -38,7 +38,7 @@ setClass("MySQLObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
 ##
 
 "MySQL" <- 
-function(max.con=16, fetch.default.rec = 500, force.reload=F)
+function(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
 {
    mysqlInitDriver(max.con = max.con, fetch.default.rec = fetch.default.rec,
       force.reload = force.reload)
@@ -51,7 +51,7 @@ setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 
 ## coerce (extract) any MySQLObject into a MySQLDriver
 setAs("MySQLObject", "MySQLDriver", 
-   def = function(from) new("MySQLDriver", Id = as(from, "integer")[1])
+   def = function(from) new("MySQLDriver", Id = as(from, "integer")[1:2])
 )
 
 setMethod("dbUnloadDriver", "MySQLDriver",
@@ -156,6 +156,15 @@ setMethod("dbWriteTable",
    valueClass = "logical"
 )
 
+## write table from filename (TODO: connections)
+setMethod("dbWriteTable", 
+   signature(conn="MySQLConnection", name="character", value="character"),
+   def = function(conn, name, value, ...){
+      mysqlImportFile(conn, name, value, ...)
+   },
+   valueClass = "logical"
+)
+
 setMethod("dbExistsTable", 
    signature(conn="MySQLConnection", name="character"),
    def = function(conn, name, ...){
@@ -209,10 +218,10 @@ setMethod("dbCallProc", "MySQLConnection",
 setClass("MySQLResult", representation("DBIResult", "MySQLObject"))
 
 setAs("MySQLResult", "MySQLConnection",
-   def = function(from) new("MySQLConnection", Id = as(from, "integer")[1:2])
+   def = function(from) new("MySQLConnection", Id = as(from, "integer")[1:3])
 )
 setAs("MySQLResult", "MySQLDriver",
-   def = function(from) new("MySQLDriver", Id = as(from, "integer")[1])
+   def = function(from) new("MySQLDriver", Id = as(from, "integer")[1:2])
 )
 
 setMethod("dbClearResult", "MySQLResult", 
