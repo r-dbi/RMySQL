@@ -47,7 +47,7 @@ dbSetDataMappings(rs, flds)
 im <- fetch(rs, n = -1)
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex

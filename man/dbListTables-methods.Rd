@@ -47,7 +47,7 @@ for(con in dbListConnections(drv)){
 }
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex

@@ -18,6 +18,7 @@
 \alias{mysqlDescribeFields}
 \alias{mysqlReadTable}
 \alias{mysqlWriteTable}            % convenience functions
+\alias{mysqlImportFile}
 \alias{mysqlDataType}
 \alias{.MySQLPkgName}              % constants
 \alias{.MySQLPkgVersion}
@@ -40,7 +41,7 @@
 
    ## MySQLConnection-related
    mysqlNewConnection(drv, dbname, username, password, host, unix.socket,
-         port, client.flag, groups)
+         port, client.flag, groups, default.file)
    mysqlCloneConnection(con, ...)
    mysqlConnectionInfo(obj, what, ...)
    mysqlDescribeConnection(obj, verbose = FALSE, ...)
@@ -57,9 +58,12 @@
 
    ## data mappings, convenience functions, and extensions
    mysqlDataType(obj, ...)
-   mysqlReadTable(con, name, row.names = "row.names", check.names = TRUE, ...)
+   mysqlReadTable(con, name, row.names = "row_names", check.names = TRUE, ...)
    mysqlWriteTable(con, name, value, field.types, row.names = TRUE, 
       overwrite=FALSE, append=FALSE, ..., allow.keywords = FALSE)
+   mysqlImportFile(con, name, value, field.types, overwrite=FALSE, 
+      append=FALSE, header, row.names, nrows=50, sep=",", eol="\n", 
+      skip = 0, quote='"', ...)
 }
 \arguments{
 \item{max.con}{
@@ -109,9 +113,8 @@
    character vector with one or more MySQL group names.  For details
    see \code{\link{MySQL}}.
 }
-\item{dbname}{
-   character string with the MySQL database name.
-}
+\item{default.file}{filename of an alternate MySQL options file.}
+\item{dbname}{ character string with the MySQL database name.}
 \item{host}{
    character string with the name (or IP address) of the machine
    hosting the database. Default is \code{""}, which is
@@ -154,6 +157,11 @@
    \code{value} to SQL data types.  The default is
    \code{sapply(value,SQLDataType)}, see \code{MySQLSQLType}.
 }
+\item{header}{
+  logical, does the input file have a header line?  Default is the
+  same heuristic used by \code{read.table}, i.e., TRUE if the first
+  line has one fewer column that the second line.
+}
 \item{row.names}{
    a logical specifying whether to prepend the \code{value} data.frame 
    row names or not.  The default is \code{TRUE}.
@@ -171,6 +179,14 @@
    logical indicating whether to append \code{value} to the existing
    table \code{name}.
 }
+\item{nrows}{
+  number of lines to rows to import using \code{read.table} from the
+  input file to create the proper table definition. Default is 50.
+}
+\item{sep}{field separator character.}
+\item{eol}{end-of-line separator.}
+\item{skip}{number of lines to skip before reading data in the input file.}
+\item{quote}{the quote character used in the input file (defaults to \code{"}.}
 \item{allow.keywords}{
    logical indicating whether column names that happen to be MySQL
    keywords be used as column names in the resulting relation (table)

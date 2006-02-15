@@ -47,7 +47,7 @@ res <- dbSendQuery(con, "SELECT * from liv25")
 data <- fetch(res, n = -1)
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex

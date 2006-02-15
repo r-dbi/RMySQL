@@ -38,7 +38,7 @@ drv <- dbDriver("MySQL")
 sql.type <- dbDataType(drv, quakes)
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % docclass is function

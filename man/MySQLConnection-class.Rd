@@ -4,7 +4,7 @@
 \alias{MySQLConnection-class}
 \title{Class MySQLConnection}
 \description{MySQLConnection class.}
-\section{Generators}
+\section{Generators}{
     The method \code{\link[DBI]{dbConnect}} is the main generator.
 }
 \section{Extends}{

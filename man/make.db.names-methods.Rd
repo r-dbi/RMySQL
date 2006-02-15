@@ -83,7 +83,7 @@ for(i in seq(along = export) )
    dbWriteTable(con, name = tabs[i],  get(export[i]))
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex

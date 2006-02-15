@@ -33,7 +33,7 @@
    \code{\link[DBI]{dbGetInfo}},
    \code{\link[DBI]{dbReadTable}}.
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex

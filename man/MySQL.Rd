@@ -10,7 +10,7 @@ It returns an driver object that allows you to connect
 to one or several MySQL servers.
 }
 \usage{
-MySQL(max.con = 16, fetch.default.rec = 500, force.reload = F)
+MySQL(max.con = 16, fetch.default.rec = 500, force.reload = FALSE)
 }
 \arguments{
 \item{max.con }{
@@ -102,7 +102,7 @@ The most important parameters are \code{user},
 \code{password}, \code{host}, 
 and \code{dbname}.
 }
-\notes{
+\note{
 The \code{dbname} cannot go in the
 \code{[client]} section, but you may safely include 
 it under the \code{[rs-dbi]} section or one you define
@@ -110,8 +110,7 @@ yourself.
 }
 \author{David A. James}
 \section{References}{
-See the Omega Project for Statistical Computing
-at \url{http://www.omegahat.org}
+See \url{stat.bell-labs.com/RS-DBI} 
 for more details on the R/S-Plus database interface.
 
 See the documentation at the MySQL Web site

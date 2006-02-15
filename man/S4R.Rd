@@ -12,7 +12,7 @@
 \usage{
 usingR(major, minor)
 }
-\example{\dontrun{
+\examples{\dontrun{
 rc <- try(fetch(res, n = -1))
 if(inherit(rc, ErrorClass))
    stop("could not fetch the data")

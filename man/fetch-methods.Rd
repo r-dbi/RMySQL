@@ -66,7 +66,7 @@ dbHasCompleted(res)
 data2 <- fetch(res, n = -1)
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex

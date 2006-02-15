@@ -6,6 +6,7 @@
 \alias{dbExistsTable-methods}
 \alias{dbRemoveTable-methods}
 \alias{dbReadTable,MySQLConnection,character-method}
+\alias{dbWriteTable,MySQLConnection,character,character-method}
 \alias{dbWriteTable,MySQLConnection,character,data.frame-method}
 \alias{dbExistsTable,MySQLConnection,character-method}
 \alias{dbRemoveTable,MySQLConnection,character-method}
@@ -57,6 +58,41 @@
     to allow or prevent MySQL reserved identifiers to be used as 
     column names. By default it is \code{FALSE}.
    }
+\item{dots}{
+  optional arguments.
+
+  When \code{dbWriteTable} is used to import data from a file, 
+  you may optionally specify \code{header=}, \code{row.names=},
+  \code{col.names=}, \code{sep=}, \code{eol=}, \code{field.types=}, 
+  \code{skip=}, and \code{quote=}.
+
+  \code{header} is a logical indicating whether the first data line
+  (but see \code{skip}) has a header or not.  If missing, it value
+  is determined following \code{\link[base]{read.table}} convention,
+  namely, it is set to TRUE if and only if the first row has one
+  fewer field that the number of columns.
+
+  \code{row.names} is a logical to specify whether the first column
+  is a set of row names.  If missing its default follows the 
+  \code{\link[base]{read.table}} convention.
+  
+  \code{col.names} a character vector with column names (these names
+  will be filtered with \code{\link[DBI]{make.db.names}} to 
+  ensure valid SQL identifiers. (See also \code{field.types} below.)
+
+  \code{sep=} specifies the field separator, and its default is \code{','}.
+
+  \code{eol=} specifies the end-of-line delimiter, and its default is 
+  \code{'\n'}.
+
+  \code{skip} specifies number of lines to skip before reading the data,
+  and it defaults to 0. 
+
+  \code{field.types} is a list of named field SQL types where 
+  \code{names(field.types)} provide the new table's column names 
+  (if missing, field types are inferred using \code{\link[DBI]{dbDataType}}).
+ }
+
 }
 }
 
@@ -95,6 +131,7 @@
 }
 \seealso{
   \code{\link{MySQL}},
+  \code{\link{mysqlImportFile}},
   \code{\link[DBI]{isSQLKeyword}},
   \code{\link[DBI]{dbDriver}},
   \code{\link[DBI]{dbConnect}},
@@ -119,7 +156,7 @@ else
 }
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex

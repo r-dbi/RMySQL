@@ -31,8 +31,10 @@
 \item{port}{(optional) TCP/IP default port.}
 \item{client.flag}{(optional) integer setting various MySQL client flags.
 See the MySQL manual for details.}
-\item{group}{string identifying a section in the \code{\$HOME/.my.cnf}
+\item{group}{string identifying a section in the \code{default.file}
    to use for setting authentication parameters (see \code{\link{MySQL}}.)}
+\item{default.file}{filename with MySQL client options. Defaults to
+   \code{\$HOME/.my.cnf}}
 \item{\dots }{Currently unused.}
 }
 }
@@ -74,7 +76,7 @@ data <- fetch(rs, n = -1)   # extract all rows
 dim(data)
 }
 }
-\keywords{methods}
+\keyword{methods}
 \keyword{interface}
 \keyword{database}
 % vim: syntax=tex
