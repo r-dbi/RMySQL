@@ -1,0 +1,4 @@
+You need to move libs/libMySQL.dll into the PATH, or add
+...\library\mysql\libs to the path.
+
+BDR 2002-06-19

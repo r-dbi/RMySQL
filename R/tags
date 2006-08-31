@@ -1,0 +1,78 @@
+!_TAG_FILE_FORMAT	1	original (simple) ctag(1) format
+!_TAG_FILE_SORTED	1	yes, file is sorted
+!_TAG_PROGRAM_NAME	rtags.py	python implementation
+!_TAG_PROGRAM_VERSION	$Id: rtags.py,v 1.5 2003/09/08 16:21:04 dj Exp dj $	
+.First.lib	zzz.R	/".First.lib" <- /
+MySQL	MySQL.R	/"MySQL" <- /
+MySQLConnection	MySQL.R	/setClass("MySQLConnection"/
+MySQLDriver	MySQL.R	/setClass("MySQLDriver"/
+MySQLObject	MySQL.R	/setClass("MySQLObject"/
+MySQLResult	MySQL.R	/setClass("MySQLResult"/
+SQLKeywords	MySQL.R	/setMethod("SQLKeywords"/
+dbApply	MySQL.R	/setGeneric("dbApply"/
+dbApply	MySQL.R	/setMethod("dbApply"/
+dbCallProc	MySQL.R	/setMethod("dbCallProc"/
+dbClearResult	MySQL.R	/setMethod("dbClearResult"/
+dbColumnInfo	MySQL.R	/setMethod("dbColumnInfo"/
+dbCommit	MySQL.R	/setMethod("dbCommit"/
+dbConnect	MySQL.R	/setMethod("dbConnect"/
+dbConnect	MySQL.R	/setMethod("dbConnect"/
+dbConnect	MySQL.R	/setMethod("dbConnect"/
+dbDataType	MySQL.R	/setMethod("dbDataType"/
+dbDisconnect	MySQL.R	/setMethod("dbDisconnect"/
+dbExistsTable	MySQL.R	/setMethod("dbExistsTable"/
+dbGetException	MySQL.R	/setMethod("dbGetException"/
+dbGetException	MySQL.R	/setMethod("dbGetException"/
+dbGetInfo	MySQL.R	/setMethod("dbGetInfo"/
+dbGetInfo	MySQL.R	/setMethod("dbGetInfo"/
+dbGetInfo	MySQL.R	/setMethod("dbGetInfo"/
+dbGetQuery	MySQL.R	/setMethod("dbGetQuery"/
+dbGetRowCount	MySQL.R	/setMethod("dbGetRowCount"/
+dbGetRowsAffected	MySQL.R	/setMethod("dbGetRowsAffected"/
+dbGetStatement	MySQL.R	/setMethod("dbGetStatement"/
+dbHasCompleted	MySQL.R	/setMethod("dbHasCompleted"/
+dbListConnections	MySQL.R	/setMethod("dbListConnections"/
+dbListFields	MySQL.R	/setMethod("dbListFields"/
+dbListFields	MySQL.R	/setMethod("dbListFields"/
+dbListResults	MySQL.R	/setMethod("dbListResults"/
+dbListTables	MySQL.R	/setMethod("dbListTables"/
+dbObjectId	dbObjectId.R	/setClass("dbObjectId"/
+dbReadTable	MySQL.R	/setMethod("dbReadTable"/
+dbRemoveTable	MySQL.R	/setMethod("dbRemoveTable"/
+dbRollback	MySQL.R	/setMethod("dbRollback"/
+dbSendQuery	MySQL.R	/setMethod("dbSendQuery"/
+dbUnloadDriver	MySQL.R	/setMethod("dbUnloadDriver"/
+dbWriteTable	MySQL.R	/setMethod("dbWriteTable"/
+fetch	MySQL.R	/setMethod("fetch"/
+fetch	MySQL.R	/setMethod("fetch"/
+format	dbObjectId.R	/setMethod("format"/
+isIdCurrent	dbObjectId.R	/"isIdCurrent" <- /
+isSQLKeyword	MySQL.R	/setMethod("isSQLKeyword"/
+make.db.names	MySQL.R	/setMethod("make.db.names"/
+mysqlCloneConnection	MySQLSupport.R	/"mysqlCloneConnection" <-/
+mysqlCloseConnection	MySQLSupport.R	/"mysqlCloseConnection" <-/
+mysqlCloseDriver	MySQLSupport.R	/"mysqlCloseDriver"<- /
+mysqlCloseResult	MySQLSupport.R	/"mysqlCloseResult" <-/
+mysqlConnectionInfo	MySQLSupport.R	/"mysqlConnectionInfo" <-/
+mysqlDBApply	MySQLSupport.R	/"mysqlDBApply" <-/
+mysqlDataType	MySQLSupport.R	/"mysqlDataType" <-/
+mysqlDescribeConnection	MySQLSupport.R	/"mysqlDescribeConnection" <-/
+mysqlDescribeDriver	MySQLSupport.R	/"mysqlDescribeDriver" <-/
+mysqlDescribeFields	MySQLSupport.R	/"mysqlDescribeFields" <-/
+mysqlDescribeResult	MySQLSupport.R	/"mysqlDescribeResult" <-/
+mysqlDriverInfo	MySQLSupport.R	/"mysqlDriverInfo" <-/
+mysqlExecStatement	MySQLSupport.R	/"mysqlExecStatement" <-/
+mysqlFetch	MySQLSupport.R	/"mysqlFetch" <-/
+mysqlInitDriver	MySQLSupport.R	/"mysqlInitDriver" <- /
+mysqlQuickSQL	MySQLSupport.R	/"mysqlQuickSQL" <-/
+mysqlReadTable	MySQLSupport.R	/"mysqlReadTable" <- /
+mysqlResultInfo	MySQLSupport.R	/"mysqlResultInfo" <-/
+mysqlWriteTable	MySQLSupport.R	/"mysqlWriteTable" <-/
+null.or.fun	MySQLSupport.R	/"null.or.fun" <- function/
+print	dbObjectId.R	/setMethod("print"/
+safe.write	MySQLSupport.R	/"safe.write" <- /
+show	dbObjectId.R	/setMethod("show"/
+summary	MySQL.R	/setMethod("summary"/
+summary	MySQL.R	/setMethod("summary"/
+summary	MySQL.R	/setMethod("summary"/
+usingR	S4R.R	/usingR <- function/

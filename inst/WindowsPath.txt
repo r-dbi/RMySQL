@@ -1,0 +1,24 @@
+This is the process I used to include RMySQL's libs directory
+on the Windows path on Windows 2000 and Windows NT 4, Service Pack 6.
+
+NOTE: This procedure has to be done prior to invoking R.
+
+1. Single click "My Computer"
+2. Go to the environement variables:
+
+   In Window 2000 
+   Select "System Properties" -> "Advanced" Tab 
+                                              
+   In Windows NT 4
+   Select "System "Properties" -> "Environment"
+
+3. Click on "Environment Variables"
+4. Under "User variables for dj", I added
+   PATH=c:\R\rw1051\library\RMySQL\libs
+
+Click OK.
+
+Invoke R, 
+> 
+> library(RMySQL)
+> ...

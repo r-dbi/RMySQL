@@ -1,0 +1,70 @@
+
+RMySQL Windows Binary distribution.
+
+   NOTE:
+
+   Your PATH variable should include the directory where the library
+   file libmysql.dll (which is distributed with RMySQL) is located;
+   typically it'll be in the R's area \library\RMySQL\libs.  Or
+   you may move it to a directory in your PATH.
+
+RMySQL Windows Source Distribution.
+
+[Update 27 Jan 2006, for MySQL 5.0.18]
+
+   NOTE:
+
+   The following is how I compiled against MySQL 5.0.18
+   (these notes are based on earlier tips from Prof. Ripley
+   and Duncan Temple Lang).  If you have problems, please let 
+   me (dj@bell-labs.com) know. See also the files configure.win
+   and src/Makevars.win.
+
+   1. You need to make sure sure the file src/Makevars.win has the 
+      correct location for MySQL.  For example, 
+
+      PKG_CPPFLAGS = -Ic:/PROGRA~1/MySQL/MYSQLS~1.0/include
+      PKG_LIBS = -Lc:/PROGRA~1/MySQL/MYSQLS~1.0/lib/opt -lmysql -liberty
+
+
+   2. You will need to re-import the libmysql.dll into libmysql.a library
+      in order to create RMySQL.dll (this is what configure.win does, 
+      except (d) below):
+
+      Unfortunately, the "libmysql.lib" supplied with the 4.0.18 MySQL
+      binary distribution is not compatible for building dll for
+      use with R.  This manifest itself during creation of the RMySQL.dll
+      with multiple error messages like 
+
+        "RMySQL.a(RMySQL.o) ... undefined reference mysql_get_client_info@0"
+        "RMySQL.a(RMySQL.o) ... undefined reference mysql_init@4"
+        ...
+
+      [I didn't have this problem w. 5.0.18, yet I followed (a)-(e) below.]
+      Therefore you need to create an R-compatible (mingw, to be precise)
+      MySQL library file "libmysql.a" in c:\mysql\lib\opt as follows:
+
+      For R 1.8.1 through 2.2.1 and MySQL 5.0.18 simply use dlltool, i.e., 
+
+      (a) cd c:\mysql\lib\opt        ## or wherever MySQL's lib resides
+   
+      (b) Create the LIBMYSQL.def (if it doesn't exist)
+          reimp --only-def libmySQL.lib
+
+      (c) Create the actual libmySQL.a 
+          dlltool --dllname libmySQL.dll --def LIBMYSQL.def 
+                  --output-lib libmySQL.a  -k
+
+          (dlltool -V  "GNU dlltool 2.11.92 20011001")
+
+      (d) Copy libmySQL.a to the MySQL/lib/opt dir (why?) and build the 
+          binary package (Rcmd build --binary RMySQL) [This is what
+          I did, and it worked, but I don't understand why -- I also
+          tried (to no avail) leaving libmysql.a in ./src and adding 
+          -L. to the PKG_LIBS variable. Huh?]
+
+      (e) In order to *run* RMySQL, you need to have the libmySQL.dll
+          file in your PATH.  You can either include the MySQL/lib/opt
+          directory in your PATH or copy the file libmySQL.dll to, say,
+          R's bin directory.
+

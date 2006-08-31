@@ -1,5 +1,5 @@
 /* 
- * $Id$
+ * $Id: RS-MySQL.c,v 1.5 2003/05/16 12:10:15 dj Exp $
  *
  *
  * Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
@@ -40,11 +40,12 @@ static char *compiled_mysql_client_version = MYSQL_SERVER_VERSION;   /* sic.*/
  * 
  * For details see
  *  On S, Appendix A in "Programming with Data" by John M. Chambers. 
- *  On R, "The .Call and .External Interfaces"  in the "Writing R Extensions"
- *  manual.
+ *  On R, "The .Call and .External Interfaces"  in the R manual.
  *  On MySQL, 
-       The "MySQL Reference Manual" available at http://www.mysql.com
- *     Also, "MySQL" Third Ed. by Paul Dubois (2005) New Riders Publishing.
+       The "MySQL Reference Manual (version 3.23.7 alpha,
+ *         02 Dec 1999" and the O'Reilly book "MySQL & mSQL" by Yarger, 
+ *         Reese, and King.
+ *     Also, "MySQL" by Paul Dubois (2000) New Riders Publishing.
  *
  * TODO:
  *    1. Make sure the code is thread-safe, in particular,
@@ -71,12 +72,7 @@ RS_MySQL_init(s_object *config_params, s_object *reload)
   const char *drvName = "MySQL";
   const char *clientVersion = mysql_get_client_info();
 
-  /* make sure the versions of the runtime and compile-time of the 
-   * MySQL client library are reasonably close, e.g., first major
-   * and minor id, e.g., 41 for 4.1.*, 42 for 4.2.*, etc.
-   * TODO: Should we using PROTOCOL_VERSION here?
-   */
-  if(strncmp(clientVersion, compiled_mysql_client_version, (size_t) 2)){
+  if(strcmp(clientVersion, compiled_mysql_client_version)){
      char  buf[256];
      (void) sprintf(buf, 
                     "%s mismatch between compiled version %s and runtime version %s",
@@ -122,23 +118,18 @@ RS_MySQL_cloneConnection(Con_Handle *conHandle)
   Mgr_Handle  *mgrHandle;
   RS_DBI_connection  *con;
   RS_MySQL_conParams *conParams;
-  s_object    *con_params, *MySQLgroups, *s_mysql_default_file;
+  s_object    *con_params, *MySQLgroups;
   char   buf1[256], buf2[256];
 
   /* get connection params used to open existing connection */
   con = RS_DBI_getConnection(conHandle);
   conParams = con->conParams;
 
-  /* will not used the "group" MySQL config file info, nor the
-   * default_file (use dummy ones) 
-   */
+  /* will not used the "group" MySQL config file info (use a dummy one) */
   MEM_PROTECT(MySQLgroups = NEW_CHARACTER((Sint) 1)) ;
   SET_CHR_EL(MySQLgroups,0,C_S_CPY(""));
 
-  MEM_PROTECT(s_mysql_default_file = NEW_CHARACTER((Sint) 1)) ;
-  SET_CHR_EL(s_mysql_default_file,0,C_S_CPY(""));
-
-  mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
+  mgrHandle = RS_DBI_asMgrHandle(PID(conHandle), MGR_ID(conHandle));
   
   /* Connection parameters need to be put into a 7-element character
    * vector to be passed to the RS_MySQL_newConnection() function.
@@ -154,10 +145,9 @@ RS_MySQL_cloneConnection(Con_Handle *conHandle)
   SET_CHR_EL(con_params,5,C_S_CPY(buf1));
   SET_CHR_EL(con_params,6,C_S_CPY(buf2));
   
-  MEM_UNPROTECT(3); 
+  MEM_UNPROTECT(2); 
 
-  return RS_MySQL_newConnection(mgrHandle, con_params, MySQLgroups,
-             s_mysql_default_file);
+  return RS_MySQL_newConnection(mgrHandle, con_params, MySQLgroups);
 }
 
 RS_MySQL_conParams *
@@ -189,7 +179,7 @@ RS_MySQL_freeConParams(RS_MySQL_conParams *conParams)
 
 Con_Handle *
 RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params, 
-		       s_object *MySQLgroups, s_object *s_mysql_default_file)
+		       s_object *MySQLgroups)
 {
   S_EVALUATOR
 
@@ -202,7 +192,7 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
   char      *unix_socket = NULL;
   int       i; 
   Sint      ngroups;
-  char      **groups, *mysql_default_file;
+  char      **groups;
 #if HAVE_GETOPT_LONG
   int   argc, option_index;    /* TODO: What about Mac OS, OS X??     */
   char  **argv;                /* we do have MySQL's load_defaults() */
@@ -228,7 +218,7 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
    * [rs-dbi] sections of the MySQL configuration files.  We
    * recognize options in the [client] and [rs-dbi] sections, plus any
    * other passed from S/R in the MySQLgroups character vector.  
-   * Note that we're faking the argc and argv -- it's just simpler (and the
+   * Note that we're faking the argc and argv -- it just simpler (and the
    * recommended way from MySQL perspective).  Re-initialize the
    * getopt_long buffers by setting optind = 0 (defined in getopt.h),
    * this is needed to avoid getopt_long "remembering" options from
@@ -236,10 +226,6 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
    * TODO: This can't be thread-safe, can it?
    *
    */
-  if(GET_LENGTH(s_mysql_default_file)==1){
-      mysql_default_file = RS_DBI_copyString(CHR_EL(s_mysql_default_file,0));
-      mysql_options(my_connection, MYSQL_READ_DEFAULT_FILE, mysql_default_file);
-  }
   ngroups = GET_LENGTH(MySQLgroups);
   groups = (char **) S_alloc((long) ngroups+3, (int) sizeof(char **));
   groups[0] = RS_DBI_copyString("client");  
@@ -309,9 +295,9 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
     mysql_real_connect(my_connection, host, user, passwd, dbname, 
 		       port, unix_socket, client_flags);
   if(!my_connection){
-    char buf[2048];
-    sprintf(buf, "could not connect %s@%s on dbname \"%s\"\nError:%s\n",
-	    user, host, dbname, mysql_error(my_connection));
+    char buf[512];
+    sprintf(buf, "could not connect %s@%s on dbname \"%s\"\n",
+	    user, host, dbname);
     RS_DBI_errorMessage(buf, RS_DBI_ERROR);
   }
 
@@ -437,7 +423,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
    */
   if(con->num_res>0){
     res_id = (Sint) con->resultSetIds[0]; /* recall, MySQL has only 1 res */
-    rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle), 
+    rsHandle = RS_DBI_asResHandle(PID(conHandle), MGR_ID(conHandle), 
 	                          CON_ID(conHandle), res_id);
     result = RS_DBI_getResultSet(rsHandle);
     if(result->completed == 0){
@@ -513,7 +499,7 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
   RS_DBI_resultSet   *result; 
   RS_DBI_fields      *flds;
   int     j, num_fields, internal_type;
-  char    errMsg[2048];
+  char    errMsg[128];
 
   result = RS_DBI_getResultSet(rsHandle);
   my_result = (MYSQL_RES *) result->drvResultSet;
@@ -572,26 +558,12 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
       else
         flds->Sclass[j] = INTEGER_TYPE;
       break;
-#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID >= 50003 /* 5.0.3 */
-    case FIELD_TYPE_BIT:
-      if(flds->precision[j] <= sizeof(Sint))   /* can R int hold the bytes? */
-	flds->Sclass[j] = INTEGER_TYPE;
-      else {
-        flds->Sclass[j] = CHARACTER_TYPE;
-        (void) sprintf(errMsg, 
-	       "BIT field in column %d too long (%d bits) for an R integer (imported as character)", 
-		     j+1, flds->precision[j]);
-      }
-#endif
     case FIELD_TYPE_LONGLONG:        /* TODO: can we fit these in R/S ints? */
       if(sizeof(Sint)>=8)            /* Arg! this ain't pretty:-( */
 	flds->Sclass[j] = INTEGER_TYPE;
       else 
 	flds->Sclass[j] = NUMERIC_TYPE;
     case FIELD_TYPE_DECIMAL:
-#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID >= 50003 /* 5.0.3 */
-    case FIELD_TYPE_NEWDECIMAL:
-#endif
       if(flds->scale[j] > 0 || flds->precision[j] > 10)
 	flds->Sclass[j] = NUMERIC_TYPE;
       else 
@@ -628,7 +600,7 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
       flds->Sclass[j] = CHARACTER_TYPE;
       flds->isVarLength[j] = (Sint) 1;
       (void) sprintf(errMsg, 
-		     "unrecognized MySQL field type %d in column %d imported as character", 
+		     "unrecognized MySQL field type %d in column %d", 
 		     internal_type, j);
       RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
       break;
@@ -880,14 +852,16 @@ RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
   RS_DBI_manager *mgr;
   s_object *output;
   Sint i, num_con, max_con, *cons, ncon;
-  Sint j, n = 8;
+  Sint j, n = 9;
   char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
+                     "processId",
                      "managerId", "length",        "num_con", 
                      "counter",   "clientVersion"};
   Stype mgrType[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE, 
+                     INTEGER_TYPE,
                      INTEGER_TYPE,   INTEGER_TYPE, INTEGER_TYPE, 
                      INTEGER_TYPE,   CHARACTER_TYPE};
-  Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
+  Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1, 1};
   
   mgr = RS_DBI_getManager(mgrHandle);
   if(!mgr)
@@ -921,6 +895,7 @@ RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
     LST_INT_EL(output, j, i) = cons[i];
   j++;
   LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
+  LST_INT_EL(output,j++,0) = mgr->processId;
   LST_INT_EL(output,j++,0) = mgr->managerId;
   LST_INT_EL(output,j++,0) = mgr->length;
   LST_INT_EL(output,j++,0) = mgr->num_con;
@@ -1558,38 +1533,4 @@ add_group(s_object *group_names, s_object *data,
    }
    SET_CHR_EL(group_names, ngroup, C_S_CPY(buff));
    return;
-}
-
-/* the following function was kindly provided by Mikhail Kondrin 
- * it returns the last inserted index. 
- * TODO: It returns an int, but it can potentially be inadequate
- *       if the index is anunsigned integer.  Should we return
- *       a numeric instead?
- */
-s_object *
-RS_MySQL_insertid(Con_Handle *conHandle)
-{
-  S_EVALUATOR
- 
-  MYSQL   *my_con;
-  RS_DBI_connection  *con;
-  s_object   *output;
-  char *conDesc[] = {"iid"};
-  Stype conType[] = {INTEGER_TYPE};    /* dj: are we sure an int will do? */
-  Sint  conLen[]  = {1};
-
-  con = RS_DBI_getConnection(conHandle);
-  my_con = (MYSQL *) con->drvConnection;
-  output = RS_DBI_createNamedList(conDesc, conType, conLen, 1);
-#ifndef USING_R
-  if(IS_LIST(output))
-    output = AS_LIST(output);
-  else
-    RS_DBI_errorMessage("internal error: could not alloc named list",
-                        RS_DBI_ERROR);
-#endif
-  LST_INT_EL(output,0,0) = (Sint) mysql_insert_id(my_con);
-
-  return output;
-
 }

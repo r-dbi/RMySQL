@@ -1,0 +1,268 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/darren@hiebert.com/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://darren.hiebert.com/ctags/	/official site/
+!_TAG_PROGRAM_VERSION	3.4	/with C, C++, Eiffel, Fortran, and Java  support/
+ASSIGN_IN_FRAME	S4R.h	73;"	d
+BEGIN	RS-MySQL.c	1055;"	d	file:
+BEGIN_GROUP	RS-MySQL.c	1057;"	d	file:
+CHARACTER_TYPE	S4R.h	84;"	d
+CHARACTER_TYPE	S4R.h	95;"	d
+CHAR_DEREF	S4R.h	48;"	d
+CHAR_DEREF	S4R.h	57;"	d
+CHR_EL	S4R.h	137;"	d
+CHR_EL	S4R.h	141;"	d
+COMPLEX_TYPE	S4R.h	86;"	d
+COMPLEX_TYPE	S4R.h	97;"	d
+CON_HANDLE_TYPE	RS-DBI.h	/^  CON_HANDLE_TYPE = 2,     \/* dbConnection handle *\/$/;"	e	enum:enum_handle_type
+CON_ID	RS-DBI.h	71;"	d
+COPY	S4R.h	69;"	d
+COPY_ALL	S4R.h	70;"	d
+C_S_CPY	S4R.h	49;"	d
+C_S_CPY	S4R.h	58;"	d
+Con_Handle	RS-DBI.h	58;"	d
+DBI_EXCEPTION	RS-DBI.h	/^} DBI_EXCEPTION;$/;"	t
+DBL_EL	S4R.h	133;"	d
+DBMS_ERROR	RS-MySQL.c	1066;"	d	file:
+Db_Handle	RS-DBI.h	60;"	d
+END	RS-MySQL.c	1056;"	d	file:
+END_GROUP	RS-MySQL.c	1058;"	d	file:
+END_OF_DATA	RS-MySQL.c	1065;"	d	file:
+ERROR	RS-MySQL.h	29;"	d
+EVAL_IN_FRAME	S4R.h	71;"	d
+EXHAUSTED_DF	RS-MySQL.c	1063;"	d	file:
+EXHAUSTED_OUT	RS-MySQL.c	1064;"	d	file:
+FLT_EL	S4R.h	131;"	d
+GET_CLASS_NAME	S4R.h	182;"	d
+GET_FROM_FRAME	S4R.h	72;"	d
+HANDLE_TYPE	RS-DBI.h	/^} HANDLE_TYPE; $/;"	t
+INTEGER_DATA	S4R.h	103;"	d
+INTEGER_DATA	S4R.h	104;"	d
+INTEGER_TYPE	S4R.h	80;"	d
+INTEGER_TYPE	S4R.h	91;"	d
+INT_EL	S4R.h	129;"	d
+IS_EMPTY	RS-MySQL.c	267;"	d	file:
+IS_NA	S4R.h	170;"	d
+IS_NA	S4R.h	174;"	d
+LGL_EL	S4R.h	128;"	d
+LIST_TYPE	S4R.h	87;"	d
+LIST_TYPE	S4R.h	98;"	d
+LOGICAL_TYPE	S4R.h	79;"	d
+LOGICAL_TYPE	S4R.h	90;"	d
+LST_CHR_EL	S4R.h	146;"	d
+LST_DBL_EL	S4R.h	152;"	d
+LST_EL	S4R.h	136;"	d
+LST_EL	S4R.h	140;"	d
+LST_FLT_EL	S4R.h	150;"	d
+LST_INT_EL	S4R.h	148;"	d
+LST_LGL_EL	S4R.h	147;"	d
+LST_LST_EL	S4R.h	154;"	d
+LST_NUM_EL	S4R.h	151;"	d
+LST_RAW_EL	S4R.h	153;"	d
+LST_SGL_EL	S4R.h	149;"	d
+MEM_PROTECT	S4R.h	50;"	d
+MEM_PROTECT	S4R.h	60;"	d
+MEM_UNPROTECT	S4R.h	51;"	d
+MEM_UNPROTECT	S4R.h	61;"	d
+MEM_UNPROTECT_PTR	S4R.h	52;"	d
+MEM_UNPROTECT_PTR	S4R.h	62;"	d
+MGR_HANDLE_TYPE	RS-DBI.h	/^  MGR_HANDLE_TYPE = 1,     \/* dbManager handle *\/$/;"	e	enum:enum_handle_type
+MGR_ID	RS-DBI.h	70;"	d
+Mgr_Handle	RS-DBI.h	57;"	d
+NA_CHR_SET	S4R.h	169;"	d
+NA_CHR_SET	S4R.h	173;"	d
+NA_SET	S4R.h	168;"	d
+NA_SET	S4R.h	172;"	d
+NEVER	RS-MySQL.c	1054;"	d	file:
+NEW_RECORD	RS-MySQL.c	1059;"	d	file:
+NUMERIC_TYPE	S4R.h	81;"	d
+NUMERIC_TYPE	S4R.h	92;"	d
+NUM_EL	S4R.h	132;"	d
+PARTIAL_GROUP	RS-MySQL.c	1060;"	d	file:
+RAW_DATA	S4R.h	59;"	d
+RAW_EL	S4R.h	134;"	d
+RAW_TYPE	S4R.h	99;"	d
+REAL_TYPE	S4R.h	83;"	d
+REAL_TYPE	S4R.h	94;"	d
+RES_HANDLE_TYPE	RS-DBI.h	/^  RES_HANDLE_TYPE = 3      \/* dbResult handle *\/$/;"	e	enum:enum_handle_type
+RES_ID	RS-DBI.h	72;"	d
+RODBC_getInfo	tmp.c	/^RODBC_getInfo(SEXP *channel)$/;"	f
+RS_DBI_ERROR	RS-DBI.h	/^  RS_DBI_ERROR,$/;"	e	enum:enum_dbi_exception
+RS_DBI_MAX_IDENTIFIER_LENGTH	RS-DBI.c	1162;"	d	file:
+RS_DBI_MESSAGE	RS-DBI.h	/^  RS_DBI_MESSAGE,$/;"	e	enum:enum_dbi_exception
+RS_DBI_SclassNames	RS-DBI.c	/^RS_DBI_SclassNames(s_object *type)$/;"	f
+RS_DBI_TERMINATE	RS-DBI.h	/^  RS_DBI_TERMINATE$/;"	e	enum:enum_dbi_exception
+RS_DBI_WARNING	RS-DBI.h	/^  RS_DBI_WARNING,$/;"	e	enum:enum_dbi_exception
+RS_DBI_allocConnection	RS-DBI.c	/^RS_DBI_allocConnection(Mgr_Handle *mgrHandle, Sint max_res)$/;"	f
+RS_DBI_allocFields	RS-DBI.c	/^RS_DBI_allocFields(int num_fields)$/;"	f
+RS_DBI_allocManager	RS-DBI.c	/^RS_DBI_allocManager(const char *drvName, Sint max_con,$/;"	f
+RS_DBI_allocOutput	RS-DBI.c	/^RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,$/;"	f
+RS_DBI_allocResultSet	RS-DBI.c	/^RS_DBI_allocResultSet(Con_Handle *conHandle)$/;"	f
+RS_DBI_asConHandle	RS-DBI.c	/^RS_DBI_asConHandle(Sint mgrId, Sint conId)$/;"	f
+RS_DBI_asMgrHandle	RS-DBI.c	/^RS_DBI_asMgrHandle(Sint mgrId)$/;"	f
+RS_DBI_asResHandle	RS-DBI.c	/^RS_DBI_asResHandle(Sint mgrId, Sint conId, Sint resId)$/;"	f
+RS_DBI_connection	RS-DBI.h	/^} RS_DBI_connection;$/;"	t
+RS_DBI_connectionInfo	RS-DBI.c	/^RS_DBI_connectionInfo(Con_Handle *conHandle)$/;"	f
+RS_DBI_copyString	RS-DBI.c	/^RS_DBI_copyString(const char *str)$/;"	f
+RS_DBI_copyfields	RS-DBI.c	/^RS_DBI_copyfields(RS_DBI_fields *flds)$/;"	f
+RS_DBI_createNamedList	RS-DBI.c	/^RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)$/;"	f
+RS_DBI_errorMessage	RS-DBI.c	/^RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type)$/;"	f
+RS_DBI_exception	RS-DBI.h	/^} RS_DBI_exception;$/;"	t
+RS_DBI_fields	RS-DBI.h	/^} RS_DBI_fields;$/;"	t
+RS_DBI_freeConnection	RS-DBI.c	/^RS_DBI_freeConnection(Con_Handle *conHandle)$/;"	f
+RS_DBI_freeEntry	RS-DBI.c	/^RS_DBI_freeEntry(Sint *table, Sint indx)$/;"	f
+RS_DBI_freeFields	RS-DBI.c	/^RS_DBI_freeFields(RS_DBI_fields *flds)$/;"	f
+RS_DBI_freeManager	RS-DBI.c	/^RS_DBI_freeManager(Mgr_Handle *mgrHandle)$/;"	f
+RS_DBI_freeResultSet	RS-DBI.c	/^RS_DBI_freeResultSet(Res_Handle *rsHandle)$/;"	f
+RS_DBI_getConnection	RS-DBI.c	/^RS_DBI_getConnection(Con_Handle *conHandle)$/;"	f
+RS_DBI_getFieldDescriptions	RS-DBI.c	/^RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)$/;"	f
+RS_DBI_getManager	RS-DBI.c	/^RS_DBI_getManager(Mgr_Handle *handle)$/;"	f
+RS_DBI_getResultSet	RS-DBI.c	/^RS_DBI_getResultSet(Res_Handle *rsHandle)$/;"	f
+RS_DBI_getTypeName	RS-DBI.c	/^RS_DBI_getTypeName(Sint t, const struct data_types table[])$/;"	f
+RS_DBI_invokeBeginGroup	RS-MySQL.c	/^RS_DBI_invokeBeginGroup(s_object *callObj,      \/* should be initialized *\/$/;"	f
+RS_DBI_invokeEndGroup	RS-MySQL.c	/^RS_DBI_invokeEndGroup(s_object *callObj, s_object *data,$/;"	f
+RS_DBI_invokeNewRecord	RS-MySQL.c	/^RS_DBI_invokeNewRecord(s_object *callObj,   \/* should be initialized already *\/$/;"	f
+RS_DBI_listEntries	RS-DBI.c	/^RS_DBI_listEntries(Sint *table, Sint length, Sint *entries)$/;"	f
+RS_DBI_lookup	RS-DBI.c	/^RS_DBI_lookup(Sint *table, Sint length, Sint obj_id)$/;"	f
+RS_DBI_makeDataFrame	RS-DBI.c	/^RS_DBI_makeDataFrame(s_object *data)$/;"	f
+RS_DBI_makeSQLNames	RS-DBI.c	/^RS_DBI_makeSQLNames(s_object *snames)$/;"	f
+RS_DBI_manager	RS-DBI.h	/^} RS_DBI_manager;$/;"	t
+RS_DBI_managerInfo	RS-DBI.c	/^RS_DBI_managerInfo(Mgr_Handle *mgrHandle)$/;"	f
+RS_DBI_nCopyString	RS-DBI.c	/^RS_DBI_nCopyString(const char *str, size_t len, int del_blanks)$/;"	f
+RS_DBI_newEntry	RS-DBI.c	/^RS_DBI_newEntry(Sint *table, Sint length)$/;"	f
+RS_DBI_resultSet	RS-DBI.h	/^} RS_DBI_resultSet;$/;"	t
+RS_DBI_resultSetInfo	RS-DBI.c	/^RS_DBI_resultSetInfo(Res_Handle *rsHandle)$/;"	f
+RS_DBI_setException	RS-DBI.c	/^RS_DBI_setException(Db_Handle *handle, DBI_EXCEPTION exceptionType,$/;"	f
+RS_DBI_validHandle	RS-DBI.c	/^RS_DBI_validHandle(Db_Handle *handle)$/;"	f
+RS_MYSQL_MAX_CON	RS-MySQL.h	39;"	d
+RS_MySQL_cloneConnection	RS-MySQL.c	/^RS_MySQL_cloneConnection(Con_Handle *conHandle)$/;"	f
+RS_MySQL_closeConnection	RS-MySQL.c	/^RS_MySQL_closeConnection(Con_Handle *conHandle)$/;"	f
+RS_MySQL_closeManager	RS-MySQL.c	/^RS_MySQL_closeManager(Mgr_Handle *mgrHandle)$/;"	f
+RS_MySQL_closeResultSet	RS-MySQL.c	/^RS_MySQL_closeResultSet(s_object *resHandle)$/;"	f
+RS_MySQL_conParams	RS-MySQL.h	/^} RS_MySQL_conParams;$/;"	t
+RS_MySQL_connectionInfo	RS-MySQL.c	/^RS_MySQL_connectionInfo(Con_Handle *conHandle)$/;"	f
+RS_MySQL_createDataMappings	RS-MySQL.c	/^RS_MySQL_createDataMappings(Res_Handle *rsHandle)$/;"	f
+RS_MySQL_dataTypes	RS-MySQL.h	/^static struct data_types RS_MySQL_dataTypes[] = {$/;"	v
+RS_MySQL_dbApply	RS-MySQL.c	/^RS_MySQL_dbApply(s_object *rsHandle,     \/* resultset handle *\/$/;"	f
+RS_MySQL_exec	RS-MySQL.c	/^RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)$/;"	f
+RS_MySQL_fetch	RS-MySQL.c	/^RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)$/;"	f
+RS_MySQL_freeConParams	RS-MySQL.c	/^RS_MySQL_freeConParams(RS_MySQL_conParams *conParams)$/;"	f
+RS_MySQL_getException	RS-MySQL.c	/^RS_MySQL_getException(s_object *conHandle)$/;"	f
+RS_MySQL_init	RS-MySQL.c	/^RS_MySQL_init(s_object *config_params, s_object *reload)$/;"	f
+RS_MySQL_managerInfo	RS-MySQL.c	/^RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)$/;"	f
+RS_MySQL_newConnection	RS-MySQL.c	/^RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params, $/;"	f
+RS_MySQL_resultSetInfo	RS-MySQL.c	/^RS_MySQL_resultSetInfo(Res_Handle *rsHandle)$/;"	f
+RS_MySQL_typeNames	RS-MySQL.c	/^RS_MySQL_typeNames(s_object *type)$/;"	f
+RS_dataTypeTable	RS-DBI.c	/^const struct data_types RS_dataTypeTable[] = {$/;"	v
+RS_is_na	RS-DBI.c	/^RS_is_na(void *ptr, Stype type)$/;"	f
+RS_mysql_allocConParams	RS-MySQL.c	/^RS_mysql_allocConParams(void)$/;"	f
+RS_na_set	RS-DBI.c	/^RS_na_set(void *ptr, Stype type)$/;"	f
+Res_Handle	RS-DBI.h	59;"	d
+S4R_H	S4R.h	15;"	d
+SET_CHR_EL	S4R.h	138;"	d
+SET_CHR_EL	S4R.h	142;"	d
+SET_CLASS_NAME	S4R.h	183;"	d
+SET_CLASS_NAME	S4R.h	186;"	d
+SET_ELEMENT	S4R.h	39;"	d
+SET_ELEMENT	S4R.h	40;"	d
+SET_LST_CHR_EL	S4R.h	158;"	d
+SET_LST_CHR_EL	S4R.h	160;"	d
+SET_ROWNAMES	S4R.h	181;"	d
+SET_ROWNAMES	S4R.h	185;"	d
+SGL_EL	S4R.h	130;"	d
+SINGLE_TYPE	S4R.h	82;"	d
+SINGLE_TYPE	S4R.h	93;"	d
+STRING_TYPE	S4R.h	85;"	d
+STRING_TYPE	S4R.h	96;"	d
+S_NULL_ENTRY	S4R.h	105;"	d
+S_NULL_ENTRY	S4R.h	106;"	d
+S_NULL_ENTRY	S4R.h	108;"	d
+Sclass	RS-DBI.h	/^  Stype *Sclass;        \/* R\/S class (type) -- may be overriden *\/$/;"	m	struct:st_sdbi_fields
+Sint	S4R.h	46;"	d
+Sint	S4R.h	55;"	d
+Stype	S4R.h	78;"	d
+Stype	S4R.h	89;"	d
+USE_RINTERNALS	S4R.h	36;"	d
+USING_S4	S4R.h	30;"	d
+USING_SP5	S4R.h	28;"	d
+_GETOPT_H	getopt.h	23;"	d
+_RS_DBI_H	RS-DBI.h	2;"	d
+_RS_MYSQL_H	RS-MySQL.h	2;"	d
+add_group	RS-MySQL.c	/^add_group(s_object *group_names, s_object *data, $/;"	f
+charPtr	S4R.h	47;"	d
+charPtr	S4R.h	56;"	d
+check_groupEvents	RS-MySQL.c	/^check_groupEvents(s_object *data, Stype fld_Sclass[], Sint irow, Sint jcol)$/;"	f
+client_flags	RS-MySQL.h	/^  unsigned int  client_flags;$/;"	m	struct:st_sdbi_conParams
+completed	RS-DBI.h	/^  Sint  completed;       \/* have we fetched all rows? *\/$/;"	m	struct:st_sdbi_resultset
+conParams	RS-DBI.h	/^  void  *conParams;      \/* pointer to connection params (host, user, etc)*\/$/;"	m	struct:st_sdbi_connection
+connectionId	RS-DBI.h	/^  Sint   connectionId; $/;"	m	struct:st_sdbi_connection
+connectionId	RS-DBI.h	/^  Sint  connectionId;    \/* validating stuff coming from S *\/$/;"	m	struct:st_sdbi_resultset
+connectionIds	RS-DBI.h	/^  Sint *connectionIds;              \/* array of connectionIds *\/$/;"	m	struct:st_sdbi_manager
+connections	RS-DBI.h	/^  RS_DBI_connection **connections;  \/* list of dbConnections *\/$/;"	m	struct:st_sdbi_manager
+counter	RS-DBI.h	/^  Sint   counter;                    \/* total number of queries *\/$/;"	m	struct:st_sdbi_connection
+counter	RS-DBI.h	/^  Sint counter;                     \/* num of connections handled so far*\/$/;"	m	struct:st_sdbi_manager
+data_types	RS-DBI.h	/^struct data_types {$/;"	s
+dbManager	RS-DBI.c	/^static RS_DBI_manager *dbManager = NULL;$/;"	v	file:
+dbname	RS-MySQL.h	/^  char *dbname;$/;"	m	struct:st_sdbi_conParams
+drvConnection	RS-DBI.h	/^  void  *drvConnection;  \/* pointer to the actual DBMS connection struct*\/$/;"	m	struct:st_sdbi_connection
+drvData	RS-DBI.h	/^  void  *drvData;        \/* a pointer to driver-specific data *\/$/;"	m	struct:st_sdbi_resultset
+drvData	RS-DBI.h	/^  void  *drvData;        \/* to be used at will by individual drivers *\/$/;"	m	struct:st_sdbi_connection
+drvData	RS-DBI.h	/^  void *drvData;                    \/* to be used by the drv implementation*\/$/;"	m	struct:st_sdbi_manager
+drvName	RS-DBI.h	/^  char *drvName;                    \/* what driver are we implementing?*\/$/;"	m	struct:st_sdbi_manager
+drvResultSet	RS-DBI.h	/^  void  *drvResultSet;   \/* the actual (driver's) cursor\/result set *\/$/;"	m	struct:st_sdbi_resultset
+enum_dbi_exception	RS-DBI.h	/^typedef enum enum_dbi_exception {$/;"	g
+enum_handle_type	RS-DBI.h	/^typedef enum enum_handle_type {$/;"	g
+errorMsg	RS-DBI.h	/^  char *errorMsg;           \/* SQL error message *\/$/;"	m	struct:st_sdbi_exception
+errorNum	RS-DBI.h	/^  int  errorNum;            \/* SQL error number (possibly driver-dependent*\/$/;"	m	struct:st_sdbi_exception
+exception	RS-DBI.h	/^  RS_DBI_exception *exception;    $/;"	m	struct:st_sdbi_manager
+exception	RS-DBI.h	/^  RS_DBI_exception *exception;$/;"	m	struct:st_sdbi_connection
+exceptionType	RS-DBI.h	/^  DBI_EXCEPTION  exceptionType; \/* one of RS_DBI_WARN, RS_RBI_ERROR, etc *\/$/;"	m	struct:st_sdbi_exception
+fetch_default_rec	RS-DBI.h	/^  Sint fetch_default_rec;           \/* default num of records per fetch *\/$/;"	m	struct:st_sdbi_manager
+fields	RS-DBI.h	/^  RS_DBI_fields *fields;$/;"	m	struct:st_sdbi_resultset
+flag	getopt.h	/^  int *flag;$/;"	m	struct:option
+has_arg	getopt.h	/^  int has_arg;$/;"	m	struct:option
+host	RS-MySQL.h	/^  char *host;$/;"	m	struct:st_sdbi_conParams
+isSelect	RS-DBI.h	/^  Sint  isSelect;        \/* boolean for testing SELECTs *\/$/;"	m	struct:st_sdbi_resultset
+isVarLength	RS-DBI.h	/^  Sint  *isVarLength;   \/* DBMS variable-length char type *\/$/;"	m	struct:st_sdbi_fields
+is_validHandle	RS-DBI.c	/^is_validHandle(Db_Handle *handle, HANDLE_TYPE handleType)$/;"	f
+length	RS-DBI.h	/^  Sint   length;                     \/* max num of concurrent resultSets *\/$/;"	m	struct:st_sdbi_connection
+length	RS-DBI.h	/^  Sint  *length;        \/* DBMS lengths in bytes *\/$/;"	m	struct:st_sdbi_fields
+length	RS-DBI.h	/^  Sint length;                      \/* max num of concurrent connections *\/$/;"	m	struct:st_sdbi_manager
+managerId	RS-DBI.h	/^  Sint   managerId;$/;"	m	struct:st_sdbi_connection
+managerId	RS-DBI.h	/^  Sint  managerId;       \/* the 3 *Id's are used for   *\/$/;"	m	struct:st_sdbi_resultset
+managerId	RS-DBI.h	/^  Sint managerId;                   \/* typically, process id *\/$/;"	m	struct:st_sdbi_manager
+name	RS-DBI.h	/^  char  **name;         \/* DBMS field names *\/$/;"	m	struct:st_sdbi_fields
+name	getopt.h	/^  const char *name;$/;"	m	struct:option
+no_argument	getopt.h	97;"	d
+nullOk	RS-DBI.h	/^  Sint  *nullOk;        \/* DBMS indicator for DBMS'  NULL type *\/$/;"	m	struct:st_sdbi_fields
+num_con	RS-DBI.h	/^  Sint num_con;                     \/* num of opened connections *\/$/;"	m	struct:st_sdbi_manager
+num_fields	RS-DBI.h	/^  int num_fields;$/;"	m	struct:st_sdbi_fields
+num_res	RS-DBI.h	/^  Sint   num_res;                    \/* num of open resultSets *\/$/;"	m	struct:st_sdbi_connection
+option	getopt.h	/^struct option$/;"	s
+optional_argument	getopt.h	99;"	d
+passwd	RS-MySQL.h	/^  char *passwd;$/;"	m	struct:st_sdbi_conParams
+port	RS-MySQL.h	/^  unsigned int  port; $/;"	m	struct:st_sdbi_conParams
+precision	RS-DBI.h	/^  Sint  *precision;     \/* DBMS num of digits for numeric types *\/$/;"	m	struct:st_sdbi_fields
+required_argument	getopt.h	98;"	d
+resultSetId	RS-DBI.h	/^  Sint  resultSetId;  $/;"	m	struct:st_sdbi_resultset
+resultSetIds	RS-DBI.h	/^  Sint   *resultSetIds;$/;"	m	struct:st_sdbi_connection
+resultSets	RS-DBI.h	/^  RS_DBI_resultSet  **resultSets;    \/* vector to result set ptrs  *\/$/;"	m	struct:st_sdbi_connection
+rowCount	RS-DBI.h	/^  Sint  rowCount;        \/* rows fetched so far (SELECT-types)*\/$/;"	m	struct:st_sdbi_resultset
+rowsAffected	RS-DBI.h	/^  Sint  rowsAffected;    \/* used by non-SELECT statements *\/$/;"	m	struct:st_sdbi_resultset
+scale	RS-DBI.h	/^  Sint  *scale;         \/* DBMS num of decimals for numeric types *\/$/;"	m	struct:st_sdbi_fields
+singl	S4R.h	45;"	d
+singl	S4R.h	54;"	d
+st_sdbi_conParams	RS-MySQL.h	/^typedef struct st_sdbi_conParams {$/;"	s
+st_sdbi_connection	RS-DBI.h	/^typedef struct st_sdbi_connection {$/;"	s
+st_sdbi_exception	RS-DBI.h	/^typedef struct st_sdbi_exception {$/;"	s
+st_sdbi_fields	RS-DBI.h	/^typedef struct st_sdbi_fields {$/;"	s
+st_sdbi_manager	RS-DBI.h	/^typedef struct st_sdbi_manager {$/;"	s
+st_sdbi_resultset	RS-DBI.h	/^typedef struct st_sdbi_resultset {$/;"	s
+statement	RS-DBI.h	/^  char  *statement;      \/* SQL statement *\/$/;"	m	struct:st_sdbi_resultset
+type	RS-DBI.h	/^  Sint  *type;          \/* DBMS internal types *\/$/;"	m	struct:st_sdbi_fields
+typeId	RS-DBI.h	/^    Sint typeId;$/;"	m	struct:data_types
+typeName	RS-DBI.h	/^    char *typeName;$/;"	m	struct:data_types
+unix_socket	RS-MySQL.h	/^  char *unix_socket;$/;"	m	struct:st_sdbi_conParams
+user	RS-MySQL.h	/^  char *user;$/;"	m	struct:st_sdbi_conParams
+val	getopt.h	/^  int val;$/;"	m	struct:option

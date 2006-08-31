@@ -58,6 +58,7 @@ A typical usage of the R-MySQL interface is:
    dbDisconnect(con2)
    }
 }
+}
 
 \section{Data mappings between MySQL and R}{
 MySQL tables are read into R as data.frames, but without coercing
@@ -99,7 +100,7 @@ such as, \code{user=}, \code{password=}, \code{host=}, etc.
 For instance,
 
 \preformatted{
-\$ cat \$HOME/.my.cnf
+$ cat $HOME/.my.cnf
 # this is a comment
 ; this is also a comment
 [client]
@@ -214,5 +215,5 @@ On meta-data:
 }
 \keyword{package}
 \keyword{interface}
-\keyword{databases}
+\keyword{database}
 % vim: syntax=tex

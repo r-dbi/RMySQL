@@ -1,0 +1,41 @@
+##
+## This configure.win scripts creates libmysql.a and bundles the mysql dll 
+## into a binary distribution RMySQL (ie., when used w. R CMD build --binary). 
+## Currently it packages libmysql.dll and libmysql.lib from the MySQL 5.0.18.
+## Modify the MYSQL_LIB_DIR and MYSQL_BIN_DIR variables (make sure the 
+## file paths do *not* include spaces), and modify src/Makevars.win 
+## accordingly.
+
+MYSQL_LIB_DIR=c:/PROGRA~1/MySQL/MYSQLS~1.0/lib/opt 
+MYSQL_BIN_DIR=c:/PROGRA~1/MySQL/MYSQLS~1.0/bin
+
+MYSQL_DLL=libMySQL.dll        
+MYSQL_LIB=libmysql.lib         
+
+echo "======================================================================"
+echo "RMySQL configure.win:"
+echo "* Using mysql libraries from ${MYSQL_LIB_DIR} "
+echo "* Using mysql dll from ${MYSQL_BIN_DIR} "
+
+## install the runtime MySQL dll in the RMySQL libs directory to avoid
+## having to add extraneous directories to the Windows PATH at runtime
+echo "* Copying runtime ${MYSQL_DLL} and ${MYSQL_LIB} to inst/libs"
+test -d inst/libs || mkdir inst/libs
+cp ${MYSQL_BIN_DIR}/${MYSQL_DLL} inst/libs
+cp ${MYSQL_LIB_DIR}/${MYSQL_LIB} inst/libs
+
+## build the libmysql.a library needed during *compilation* of RMySQL
+cp ${MYSQL_LIB_DIR}/${MYSQL_LIB} ./src
+cd ./src
+reimp --only-def ${MYSQL_LIB}
+dlltool --dllname ${MYSQL_LIB} --def libmysql.def --output-lib libmysql.a -k
+
+if test -f ${MYSQL_LIB_DIR}/libmysql.a 
+then
+   echo "* Using an existing libmysql.a in ${MYSQL_LIB_DIR} "
+else
+   echo "* Making libmysql.a in ${MYSQL_LIB_DIR}"
+   cp libmysql.a ${MYSQL_LIB_DIR}    
+fi
+
+echo "======================================================================"

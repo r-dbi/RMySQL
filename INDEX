@@ -1,0 +1,38 @@
+dbApply                 Apply R/S-Plus functions to remote groups of
+                        DBMS rows (experimental)
+dbApply-methods         Apply R/S-Plus functions to remote groups of
+                        DBMS rows (experimental)
+dbBuildTableDefinition
+                        Build the SQL CREATE TABLE definition as a
+                        string
+dbCallProc-methods      Call an SQL stored procedure
+dbCommit-methods        DBMS Transaction Management
+dbConnect-methods       Create a connection object to an MySQL DBMS
+dbDataType-methods      Determine the SQL Data Type of an S object
+dbDriver-methods        MySQL implementation of the Database Interface
+                        (DBI) classes and drivers
+dbGetInfo               Database interface meta-data
+dbListTables-methods    List items from an MySQL DBMS and from objects
+dbObjectId-class        Class dbObjectId
+dbReadTable-methods     Convenience functions for Importing/Exporting
+                        DBMS tables
+dbSendQuery-methods     Execute a statement on a given database
+                        connection
+dbSetDataMappings-methods
+                        Set data mappings between MySQL and R/S-Plus
+fetch-methods           Fetch records from a previously executed query
+isIdCurrent             Check whether a database handle object is valid
+                        or not
+MySQL                   Instantiate a MySQL client from the current R
+                        or S-Plus session
+MySQLConnection-class   Class MySQLConnection
+mysqlDBApply            Apply R/S-Plus functions to remote groups of
+                        DBMS rows (experimental)
+MySQLDriver-class       Class MySQLDriver
+mysqlInitDriver         Support Functions
+MySQLObject-class       Class MySQLObject
+MySQLResult-class       Class MySQLResult
+RMySQL-package          R interface to the MySQL database
+SQLKeywords-methods     Make R/S-Plus identifiers into legal SQL
+                        identifiers
+summary-methods         Summarize an MySQL object

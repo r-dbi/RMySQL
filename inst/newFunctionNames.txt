@@ -1,0 +1,49 @@
+As of version 0.5-0, RMySQL functions have different names
+as suggested by the R/S-Plus database interface DBI.  
+
+prior to 0.5             DBI 0.1-4 / RMySQL 0.5-0 and later 
+----------------------   ----------------------------------
+dbManager                dbDriver
+dbConnect                dbConnect
+dbExecStatement          dbSendQuery
+dbExec                   dbSendQuery
+quickSQL                 dbGetQuery
+fetch                    fetch
+getTables                dbListTables
+getConnections           dbListConnections
+getResultSets            dbListResults
+getConnection            NA
+getFields                dbColumnInfo         # for a result set 
+getFields                dbListFields         # for a table name in a conn
+getStatement             dbGetStatement
+getRowsAffected          dbGetRowsAffected
+getRowCount              dbGetRowCount
+hasCompleted             dbHasCompleted
+getInfo                  dbGetInfo
+describe                 summary
+getTableFields           dbListFields
+getTable                 dbReadTable
+assignTable              dbWriteTable
+existsTable              dbExistsTable
+SQLDataType              dbDataType
+make.SQL.name            make.db.name
+isSQLKeyword             isSQLKeyword
+removeTable              dbRemoveTable
+getException             dbGetException
+load                     dbDriver
+unload                   dbUnloadDriver
+commit                   dbCommit
+rollback                 dbRollback
+callProc                 dbCallProc
+close                    dbDisconnect
+close                    dbClearResult
+
+getVersion               NA
+getCurrentDatabase       NA
+getNumRows               NA
+getNullOk                NA
+getNumCols               NA
+getDatabases             NA
+getTableIndices          NA
+
+NA                       dbGetDBIVersion

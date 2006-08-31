@@ -1,0 +1,58 @@
+$Id$
+
+Installation:
+
+   R CMD INSTALL [-l<alternate-dir>] RMySQL_<version>.tar.gz
+
+During installation, RMySQL looks for the MySQL headers and libraries
+in the system directories.  If these are not installed in system-wide
+directories (or if you want to use an alternate MySQL distribution),
+you may specify which MySQL directory(ies) to use through one of the
+following:
+
+   1. The shell variables PKG_CPPFLAGS and PKG_LIBS (using Bourne shell)
+
+       export PKG_CPPFLAGS="-I<include-dir>"
+       export PKG_LIBS="-L<library-dir> -lmysqlclient"
+
+       For instance, on some 64 systems (e.g., Linux) you may need to set
+
+       export PKG_CPPFALGS="-I/usr/include/mysql"
+       export PKG_LIBS="-L/usr/lib64/mysql -lmysqlclient"
+
+or  2. Use the RMySQL configuration shell variables
+
+           export MYSQL_INC=<include directory>"
+           export MYSQL_LIB=<library directory>"
+
+       You may also specify the base directory (this is the directory
+       that has sub-directories "lib/mysql" and "include/mysql" directories)
+
+           export MYSQL_DIR="<base directory>"
+
+or 3. Use the --with-mysql-* RMySQL configuration arguments
+
+          --with-mysql-dir=<base dir>
+          --with-mysql-inc=<include dir>
+          --with-mysql-lib=<library dir>
+
+     e.g.,
+
+          R CMD INSTALL --configure-args="--with-mysql-dir=$HOME/mysql" ...
+
+S/W Requirements:
+-----------------
+
+   MySQL client library ("libmysqlclient.so") and header files
+   (see www.mysql.com).  For Linux/intel you may use the binary rpms 
+   client+devel+shared, and make sure you also have the header files, 
+   they are *NOT* included in the following
+	MySQL-client-4.1.7-1.i386.rpm
+	MySQL-shared-4.1.7-1.i386.rpm
+
+   but they are included in the latest 4.1.7 rpm versions.
+
+   The library libz.  This is a standard library on many (but not all)
+   systems.  Under Red Hat, it's included in the rpm zlib-devel.
+   I've been told that on debian it's in the zlib1g-dev package.
+
