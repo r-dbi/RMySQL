@@ -316,8 +316,10 @@ setMethod("dbDataType",
 
 setMethod("make.db.names", 
    signature(dbObj="MySQLObject", snames = "character"),
-   def = function(dbObj, snames, ...){
-      make.db.names.default(snames, keywords = .MySQLKeywords, ...)
+   def = function(dbObj, snames, keywords = .MySQLKeywords,
+     unique, allow.keywords, ...){
+      make.db.names.default(snames, keywords = .MySQLKeywords, unique = unique,
+                            allow.keywords = allow.keywords)
    },
    valueClass = "character"
 )
@@ -329,8 +331,8 @@ setMethod("SQLKeywords", "MySQLObject",
 
 setMethod("isSQLKeyword",
    signature(dbObj="MySQLObject", name="character"),
-   def = function(dbObj, name, ...){
-        isSQLKeyword.default(name, keywords = .MySQLKeywords)
+   def = function(dbObj, name, keywords = .MySQLKeywords, case, ...){
+        isSQLKeyword.default(name, keywords = .MySQLKeywords, case = case)
    },
    valueClass = "character"
 )

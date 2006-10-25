@@ -1,14 +1,13 @@
 Package: RMySQL
-Version: 0.5-9
-Date: 2006-09-25
+Version: 0.5-10
 Title: R interface to the MySQL database
-Author: David A. James <dj@bell-labs.com>
-        Saikat DebRoy <saikat@stat.wisc.edu>
-Maintainer: David A. James <dj@bell-labs.com>
+Author: David A. James and Saikat DebRoy
+Maintainer: David A. James <daj025@gmail.com>
 Description: Database interface and MySQL driver for R.
    This version complies with the database interface 
    definition as implemented in the package DBI 0.1-8.
 SaveImage: yes
-Depends: R (>= 2.0.0), methods, DBI (>= 0.1-8)
+Depends: R (>= 2.3.0), methods, DBI (>= 0.1-11)
 License: GPL 
 URL: stat.bell-labs.com/RS-DBI www.mysql.com www.omegahat.org
+Collate:  S4R.R zzz.R dbObjectId.R MySQL.R MySQLSupport.R

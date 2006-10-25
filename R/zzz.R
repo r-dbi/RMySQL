@@ -3,14 +3,9 @@
 ##
 
 ".conflicts.OK" <- TRUE
-## need DBI and methods *prior* to having library.dynam() invoked!
-library(methods)
-library(DBI, warn.conflicts = FALSE)
 
 ".First.lib" <- 
-function(lib, pkg) 
+function(libname, pkgname) 
 {
-   library(methods)
-   library(DBI, warn.conflicts = FALSE)
-   library.dynam("RMySQL", pkg, lib)
+   library.dynam("RMySQL", pkgname, libname)
 }

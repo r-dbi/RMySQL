@@ -1,2 +1,2 @@
-PKG_CPPFLAGS = -I/usr/include/mysql -Wall -pedantic
+PKG_CPPFLAGS = -I/usr/include/mysql
 PKG_LIBS = -lmysqlclient -lz
