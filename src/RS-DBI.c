@@ -453,8 +453,8 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
     output = AS_LIST(output);
   else 
     RS_DBI_errorMessage(
-          "internal error in RS_DBI_allocOutput: could not (re)allocate output list",
-                        RS_DBI_ERROR);
+      "internal error in RS_DBI_allocOutput: could not (re)allocate output list",
+      RS_DBI_ERROR);
 #endif
 
   MEM_PROTECT(output);
@@ -494,6 +494,7 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
       SET_ELEMENT(output, j, NEW_LIST(num_rec));
       break;
 #ifndef USING_R
+      /* should we map BLOBS to RAWs? what do we return? an external pointer?*/
     case RAW:  /* we use a list as a container for raw objects */
       SET_ELEMENT(output, j, NEW_LIST(num_rec));
       break;
@@ -711,6 +712,7 @@ RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
       MEM_PROTECT(obj = NEW_LIST(num_elem));
       break;
 #ifndef USING_R
+      /* this should work in R, but it needs testing first */
     case RAW_TYPE:
       MEM_PROTECT(obj = NEW_RAW(num_elem));
       break;
@@ -1103,7 +1105,7 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   num_fields = flds->num_fields;
   for(j = 0; j < n; j++) 
     lengths[j] = (Sint) num_fields;
-  S_fields =  RS_DBI_createNamedList(desc, types, lengths, n);
+  PROTECT(S_fields =  RS_DBI_createNamedList(desc, types, lengths, n));
 #ifndef USING_R
   if(IS_LIST(S_fields))
     S_fields = AS_LIST(S_fields);
@@ -1122,7 +1124,7 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
     LST_INT_EL(S_fields,5,i) = (Sint) flds->scale[i];
     LST_INT_EL(S_fields,6,i) = (Sint) flds->nullOk[i];
   }
-
+  UNPROTECT(1);
   return(S_fields);
 }
 
@@ -1274,6 +1276,7 @@ const struct data_types RS_dataTypeTable[] = {
     { "any",		ANYSXP	   },
     { "expression",	EXPRSXP	   },
     { "list",		VECSXP	   },
+    { "raw",		RAWSXP     },
     /* aliases : */
     { "numeric",	REALSXP	   },
     { "name",		SYMSXP	   },

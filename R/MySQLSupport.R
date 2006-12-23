@@ -277,7 +277,7 @@ function(res, INDEX, FUN = stop("must specify FUN"),
 ##  begin()
 ##    group.begin(group.name)   
 ##    new.record(df.record)
-##    FUN(df.group, group.name)   (aka group.end)
+##    FUN(df.group, group.name, ...)   (aka group.end)
 ##  end()
 ##
 ## TODO: (1) add argument output=F/T to suppress the creation of

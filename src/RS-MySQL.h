@@ -56,13 +56,13 @@ extern  "C" {
  * themselves.
  */
 typedef struct st_sdbi_conParams {
-  char *host;
-  char *dbname;
-  char *user;
-  char *passwd;
-  char *unix_socket;
-  unsigned int  port; 
-  unsigned int  client_flags;
+    char *host;
+    char *dbname;
+    char *user;
+    char *passwd;
+    char *unix_socket;
+    unsigned int  port; 
+    unsigned int  client_flags;
 } RS_MySQL_conParams;
 
 RS_MySQL_conParams *RS_MySQL_allocConParams(void);
@@ -85,10 +85,10 @@ s_object   *RS_MySQL_close(Mgr_Handle *mgrHandle);
 
 /* dbConnection */
 Con_Handle *RS_MySQL_newConnection(Mgr_Handle *mgrHandle, 
-				   s_object *con_params,
-				   s_object *MySQLgroups,
-				   s_object *s_mysql_default_file);
-Con_Handle *RS_MySQL_cloneConnection(Con_Handle *conHandle);
+    s_object *con_params,
+    s_object *MySQLgroups,
+    s_object *s_mysql_default_file);
+    Con_Handle *RS_MySQL_cloneConnection(Con_Handle *conHandle);
 s_object   *RS_MySQL_closeConnection(Con_Handle *conHandle);
 s_object   *RS_MySQL_getException(Con_Handle *conHandle);    /* err No, Msg */
 
@@ -109,30 +109,30 @@ s_object *RS_MySQL_resultSetInfo(Res_Handle *rsHandle);
 
 /* the following type names are from "mysql_com.h" */
 static struct data_types RS_MySQL_dataTypes[] = {
-    { "FIELD_TYPE_DECIMAL",	FIELD_TYPE_DECIMAL	},
-    { "FIELD_TYPE_TINY",	FIELD_TYPE_TINY		},
-    { "FIELD_TYPE_SHORT",	FIELD_TYPE_SHORT	},
-    { "FIELD_TYPE_LONG",	FIELD_TYPE_LONG		},
-    { "FIELD_TYPE_FLOAT",	FIELD_TYPE_FLOAT	},
-    { "FIELD_TYPE_DOUBLE",	FIELD_TYPE_DOUBLE	},
-    { "FIELD_TYPE_NULL",	FIELD_TYPE_NULL		},
-    { "FIELD_TYPE_TIMESTAMP",   FIELD_TYPE_TIMESTAMP	},
-    { "FIELD_TYPE_LONGLONG",	FIELD_TYPE_LONGLONG	},
-    { "FIELD_TYPE_INT24",	FIELD_TYPE_INT24	},
-    { "FIELD_TYPE_DATE",	FIELD_TYPE_DATE		},
-    { "FIELD_TYPE_TIME",	FIELD_TYPE_TIME		},
-    { "FIELD_TYPE_DATETIME",	FIELD_TYPE_DATETIME	},
-    { "FIELD_TYPE_YEAR",	FIELD_TYPE_YEAR		},
-    { "FIELD_TYPE_NEWDATE",	FIELD_TYPE_NEWDATE	},
-    { "FIELD_TYPE_ENUM",	FIELD_TYPE_ENUM		},
-    { "FIELD_TYPE_SET",		FIELD_TYPE_SET		},
-    { "FIELD_TYPE_TINY_BLOB",	FIELD_TYPE_TINY_BLOB	},
-    { "FIELD_TYPE_MEDIUM_BLOB",	FIELD_TYPE_MEDIUM_BLOB	},
-    { "FIELD_TYPE_LONG_BLOB",	FIELD_TYPE_LONG_BLOB	},
-    { "FIELD_TYPE_BLOB",	FIELD_TYPE_BLOB		},
-    { "FIELD_TYPE_VAR_STRING",	FIELD_TYPE_VAR_STRING	},
-    { "FIELD_TYPE_STRING",	FIELD_TYPE_STRING	},
-    { (char *) 0,			-1		}
+    { "FIELD_TYPE_DECIMAL",    FIELD_TYPE_DECIMAL},
+    { "FIELD_TYPE_TINY",       FIELD_TYPE_TINY},
+    { "FIELD_TYPE_SHORT",      FIELD_TYPE_SHORT},
+    { "FIELD_TYPE_LONG",       FIELD_TYPE_LONG},
+    { "FIELD_TYPE_FLOAT",      FIELD_TYPE_FLOAT},
+    { "FIELD_TYPE_DOUBLE",     FIELD_TYPE_DOUBLE},
+    { "FIELD_TYPE_NULL",       FIELD_TYPE_NULL},
+    { "FIELD_TYPE_TIMESTAMP",  FIELD_TYPE_TIMESTAMP},
+    { "FIELD_TYPE_LONGLONG",   FIELD_TYPE_LONGLONG},
+    { "FIELD_TYPE_INT24",      FIELD_TYPE_INT24},
+    { "FIELD_TYPE_DATE",       FIELD_TYPE_DATE},
+    { "FIELD_TYPE_TIME",       FIELD_TYPE_TIME},
+    { "FIELD_TYPE_DATETIME",   FIELD_TYPE_DATETIME},
+    { "FIELD_TYPE_YEAR",       FIELD_TYPE_YEAR},
+    { "FIELD_TYPE_NEWDATE",    FIELD_TYPE_NEWDATE},
+    { "FIELD_TYPE_ENUM",       FIELD_TYPE_ENUM},
+    { "FIELD_TYPE_SET",        FIELD_TYPE_SET},
+    { "FIELD_TYPE_TINY_BLOB",  FIELD_TYPE_TINY_BLOB},
+    { "FIELD_TYPE_MEDIUM_BLOB",FIELD_TYPE_MEDIUM_BLOB},
+    { "FIELD_TYPE_LONG_BLOB",  FIELD_TYPE_LONG_BLOB},
+    { "FIELD_TYPE_BLOB",       FIELD_TYPE_BLOB},
+    { "FIELD_TYPE_VAR_STRING", FIELD_TYPE_VAR_STRING},
+    { "FIELD_TYPE_STRING",     FIELD_TYPE_STRING},
+    { (char *) 0, -1 }
 };
 
 s_object *RS_MySQL_typeNames(s_object *typeIds);

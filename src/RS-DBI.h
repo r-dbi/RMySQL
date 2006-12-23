@@ -49,7 +49,7 @@ pid_t getpid();
  */
 /* In R/S a dbObject is a foreign reference consisting of a vector
  * of 1, 2 or 3 integers.  In the C implementation we use these 
- * R/S vectors as handles (we could have use pointers).
+ * R/S vectors as handles (we could have used pointers).
  */
 typedef enum enum_dbi_exception {
   RS_DBI_MESSAGE,

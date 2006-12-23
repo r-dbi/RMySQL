@@ -1,3 +1,14 @@
+Version 0.5-11
+
+* Fixed a bug that would crash R with a failed mysql_real_connect().
+
+* dbApply() is now working again (but still experimentally).
+
+* Re-formatted the C code.
+
+[0.5-9 through 0.5-10 were maintanance releases that Seth Falcon
+kindly put out.]
+
 Version 0.5-8
  
 * Added MySQL error message when failing to connect (thanks to
