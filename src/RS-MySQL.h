@@ -97,6 +97,10 @@ Res_Handle *RS_MySQL_exec(Con_Handle *conHandle, s_object *statement);
 s_object   *RS_MySQL_fetch(Res_Handle *rsHandle, s_object *max_rec);
 s_object   *RS_MySQL_closeResultSet(Res_Handle *rsHandle); 
 
+/* Multiple result set function (as of MySQL Version 4.1) */
+Res_Handle *RS_MySQL_nextResultSet(Con_Handle *conHandle);
+s_object   *RS_MySQL_moreResultSets(Con_Handle *conHandle);  /* boolean */
+
 s_object   *RS_MySQL_validHandle(Db_Handle *handle);      /* boolean */
 
 RS_DBI_fields *RS_MySQL_createDataMappings(Res_Handle *resHandle);

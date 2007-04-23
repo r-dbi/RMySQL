@@ -1,6 +1,6 @@
 Package: RMySQL
-Version: 0.5-11
-Date: 2006-12-22
+Version: 0.5-12
+Date: 2007-04-22
 Title: R interface to the MySQL database
 Author: David A. James and Saikat DebRoy
 Maintainer: David A. James <daj025@gmail.com>

@@ -1,3 +1,23 @@
+Version 0.5-12
+
+* Added a highly experimental version of multiple result sets processing. 
+  There are two DBI extensions, dbMoreResults() and dbNextResult()
+  that return, respectively, whether there are more results sets and 
+  the next result set, e.g., 
+
+     con <- dbConnect("MySQL", "test", client.flag = 65536) 
+
+     r1 <- dbSendQuery(con, "sql ; sql ; sql;")
+     fetch(r2)
+ 
+     r2 <- dbNextResult(con)    ## Note this takes the connection object
+     fetch(r2)
+
+     r3 <- dbNextResult(con)
+     fetch(r3)
+
+   (Not all results need return data).
+
 Version 0.5-11
 
 * Fixed a bug that would crash R with a failed mysql_real_connect().

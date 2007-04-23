@@ -23,7 +23,7 @@
 
 .MySQLRCS <- "$Id$"
 .MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
-.MySQLVersion <- "0.5-8"       ##package.description(.MySQLPkgName, fields = "Version")
+.MySQLVersion <- "0.5-12"      ##package.description(.MySQLPkgName, fields = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
@@ -336,8 +336,36 @@ setMethod("isSQLKeyword",
    },
    valueClass = "character"
 )
+
 ## extension to the DBI 0.1-4
 setGeneric("dbApply", def = function(res, ...) standardGeneric("dbApply"))
 setMethod("dbApply", "MySQLResult",
    def = function(res, ...)  mysqlDBApply(res, ...),
 )
+
+setGeneric("dbMoreResults",
+   def = function(con, ...) standardGeneric("dbMoreResults"),
+   valueClass = "logical"
+)
+
+setMethod("dbMoreResults", 
+   signature(con = "MySQLConnection"),
+   def = function(con, ...) .Call("RS_MySQL_moreResultSets", as(con, "integer"))
+)
+
+setGeneric("dbNextResult",
+   def = function(con, ...) standardGeneric("dbNextResult"),
+   #valueClass = DBIResult
+)
+
+setMethod("dbNextResult", 
+   signature(con = "MySQLConnection"),
+   def = function(con, ...){
+       for(rs in dbListResults(con)){
+           dbClearResult(rs)
+       }
+      id = .Call("RS_MySQL_nextResultSet", as(con, "integer"))
+      new("MySQLResult", Id = id)
+   }
+)
+

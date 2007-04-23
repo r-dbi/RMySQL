@@ -114,6 +114,97 @@ RS_MySQL_closeManager(Mgr_Handle *mgrHandle)
     return status;
 }
 
+/* Are there more results on this connection (as in multi results or
+ * SQL scripts
+ */
+
+s_object * /* boolean */
+RS_MySQL_moreResultSets(Con_Handle *conHandle)
+{
+    S_EVALUATOR
+
+    RS_DBI_connection *con;
+    MYSQL             *my_connection;
+    my_bool           tmp;
+    s_object          *status;            /* boolean */
+  
+    con = RS_DBI_getConnection(conHandle);
+    my_connection = (MYSQL *) con->drvConnection;
+
+    tmp = mysql_more_results(my_connection);
+    MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+    if(tmp)
+       LGL_EL(status, 0) = TRUE;
+    else
+       LGL_EL(status, 0) = FALSE;
+
+    MEM_UNPROTECT(1);
+
+    return status;
+}
+
+Res_Handle *
+RS_MySQL_nextResultSet(Con_Handle *conHandle)
+{
+    S_EVALUATOR
+
+    RS_DBI_connection *con;
+    RS_DBI_resultSet  *result;
+    Res_Handle        *rsHandle;
+    MYSQL_RES         *my_result;
+    MYSQL             *my_connection;
+    Sint              rc, num_fields, is_select;
+  
+    con = RS_DBI_getConnection(conHandle);
+    my_connection = (MYSQL *) con->drvConnection;
+
+    rc = (Sint) mysql_next_result(my_connection);
+
+    if(rc<0){
+        fprintf(stderr, "there are no more results\n");
+        return S_NULL_ENTRY;
+    }
+    else if(rc>0){
+        RS_DBI_errorMessage("error in getting next result set", RS_DBI_ERROR);
+    }
+
+    /* the following comes verbatim from RS_MySQL_exec() */
+    my_result = mysql_use_result(my_connection);
+    if(!my_result)
+        my_result = (MYSQL_RES *) NULL;
+
+    num_fields = (Sint) mysql_field_count(my_connection);
+    is_select = (Sint) TRUE;
+    if(!my_result){
+        if(num_fields>0){
+            RS_DBI_errorMessage("error in getting next result set", RS_DBI_ERROR);
+        }
+        else 
+            is_select = FALSE;
+    }
+
+    /* we now create the wrapper and copy values */
+    rsHandle = RS_DBI_allocResultSet(conHandle);
+    result = RS_DBI_getResultSet(rsHandle);
+    result->statement = RS_DBI_copyString("<UNKNOWN>");
+    result->drvResultSet = (void *) my_result;
+    result->rowCount = (Sint) 0;
+    result->isSelect = is_select;
+    if(!is_select){
+        result->rowsAffected = (Sint) mysql_affected_rows(my_connection);
+        result->completed = 1;
+    }
+    else {
+        result->rowsAffected = (Sint) -1;
+        result->completed = 0;
+    }
+    
+    if(is_select)
+      result->fields = RS_MySQL_createDataMappings(rsHandle);
+
+    return rsHandle;
+}
+
 /* open a connection with the same parameters used for in conHandle */
 Con_Handle *
 RS_MySQL_cloneConnection(Con_Handle *conHandle)
