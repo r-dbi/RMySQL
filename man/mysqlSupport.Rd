@@ -20,6 +20,7 @@
 \alias{mysqlWriteTable}            % convenience functions
 \alias{mysqlImportFile}
 \alias{mysqlDataType}
+\alias{mysqlEscapeStrings}
 \alias{.MySQLPkgName}              % constants
 \alias{.MySQLPkgVersion}
 \alias{.MySQLPkgRCS}
@@ -64,6 +65,7 @@
    mysqlImportFile(con, name, value, field.types, overwrite=FALSE, 
       append=FALSE, header, row.names, nrows=50, sep=",", eol="\n", 
       skip = 0, quote='"', ...)
+   mysqlEscapeStrings(con, strings)
 }
 \arguments{
 \item{max.con}{
@@ -193,6 +195,7 @@
    being written.  Defaults to \code{FALSE}, forcing \code{mysqlWriteTable}
    to modify column names to make them legal MySQL identifiers.
    }
+\item{strings}{a character vector of strings to be escaped}
 \item{\dots}{
    placeholder for future use.
 }
@@ -249,6 +252,10 @@
    \code{mysqlDataType} retuns a character string with the closest
    
    \code{mysqlResultInfo} returns a list of name-value metadata pairs.
+
+   \code{mysqlEscapeStrings} returns a character vector with each string 
+   escaped for MySQL special characters (such as single and double quotes).
+   This is done using the character set used by the connection \code{con}.
 }
 \section{Constants}{
 \code{.MySQLPkgName} (currently \code{"RMySQL"}),
