@@ -1711,3 +1711,56 @@ RS_MySQL_insertid(Con_Handle *conHandle)
     return output;
 
 }
+
+/* The single string version of this function was kindly provided by 
+ * J. T. Lindgren (any bugs are probably dj's)
+ *
+ * NOTE/BUG?: This function could potentially grab a huge amount of memory
+ *   if given (not inappropriately) very large binary objects. How should
+ *   we protect against potentially deadly requests?
+ */
+
+s_object *
+RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
+{
+    RS_DBI_connection *con;
+    MYSQL             *my_connection;
+    long len, old_len;
+    Sint i, nStrings;
+    char *str;
+    char *escapedString;
+    s_object  *output;
+
+    con = RS_DBI_getConnection(conHandle);
+    my_connection = (MYSQL *) con->drvConnection;
+
+    nStrings = GET_LENGTH(strings);
+    MEM_PROTECT(output = NEW_CHARACTER(nStrings));
+
+    old_len = (long) 1;
+    escapedString = (char *) S_alloc(old_len, (int) sizeof(char));
+    if(!escapedString){
+        RS_DBI_errorMessage(
+           "(RS_MySQL_escapeStrings) could not allocate memory",
+        RS_DBI_ERROR);
+    }
+
+    for(i=0; i<nStrings; i++){
+        str = RS_DBI_copyString(CHR_EL(strings,i));
+        len = (long) strlen(str);
+        escapedString = (char *) S_realloc(escapedString,
+               (long) 2*len+1, old_len, (int)sizeof(char));
+        if(!escapedString){
+            RS_DBI_errorMessage(
+               "(RS_MySQL_escapeStrings) could not (re)allocate memory",
+            RS_DBI_ERROR);
+        }
+
+        mysql_real_escape_string(my_connection, escapedString, str, len);
+
+        SET_CHR_EL(output, i, C_S_CPY(escapedString));
+    }
+
+    MEM_UNPROTECT(1); 
+    return output;
+}
