@@ -338,6 +338,21 @@ setMethod("isSQLKeyword",
 )
 
 ## extension to the DBI 0.1-4
+
+setGeneric("escape.strings", 
+   def = function(con, strings, ...) standardGeneric("escape.strings"))
+setMethod("escape.strings", 
+   sig = signature(con = "MySQLConnection", strings = "character"),
+   def = mysqlEscapeStrings,
+   valueClass = "character"
+)
+setMethod("escape.strings", 
+   sig = signature(con = "MySQLResult", strings = "character"),
+   def = function(con, strings, ...) 
+       mysqlEscapeString(as(con, "MySQLConnection"), strings),
+   valueClass = "character"
+)
+  
 setGeneric("dbApply", def = function(res, ...) standardGeneric("dbApply"))
 setMethod("dbApply", "MySQLResult",
    def = function(res, ...)  mysqlDBApply(res, ...),

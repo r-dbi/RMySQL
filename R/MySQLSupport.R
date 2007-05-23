@@ -715,6 +715,21 @@ function(obj, ...)
    sql.type
 }
 
+## the following code was kindly provided ny J. T. Lindgren.
+"mysqlEscapeStrings" <-
+function(con, strings)
+{
+  ## Escapes the given strings
+  if(!isIdCurrent(con))
+     stop(paste("expired", class(con)))
+  strings <- as(strings, "character")
+  conId <- as(con, "integer");
+  out <- .Call("RS_MySQL_escapeStrings", conId, strings,
+       PACKAGE = .MySQLPkgName)
+  names(out) <- names(strings)
+  out
+}
+
 ## the following reserved words were taken from Section 6.1.7
 ## of the MySQL Manual, Version 4.1.1-alpha, html format.
 
