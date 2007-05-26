@@ -1,22 +1,28 @@
 Version 0.5-12
 
-* Added a highly experimental version of multiple result sets processing. 
-  There are two DBI extensions, dbMoreResults() and dbNextResult()
-  that return, respectively, whether there are more results sets and 
-  the next result set, e.g., 
+* Added an experimental version of multiple result sets processing.
+  There are two new DBI generic function extensions, dbMoreResults() 
+  and dbNextResult() that return, respectively, whether there are 
+  more results sets and the next result set.  Note that to use this 
+  feature on a connection, the connection must be created with the
+  CLIENT_MULTI_RESULTS client flag. Also note that not all results 
+  need return data.  (Thanks to Crispin Miller for code patches and 
+  testing; also thanks to Michal Okonlewski for initial discussions 
+  on this.)
 
-     con <- dbConnect("MySQL", "test", client.flag = 65536) 
+* Added connection flags with names after the MySQL C macros 
+  CLIENT_COMPRESS, CLIENT_LOCAL_FILES, CLIENT_MULTI_RESULTS, etc.
 
-     r1 <- dbSendQuery(con, "sql ; sql ; sql;")
-     fetch(r2)
- 
-     r2 <- dbNextResult(con)    ## Note this takes the connection object
-     fetch(r2)
+* Added generic function dbEscapeStrings() and a MySQL connection 
+  method to escape strings on a connection basis, i.e., each connection 
+  can support different char sets.  (Thanks to J. T. Lindgren for the 
+  original code.)
 
-     r3 <- dbNextResult(con)
-     fetch(r3)
-
-   (Not all results need return data).
+* Enabled the dormant NAMESPACE (thanks to Paul Gilbert).
+  
+* configure now also looks for lib64 libraries *before* the default
+  library directories /usr/lib, etc. (Thanks to Brian Ripley for this 
+  patch.)
 
 Version 0.5-11
 
