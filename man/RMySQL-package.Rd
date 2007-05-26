@@ -43,6 +43,21 @@ A typical usage of the R-MySQL interface is:
    d1 <- fetch(rs, n = 10000)
    d2 <- fetch(rs, n = -1
    }
+\item Run multiple SQL statements and process the various result sets 
+   (note the \code{client.flag} value in the \code{dbConnect} call):
+   \preformatted{
+   con <- dbConnection(MySQL(), dbname = "rs-dbi", 
+             client.flag = CLIENT\_MULTI\_RESULTS)
+   script  <- paste("select * from WL where width\_nm between 0.5 and 1"
+                    "select * from lasers\_id  where id LIKE 'AL100%'
+                    sep = ";")
+   rs1 <- dbSendQuery(con, script)
+   d1 <- fetch(rs1, n = -1)
+   if(dbMoreResults(con)){
+      rs2 <- dbNextResult(con)
+      d2 <- fetch(rs2, n=-1)
+   }
+   }
 \item Get meta-information on a connection (thread-id, etc.):
    \preformatted{
    summary(MySQL(), verbose = TRUE)

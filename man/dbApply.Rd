@@ -1,9 +1,9 @@
 % $Id$
 \name{dbApply}
 \alias{dbApply}
-\title{Apply R/S-Plus functions to remote groups of DBMS rows (experimental)}
+\title{Apply R functions to remote groups of DBMS rows (experimental)}
 \description{
-  Applies R/S-Plus functions to groups of remote DBMS rows without
+  Applies R functions to groups of remote DBMS rows without
   bringing an entire result set all at once.  The result set
   is expected to be sorted by the grouping field.
 }
