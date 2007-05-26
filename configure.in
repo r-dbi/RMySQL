@@ -133,7 +133,8 @@ fi
 # if above fails, do a more exhaustive search into potential mysql
 # subdirectories of the system directories.
 if test -z "${HAVE_MYSQL_LIB}" -a -z "${PKG_LIBS}" ; then
-   for dir in /usr/local/lib /usr/lib /usr/local/mysql/lib /opt/lib /lib
+   for dir in /usr/local/lib64 /usr/lib64 \
+              /usr/local/lib   /usr/lib /usr/local/mysql/lib /opt/lib /lib
    do  # need to release mysqlcient from cache
        unset ac_cv_lib_mysqlclient_mysql_init
        candidate="${dir}/mysql"
