@@ -18,8 +18,6 @@ Version 0.5-12
   can support different char sets.  (Thanks to J. T. Lindgren for the 
   original code.)
 
-* Enabled the dormant NAMESPACE (thanks to Paul Gilbert).
-  
 * configure now also looks for lib64 libraries *before* the default
   library directories /usr/lib, etc. (Thanks to Brian Ripley for this 
   patch.)
