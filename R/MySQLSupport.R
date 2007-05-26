@@ -104,7 +104,7 @@ function(drv, dbname = "", username="",
       stop("expired manager")
    con.params <- as.character(c(username, password, host, 
                                 dbname, unix.socket, port, 
-                                client.flag))
+                                as.integer(client.flag)))
    groups <- as.character(groups)
    if(length(default.file)==1){
       default.file <- file.path(dirname(default.file), basename(default.file))

@@ -26,6 +26,28 @@
 .MySQLVersion <- "0.5-12"      ##package.description(.MySQLPkgName, fields = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
+## The following client flags were copied from mysql_com.h (version 4.1.13)
+## but it may not make sense to set some of this from RMySQL.
+
+CLIENT_LONG_PASSWORD <-   1    # new more secure passwords 
+CLIENT_FOUND_ROWS    <-   2    # Found instead of affected rows 
+CLIENT_LONG_FLAG     <-   4    # Get all column flags 
+CLIENT_CONNECT_WITH_DB <- 8    # One can specify db on connect 
+CLIENT_NO_SCHEMA     <-  16    # Don't allow database.table.column 
+CLIENT_COMPRESS      <-  32    # Can use compression protocol 
+CLIENT_ODBC          <-  64    # Odbc client 
+CLIENT_LOCAL_FILES   <- 128    # Can use LOAD DATA LOCAL 
+CLIENT_IGNORE_SPACE  <- 256    # Ignore spaces before '(' 
+CLIENT_PROTOCOL_41   <- 512    # New 4.1 protocol 
+CLIENT_INTERACTIVE   <- 1024   # This is an interactive client 
+CLIENT_SSL           <- 2048   # Switch to SSL after handshake 
+CLIENT_IGNORE_SIGPIPE <- 4096  # IGNORE sigpipes 
+CLIENT_TRANSACTIONS <- 8192    # Client knows about transactions 
+CLIENT_RESERVED     <- 16384   # Old flag for 4.1 protocol  
+CLIENT_SECURE_CONNECTION <- 32768 # New 4.1 authentication 
+CLIENT_MULTI_STATEMENTS  <- 65536 # Enable/disable multi-stmt support 
+CLIENT_MULTI_RESULTS     <- 131072 # Enable/disable multi-results 
+
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 
 ##
@@ -339,14 +361,14 @@ setMethod("isSQLKeyword",
 
 ## extension to the DBI 0.1-4
 
-setGeneric("escape.strings", 
-   def = function(con, strings, ...) standardGeneric("escape.strings"))
-setMethod("escape.strings", 
+setGeneric("dbEscapeStrings", 
+   def = function(con, strings, ...) standardGeneric("dbEscapeStrings"))
+setMethod("dbEscapeStrings",
    sig = signature(con = "MySQLConnection", strings = "character"),
    def = mysqlEscapeStrings,
    valueClass = "character"
 )
-setMethod("escape.strings", 
+setMethod("dbEscapeStrings",
    sig = signature(con = "MySQLResult", strings = "character"),
    def = function(con, strings, ...) 
        mysqlEscapeString(as(con, "MySQLConnection"), strings),
@@ -365,12 +387,14 @@ setGeneric("dbMoreResults",
 
 setMethod("dbMoreResults", 
    signature(con = "MySQLConnection"),
-   def = function(con, ...) .Call("RS_MySQL_moreResultSets", as(con, "integer"))
+   def = function(con, ...) 
+      .Call("RS_MySQL_moreResultSets", as(con, "integer"), 
+            PACKAGE=.MySQLPkgName)
 )
 
 setGeneric("dbNextResult",
-   def = function(con, ...) standardGeneric("dbNextResult"),
-   #valueClass = DBIResult
+   def = function(con, ...) standardGeneric("dbNextResult")
+   #valueClass = "DBIResult" or NULL
 )
 
 setMethod("dbNextResult", 
@@ -379,7 +403,8 @@ setMethod("dbNextResult",
        for(rs in dbListResults(con)){
            dbClearResult(rs)
        }
-      id = .Call("RS_MySQL_nextResultSet", as(con, "integer"))
+      id = .Call("RS_MySQL_nextResultSet", as(con, "integer"),
+                 PACKAGE=.MySQLPkgName)
       new("MySQLResult", Id = id)
    }
 )
