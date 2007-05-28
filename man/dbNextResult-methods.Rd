@@ -21,19 +21,22 @@
   MySQL supports SQL scripts (multiple statements terminated by ';') and 
   stored procedures from version 4.1.1 onwards.
 
-  To process SQL scripts or stored procedures on a MySQL connection, 
-  the connection must be created using the \code{CLIENT\_MULTI\_STATEMENTS} or 
-  \code{CLIENT\_MULTI\_RESULTS} client flags (see the example below).
+  To process SQL scripts on a MySQL connection, 
+  the connection must be created using the \code{CLIENT\_MULTI\_STATEMENTS}.
+  In addition, to process stored procedures that return one or more
+  result sets, the connection must be created using the 
+  \code{CLIENT\_MULTI\_RESULTS} client flag.
+
+  For simplicity, use \code{CLIENT\_MULTI\_STATEMENTS} for working
+  with either SQL scripts or stored procedures.  For more details, read on.
 
   More precisely, to execute multiple statements the connection needs 
-  \code{CLIENT\_MULTI\_STATEMENTS}, but this does not allow 
-  \emph{fetching} of multiple output results -- for that you need
-  the connection to support \code{CLIENT\_MULTI\_RESULTS}; 
-  this last flag does provide functionality for both executing multiple 
-  statements \bold{and} fetching multiple results, thus it is simpler 
-  to just use the latter.
-
-  See the MySQL documentation in \url{www.mysql.com} for more details.
+  \code{CLIENT\_MULTI\_STATEMENTS}; this in turn automatically enables 
+  \code{CLIENT\_MULTI\_RESULTS} for \emph{fetching} of multiple output 
+  results. 
+  On the other hand, the client flag \code{CLIENT\_MULTI\_RESULTS} by 
+  itself enables stored procedures to return one or more results.
+  See the MySQL documentation in \url{www.mysql.com} for full details.
 }
 \keyword{methods}
 \seealso{
@@ -49,7 +52,7 @@
 \examples{\dontrun{
 con <- dbConnect(MySQL(), 
           dbname = "rs-dbi", 
-          client.flag=CLIENT\_MULTI\_RESULTS)
+          client.flag=CLIENT\_MULTI\_STATEMENTS)
 sql.script <- paste(
    "select * from abc",
    "select * def", 

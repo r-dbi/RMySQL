@@ -161,8 +161,7 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
     rc = (Sint) mysql_next_result(my_connection);
 
     if(rc<0){
-        fprintf(stderr, "there are no more results\n");
-        return S_NULL_ENTRY;
+        RS_DBI_errorMessage("no more result sets", RS_DBI_ERROR);
     }
     else if(rc>0){
         RS_DBI_errorMessage("error in getting next result set", RS_DBI_ERROR);

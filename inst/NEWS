@@ -1,11 +1,11 @@
-Version 0.5-12
+Version 0.6-0
 
 * Added an experimental version of multiple result sets processing.
   There are two new DBI generic function extensions, dbMoreResults() 
   and dbNextResult() that return, respectively, whether there are 
   more results sets and the next result set.  Note that to use this 
   feature on a connection, the connection must be created with the
-  CLIENT_MULTI_RESULTS client flag. Also note that not all results 
+  CLIENT_MULTI_STATEMENTS client flag. Also note that not all results 
   need return data.  (Thanks to Crispin Miller for code patches and 
   testing; also thanks to Michal Okonlewski for initial discussions 
   on this.)
@@ -18,9 +18,16 @@ Version 0.5-12
   can support different char sets.  (Thanks to J. T. Lindgren for the 
   original code.)
 
-* configure now also looks for lib64 libraries *before* the default
-  library directories /usr/lib, etc. (Thanks to Brian Ripley for this 
-  patch.)
+* Enabled the package NAMESPACE.  Notice that the mysql*() support 
+  functions will be made private in the near future.
+
+* The configure script now also looks in lib64 libraries *before* the 
+  default library directories /usr/lib, etc. (thanks to Brian Ripley for 
+  this patch).  Notice that this behavior will select 64-bit libraries 
+  over 32-bit on systems that host both R builds, thus in these cases 
+  you may want to explicitly use PKG_CPPFLAGS and PKG_LIBS.  See the 
+  "R Installation and Administration" for more details, including 
+  Section 8 "Choosing between 32- and 64-bit builds".
 
 Version 0.5-11
 
@@ -30,7 +37,7 @@ Version 0.5-11
 
 * Re-formatted the C code.
 
-[0.5-9 through 0.5-10 were maintanance releases that Seth Falcon
+[0.5-9 through 0.5-10 were maintenance releases that Seth Falcon
 kindly put out.]
 
 Version 0.5-8
@@ -42,12 +49,12 @@ Version 0.5-8
   integers if not too many bytes, otherwise to characters) and 
   NEWDECIMAL.
 
-* Fixed a stack inbalance when cloning a connection, e.g., 
+* Fixed a stack imbalance when cloning a connection, e.g., 
   con2 <- dbConnect(con).
 
 * Remove abbreviation F for FALSE in call to MySQL().
 
-* Added pakage documentation page.
+* Added package documentation page.
 
 Version 0.5-7
 
@@ -134,7 +141,7 @@ the workhorse functions are.    No new functionality in this version.
 
 Version 0.4-6
 
-Ported to Windows with some very nasty porting problems beatifully
+Ported to Windows with some very nasty porting problems beautifully
 solved by BDR (thanks!)
 
 * Added Makevars.win for Windows' sake.
@@ -143,7 +150,7 @@ solved by BDR (thanks!)
   The issue is that MySQL C function load_defaults() is not defined
   in libMySQL.lib, only mysqlclient.lib.  Unfortunately the client
   library is only for static, thread-safe applications. (Need to 
-  solve this thread-safty issue).
+  solve this thread-safety issue).
 
 * Need to re-import the libMySQL.lib (see README.windows).
 
@@ -207,7 +214,7 @@ NOTE: Next release will most likely implement the emerging R/S DBI
   when exporting a data.frame to MySQL. (On input MySQL interprets
   '\N' as an SQL NULL, which is what we use in SQL to denote an NA
   in R/S.)  Re-named the argument from "rownames" to "row.names"
-  for consitancy with getTable (see below).
+  for consistency with getTable (see below).
 
 * Added row.names= argument to getTable().  The semantics is similar
   (but not identical) to read.table(), namely if row.names is a

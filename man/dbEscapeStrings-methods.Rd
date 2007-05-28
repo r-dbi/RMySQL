@@ -36,7 +36,7 @@
 \examples{\dontrun{
 con <- dbConnect(MySQL(), 
           dbname = "rs-dbi", 
-          client.flag=CLIENT_MULTI_RESULTS)
+          client.flag=CLIENT\_MULTI\_STATEMENTS)
 tmp <- sprintf("select * from emp where lname = %s", "O'Reilly")
 sql <- dbEscapeString(con, tmp)
 dbGetQuery(con, sql)

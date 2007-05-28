@@ -47,7 +47,7 @@ A typical usage of the R-MySQL interface is:
    (note the \code{client.flag} value in the \code{dbConnect} call):
    \preformatted{
    con <- dbConnection(MySQL(), dbname = "rs-dbi", 
-             client.flag = CLIENT\_MULTI\_RESULTS)
+             client.flag = CLIENT\_MULTI\_STATEMENTS)
    script  <- paste("select * from WL where width\_nm between 0.5 and 1"
                     "select * from lasers\_id  where id LIKE 'AL100%'
                     sep = ";")

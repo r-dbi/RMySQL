@@ -30,7 +30,7 @@ function(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
 {
    if(fetch.default.rec<=0)
       stop("default num of records per fetch must be positive")
-   config.params <- as.integer(c(max.con, fetch.default.rec))
+   config.params <- as(c(max.con, fetch.default.rec), "integer")
    force <- as.logical(force.reload)
    drvId <- .Call("RS_MySQL_init", config.params, force, 
                   PACKAGE = .MySQLPkgName)

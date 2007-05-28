@@ -4,8 +4,10 @@
 
 ".conflicts.OK" <- TRUE
 
-".First.lib" <- 
+#".First.lib" <- 
+".onLoad" <- 
 function(libname, pkgname) 
 {
-   library.dynam("RMySQL", pkgname, libname)
+   #library.dynam("RMySQL", pkgname, libname)
+   require(methods)
 }
