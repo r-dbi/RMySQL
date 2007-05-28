@@ -361,10 +361,7 @@ function(res, n=0, ...)
    nrec <- length(rel[[1]])
    indx <- seq(from = cnt - nrec + 1, length = nrec)
    attr(rel, "row.names") <- as.character(indx)
-   if(usingR())
-      class(rel) <- "data.frame"
-   else
-      oldClass(rel) <- "data.frame"
+   class(rel) <- "data.frame"
    rel
 }
 
@@ -675,14 +672,9 @@ function(value, file, batch, ...)
    from <- 1 
    to <- min(batch, N)
    while(from<=N){
-      if(usingR())
-         write.table(value[from:to,, drop=FALSE], file = file, append = TRUE, 
-               quote = FALSE, sep="\t", na = .MySQL.NA.string,
-               row.names=FALSE, col.names=FALSE, eol = '\n', ...)
-      else
-         write.table(value[from:to,, drop=FALSE], file = file, append = TRUE, 
-               quote.string = FALSE, sep="\t", na = .MySQL.NA.string,
-               dimnames.write=FALSE, end.of.row = '\n', ...)
+      write.table(value[from:to,, drop=FALSE], file = file, append = TRUE, 
+            quote = FALSE, sep="\t", na = .MySQL.NA.string,
+            row.names=FALSE, col.names=FALSE, eol = '\n', ...)
       from <- to+1
       to <- min(to+batch, N)
    }
