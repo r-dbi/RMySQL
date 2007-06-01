@@ -5,7 +5,7 @@ Version 0.6-0
   and dbNextResult() that return, respectively, whether there are 
   more results sets and the next result set.  Note that to use this 
   feature on a connection, the connection must be created with the
-  CLIENT_MULTI_STATEMENTS client flag. Also note that not all results 
+  CLIENT_MULTI_STATEMENTS client flag.  Also note that not all results 
   need return data.  (Thanks to Crispin Miller for code patches and 
   testing; also thanks to Michal Okonlewski for initial discussions 
   on this.)
@@ -23,11 +23,12 @@ Version 0.6-0
 
 * The configure script now also looks in lib64 libraries *before* the 
   default library directories /usr/lib, etc. (thanks to Brian Ripley for 
-  this patch).  Notice that this behavior will select 64-bit libraries 
-  over 32-bit on systems that host both R builds, thus in these cases 
-  you may want to explicitly use PKG_CPPFLAGS and PKG_LIBS.  See the 
-  "R Installation and Administration" for more details, including 
-  Section 8 "Choosing between 32- and 64-bit builds".
+  this patch and Seth Falcon for additional testing).  Notice that this 
+  behavior will select 64-bit libraries over 32-bit on systems that host 
+  both R builds, thus in these cases you may want to explicitly use 
+  PKG_CPPFLAGS and PKG_LIBS.  See the "R Installation and Administration" 
+  for more details, including Section 8 "Choosing between 32- and 64-bit 
+  builds".
 
 Version 0.5-11
 

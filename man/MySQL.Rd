@@ -2,7 +2,7 @@
 \name{MySQL}
 \alias{MySQL}
 \title{
-  Instantiate a MySQL client from the current R or S-Plus session
+  Instantiate a MySQL client from the current R session
 }
 \description{
 This function creates and initializes a MySQL client.
@@ -40,7 +40,7 @@ This object is required to create connections
 to one or several MySQL database engines.
 }
 \section{Side Effects}{
-The R/S-Plus client part of the database communication is initialized,
+The R client part of the database communication is initialized,
 but note that connecting to the database engine needs to be done through
 calls to \code{\link[DBI]{dbConnect}}.
 }
@@ -86,7 +86,7 @@ database = iptraffic\cr
 This file should be readeable only by you. 
 Inside each section, MySQL parameters may be specified one per line
 (e.g., \code{user = opto}).  
-The R/S-Plus MySQL implementation always parses the \code{[client]}
+The R MySQL implementation always parses the \code{[client]}
 and \code{[rs-dbi]} sections, but you may define you own
 project-specific sections to tailor its environment; 
 if the same parameter appears more than once, the last

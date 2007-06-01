@@ -502,7 +502,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
         row.names = row.names)
     rs <- try(dbSendQuery(new.con, sql))
     if(inherits(rs, ErrorClass)){
-      warning("could not create table: aborting sqliteImportFile")
+      warning("could not create table: aborting mysqlImportFile")
       return(FALSE)
     } 
     else 
@@ -582,16 +582,16 @@ function(con, name, value, field.types, row.names = TRUE,
    if(dbExistsTable(con,name)){
       if(overwrite){
          if(!dbRemoveTable(con, name)){
-         warning(paste("table", name, "couldn't be overwritten"))
-         return(F)
+            warning(paste("table", name, "couldn't be overwritten"))
+            return(FALSE)
          }
       }
       else if(!append){
-         warning(paste("table",name,"exists in database: aborting assignTable"))
-         return(F)
+         warning(paste("table",name,"exists in database: aborting mysqlWriteTable"))
+         return(FALSE)
       }
    } 
-   if(!dbExistsTable(con,name)){      ## need to re-test table for existance 
+   if(!dbExistsTable(con,name)){      ## need to re-test table for existence 
       ## need to create a new (empty) table
       sql1 <- paste("create table ", name, "\n(\n\t", sep="")
       sql2 <- paste(paste(names(field.types), field.types), collapse=",\n\t",
@@ -600,8 +600,8 @@ function(con, name, value, field.types, row.names = TRUE,
       sql <- paste(sql1, sql2, sql3, sep="")
       rs <- try(dbSendQuery(new.con, sql))
       if(inherits(rs, ErrorClass)){
-         warning("could not create table: aborting assignTable")
-         return(F)
+         warning("could not create table: aborting mysqlWriteTable")
+         return(FALSE)
       } 
       else 
          dbClearResult(rs)
@@ -620,7 +620,7 @@ function(con, name, value, field.types, row.names = TRUE,
    rs <- try(dbSendQuery(new.con, sql4))
    if(inherits(rs, ErrorClass)){
       warning("could not load data into table")
-      return(F)
+      return(FALSE)
    } 
    else 
       dbClearResult(rs)

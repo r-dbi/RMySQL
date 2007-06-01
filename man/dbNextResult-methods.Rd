@@ -14,12 +14,17 @@
  These MySQL methods provide functionality to sequentially extract multiple
  results produced by SQL scripts or stored procedures.
 
+ In the case of stored procedures invoked with \code{CALL}, the first 
+ result set indicates the call status, and output data (if any) are
+ return as additional result sets.
+ 
  \item{con = "MySQLConnection"}{a MySQL connection object.}
  }
 }
 \section{Note}{
-  MySQL supports SQL scripts (multiple statements terminated by ';') and 
-  stored procedures from version 4.1.1 onwards.
+  MySQL supports SQL scripts (a single string with multiple statements 
+  terminated by ';') from version 4.1.1 onwards and stored procedures 
+  from version 5.0.
 
   To process SQL scripts on a MySQL connection, 
   the connection must be created using the \code{CLIENT\_MULTI\_STATEMENTS}.
@@ -43,7 +48,7 @@
   \code{\link{MySQL}},
   \code{\link[DBI]{dbConnect}},
   \code{\link[DBI]{dbSendQuery}},
-  \code{\link[DBI]{dbGetQuery}},
+  \code{\link[DBI]{dbHasCompleted}},
   \code{\link[DBI]{fetch}},
   \code{\link[DBI]{dbCommit}},
   \code{\link[DBI]{dbGetInfo}},
@@ -63,6 +68,8 @@ data1 <- fetch(rs1, n = -1)
 
 if(dbMoreResults(con)){
    rs2 <- dbNextResult(con)
+   ## you could use dbHasCompleted(rs2) to determine whether
+   ## rs2 is a select-like that generates output or not.
    data2 <- fetch(rs2, n = -1)   
    }
 }

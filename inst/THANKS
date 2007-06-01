@@ -5,7 +5,8 @@ Torsten Hothorn, Saikat Debroy, Matthew Kelly, Brian D. Ripley,
 Mikhail Kondrin, Jake Luciani, Jens Nieschulze, Deepayan Sarkar, 
 Louis Springer, Duncan Temple Lang, Luis Torgo, Arend P. van der Veen, 
 Felix Weninger, J. T. Lindgren, Crespin Miller, and Michal Okonlewski,
-and Paul Gilbert for comments, suggestions, bug reports, and patches.
+Seth Falcon and Paul Gilbert for comments, suggestions, bug reports, 
+and patches.
 
 Special thanks to Prof. Ripley for solving some tough Windows
 porting issues that had completely stumped us.
