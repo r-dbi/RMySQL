@@ -260,6 +260,8 @@ void RS_na_set(void *ptr, Stype type);
 int  RS_is_na(void *ptr, Stype type);
 extern const struct data_types RS_dataTypeTable[];
 
+int isalpha(int c);
+
 #ifdef __cplusplus 
 }
 #endif

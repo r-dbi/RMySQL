@@ -16,6 +16,7 @@
 \alias{dbGetRowCount,MySQLResult-method}
 \alias{dbGetRowsAffected,MySQLResult-method}
 \alias{dbColumnInfo,MySQLResult-method}
+\alias{dbColumnInfo,MySQLConnection-method}
 \alias{dbHasCompleted,MySQLResult-method}
 \title{
   Database interface meta-data

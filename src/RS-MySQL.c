@@ -348,11 +348,15 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
 #if HAVE_GETOPT_LONG
     argc = 1;
     argv = (char **) S_alloc((long) 1, (int) sizeof(char **));
-    argv[0] = (char *) RS_DBI_copyString("dummy"); 
+    argv[0] = (char *) RS_DBI_copyString("RMySQL"); 
 
     load_defaults("my",(const char **) groups, &argc, &argv);
     option_index = optind = 0;
-
+    /* suppress message to stderr for unrecognized options, of which there
+     * may be many. 
+     * NOTE: the opterr variable is declared extern int in "getopt.h"
+     * */
+    opterr = 0;          
     while(1){
         int nc;
         char c;
@@ -384,15 +388,15 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
 
         /* R/S arguments take precedence over configuration file defaults. */
     if(!IS_EMPTY(CHR_EL(con_params,0)))
-        user =  CHR_EL(con_params,0);
+        user = (char *) CHR_EL(con_params,0);
     if(!IS_EMPTY(CHR_EL(con_params,1)))
-        passwd= CHR_EL(con_params,1);
+        passwd= (char *) CHR_EL(con_params,1);
     if(!IS_EMPTY(CHR_EL(con_params,2)))
-        host = CHR_EL(con_params,2);
+        host = (char *) CHR_EL(con_params,2);
     if(!IS_EMPTY(CHR_EL(con_params,3)))
-        dbname = CHR_EL(con_params,3);
+        dbname = (char *) CHR_EL(con_params,3);
     if(!IS_EMPTY(CHR_EL(con_params,4)))
-        unix_socket = CHR_EL(con_params,4);
+        unix_socket = (char *) CHR_EL(con_params,4);
     p = (unsigned int) atol(CHR_EL(con_params,5));
     port = (p > 0) ? p : 0;
     client_flags = (unsigned int) atol(CHR_EL(con_params,6));

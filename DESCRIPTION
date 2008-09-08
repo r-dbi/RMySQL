@@ -1,6 +1,6 @@
 Package: RMySQL
-Version: 0.6-0
-Date: 2007-05-31
+Version: 0.6-1
+Date: 2008-09-06
 Title: R interface to the MySQL database
 Author: David A. James and Saikat DebRoy
 Maintainer: David A. James <daj025@gmail.com>
@@ -9,7 +9,7 @@ Description: Database interface and MySQL driver for R.
    definition as implemented in the package DBI 0.2-2.
 LazyLoad: true
 Depends: R (>= 2.3.0), methods, DBI (>= 0.2-2)
-License: GPL 
+License: LGPL version 2 or later
 URL: www.mysql.com www.omegahat.org 
      bioconductor.org/packages/release/extra
 Collate:  S4R.R zzz.R MySQLSupport.R dbObjectId.R MySQL.R

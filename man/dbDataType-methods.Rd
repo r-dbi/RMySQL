@@ -22,7 +22,6 @@
   any other parameters that individual methods may need.
   }
 }
-}
 \references{
   See the Database Interface definition document
   \code{DBI.pdf} in the base directory of this package

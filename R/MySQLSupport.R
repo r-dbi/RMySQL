@@ -556,7 +556,7 @@ function(con, name, value, field.types, row.names = TRUE,
    if(missing(field.types) || is.null(field.types)){
       ## the following mapping should be coming from some kind of table
       ## also, need to use converter functions (for dates, etc.)
-      field.types <- sapply(value, dbDataType, dbObj = con)
+      field.types <- lapply(value, dbDataType, dbObj = con)
    } 
 
    ## Do we need to coerce any field prior to write it out?
@@ -616,7 +616,9 @@ function(con, name, value, field.types, row.names = TRUE,
    on.exit(unlink(fn), add = TRUE)
    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
                   " INTO TABLE ", name, 
-                  " LINES TERMINATED BY '\n' ", sep="")
+                  " LINES TERMINATED BY '\n' ", 
+                  "( ", paste(names(field.types), collapse=", "), ");",
+               sep="")
    rs <- try(dbSendQuery(new.con, sql4))
    if(inherits(rs, ErrorClass)){
       warning("could not load data into table")
@@ -639,7 +641,7 @@ function(dbObj, name, obj, field.types = NULL, row.names = TRUE, ...)
   if(is.null(field.types)){
     ## the following mapping should be coming from some kind of table
     ## also, need to use converter functions (for dates, etc.)
-    field.types <- sapply(obj, dbDataType, dbObj = dbObj)
+    field.types <- lapply(obj, dbDataType, dbObj = dbObj)
   } 
   i <- match("row.names", names(field.types), nomatch=0)
   if(i>0) ## did we add a row.names value?  If so, it's a text field.

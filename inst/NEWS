@@ -1,3 +1,22 @@
+Version 0.6-1
+
+* Fixed a dormant bug in code that imporperly used "$" in 
+  mysqlWriteTable().
+
+* Fixed typo in some Rd files; got rid of a few gcc warnings;
+  we now silently ignore unrecognized options in mysql config files
+  (thanks to Jon McAuliffe for this patch), etc.
+
+* Added method dbColumnInfo(MySQLConnection, "tablename") (similar 
+  to Greg Warnes' dbDescribeTable() suggestion).
+
+* mysqlWriteTable() now issues a LOAD LOCAL specifying column names,
+  this allows to export data.frames with a subset of fields (as per
+  Greg Warnes patch).
+
+* Plugged a memory leak when closing a connection (as per Jeff Horner's 
+  patch).
+
 Version 0.6-0
 
 * Added an experimental version of multiple result sets processing.

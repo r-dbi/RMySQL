@@ -303,6 +303,18 @@ setMethod("dbColumnInfo", "MySQLResult",
    valueClass = "data.frame"
 )
 
+## NOTE: The following is experimental (as suggested by Greg Warnes)
+setMethod("dbColumnInfo", "MySQLConnection",
+   def = function(res, ...){
+      dots <- list(...) 
+      if(length(dots) == 0)
+         stop("must specify one MySQL object (table) name")
+      if(length(dots) > 1)
+         warning("dbColumnInfo: only one MySQL object name (table) may be specified", call.=FALSE)
+      dbGetQuery(res, paste("describe", dots[[1]]))
+   },
+   valueClass = "data.frame"
+)
 setMethod("dbGetRowsAffected", "MySQLResult",
    def = function(res, ...) dbGetInfo(res, "rowsAffected")[[1]],
    valueClass = "numeric"
@@ -371,7 +383,7 @@ setMethod("dbEscapeStrings",
 setMethod("dbEscapeStrings",
    sig = signature(con = "MySQLResult", strings = "character"),
    def = function(con, strings, ...) 
-       mysqlEscapeString(as(con, "MySQLConnection"), strings),
+       mysqlEscapeStrings(as(con, "MySQLConnection"), strings),
    valueClass = "character"
 )
   
