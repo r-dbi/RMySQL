@@ -42,8 +42,7 @@ static char *compiled_mysql_client_version = MYSQL_SERVER_VERSION;   /* sic.*/
  *  On S, Appendix A in "Programming with Data" by John M. Chambers. 
  *  On R, "The .Call and .External Interfaces"  in the "Writing R Extensions"
  *  manual.
- *  On MySQL, 
-       The "MySQL Reference Manual" available at http://www.mysql.com
+ *  On MySQL, The "MySQL Reference Manual" available at http://www.mysql.com
  *     Also, "MySQL" Third Ed. by Paul Dubois (2005) New Riders Publishing.
  *
  * TODO:
@@ -210,49 +209,13 @@ RS_MySQL_cloneConnection(Con_Handle *conHandle)
 {
     S_EVALUATOR
 
-    Mgr_Handle  *mgrHandle;
-    RS_DBI_connection  *con;
-    RS_MySQL_conParams *conParams;
-    s_object    *con_params, *MySQLgroups, *s_mysql_default_file;
-    char   buf1[256], buf2[256];
-
-    /* get connection params used to open existing connection */
-    con = RS_DBI_getConnection(conHandle);
-    conParams = con->conParams;
-
-    /* will not used the "group" MySQL config file info, nor the
-     * default_file (use dummy ones) 
-     */
-    MEM_PROTECT(MySQLgroups = NEW_CHARACTER((Sint) 1)) ;
-    SET_CHR_EL(MySQLgroups,0,C_S_CPY(""));
-
-    MEM_PROTECT(s_mysql_default_file = NEW_CHARACTER((Sint) 1)) ;
-    SET_CHR_EL(s_mysql_default_file,0,C_S_CPY(""));
-
-    mgrHandle = RS_DBI_asMgrHandle(MGR_ID(conHandle));
-      
-    /* Connection parameters need to be put into a 7-element character
-     * vector to be passed to the RS_MySQL_newConnection() function.
-     */
-    MEM_PROTECT(con_params = NEW_CHARACTER((Sint) 7));
-    SET_CHR_EL(con_params,0,C_S_CPY(conParams->user));
-    SET_CHR_EL(con_params,1,C_S_CPY(conParams->passwd));
-    SET_CHR_EL(con_params,2,C_S_CPY(conParams->host));
-    SET_CHR_EL(con_params,3,C_S_CPY(conParams->dbname));
-    SET_CHR_EL(con_params,4,C_S_CPY(conParams->unix_socket));
-    (void) sprintf(buf1, "%d", conParams->port);
-    (void) sprintf(buf2, "%d", conParams->client_flags);
-    SET_CHR_EL(con_params,5,C_S_CPY(buf1));
-    SET_CHR_EL(con_params,6,C_S_CPY(buf2));
-      
-    MEM_UNPROTECT(3); 
-
-    return RS_MySQL_newConnection(mgrHandle, con_params, MySQLgroups,
-               s_mysql_default_file);
+    return RS_MySQL_createConnection(
+			RS_DBI_asMgrHandle(MGR_ID(conHandle)),
+			RS_MySQL_cloneConParams(RS_DBI_getConnection(conHandle)->conParams));
 }
 
 RS_MySQL_conParams *
-RS_mysql_allocConParams(void)
+RS_MySQL_allocConParams(void)
 {
     RS_MySQL_conParams *conParams;
 
@@ -261,48 +224,114 @@ RS_mysql_allocConParams(void)
         RS_DBI_errorMessage("could not malloc space for connection params",
                 RS_DBI_ERROR);
     }
+    conParams->dbname = NULL;
+    conParams->username = NULL;
+    conParams->password = NULL;
+	conParams->host = NULL;
+    conParams->unix_socket = NULL;
+    conParams->port = 0; 
+    conParams->client_flag = 0;
+	conParams->groups = NULL;
+	conParams->default_file = NULL;
     return conParams;
+}
+
+RS_MySQL_conParams *
+RS_MySQL_cloneConParams(RS_MySQL_conParams *cp)
+{
+	RS_MySQL_conParams *new = RS_MySQL_allocConParams();
+
+    if (cp->dbname) new->dbname = RS_DBI_copyString(cp->dbname);
+    if (cp->username) new->username = RS_DBI_copyString(cp->username);
+    if (cp->password) new->password = RS_DBI_copyString(cp->password);
+	if (cp->host) new->host = RS_DBI_copyString(cp->host);
+    if (cp->unix_socket) new->unix_socket = RS_DBI_copyString(cp->unix_socket);
+    new->port = cp->port; 
+    new->client_flag = cp->client_flag;
+	if (cp->groups) new->groups = RS_DBI_copyString(cp->groups);
+	if (cp->default_file) new->default_file = RS_DBI_copyString(cp->default_file);
+
+	return new;
 }
 
 void
 RS_MySQL_freeConParams(RS_MySQL_conParams *conParams)
 {
-    if(conParams->host) free(conParams->host);
     if(conParams->dbname) free(conParams->dbname);
-    if(conParams->user) free(conParams->user);
-    if(conParams->passwd) free(conParams->passwd);
+    if(conParams->username) free(conParams->username);
+    if(conParams->password) free(conParams->password);
+    if(conParams->host) free(conParams->host);
     if(conParams->unix_socket) free(conParams->unix_socket);
-    /* port and client_flags are unsigned ints */
+    /* port and client_flag are unsigned ints */
+	if(conParams->groups) free(conParams->groups);
+	if(conParams->default_file) free(conParams->default_file);
     free(conParams);
     return;
 }
 
 Con_Handle *
-RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params, 
-           s_object *MySQLgroups, s_object *s_mysql_default_file)
+RS_MySQL_newConnection(Mgr_Handle *mgrHandle, 
+    s_object *s_dbname,
+    s_object *s_username,
+    s_object *s_password,
+    s_object *s_myhost,
+    s_object *s_unix_socket,
+    s_object *s_port,
+    s_object *s_client_flag,
+    s_object *s_groups,
+    s_object *s_default_file)
 {
     S_EVALUATOR
 
-    RS_DBI_connection  *con;
-    RS_MySQL_conParams *conParams;
-    Con_Handle  *conHandle;
-    MYSQL     *my_connection, *tmp_conn;
-    unsigned int  p, port, client_flags;
-    char      *user = NULL, *passwd = NULL, *host = NULL, *dbname = NULL;
-    char      *unix_socket = NULL;
-    int       i; 
-    Sint      ngroups;
-    char      **groups, *mysql_default_file;
-#if HAVE_GETOPT_LONG
-    int   argc, option_index;    /* TODO: What about Mac OS, OS X??     */
-    char  **argv;                /* we do have MySQL's load_defaults() */
-#else
-    char  *tmp;  /* we'll have to peek into the MYSQL connection obj, darn!*/
-#endif
+	RS_MySQL_conParams *conParams;
 
     if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
         RS_DBI_errorMessage("invalid MySQLManager", RS_DBI_ERROR);
 
+    /* Create connection parameters structure and initialize */
+    conParams = RS_MySQL_allocConParams();
+
+	/* Arguments override defaults in config file */
+    if(s_dbname != R_NilValue && IS_CHARACTER(s_dbname))
+        conParams->dbname = RS_DBI_copyString((char *) CHR_EL(s_dbname,0));
+    if(s_username != R_NilValue && IS_CHARACTER(s_username))
+        conParams->username = RS_DBI_copyString((char *) CHR_EL(s_username,0));
+    if(s_password != R_NilValue && IS_CHARACTER(s_password))
+        conParams->password = RS_DBI_copyString((char *) CHR_EL(s_password,0));
+    if(s_myhost != R_NilValue && IS_CHARACTER(s_myhost))
+        conParams->host = RS_DBI_copyString((char *) CHR_EL(s_myhost,0));
+    if(s_unix_socket != R_NilValue && IS_CHARACTER(s_unix_socket))
+        conParams->unix_socket = RS_DBI_copyString((char *) CHR_EL(s_unix_socket,0));
+	if (s_port != R_NilValue && IS_INTEGER(s_port) && INT_EL(s_port,0) > 0)
+		conParams->port = (unsigned int) INT_EL(s_port,0);
+	if (s_client_flag != R_NilValue && IS_INTEGER(s_client_flag))
+		conParams->client_flag = (unsigned int) INT_EL(s_client_flag,0);
+    if(s_groups != R_NilValue && IS_CHARACTER(s_groups))
+        conParams->groups = RS_DBI_copyString((char *) CHR_EL(s_groups,0));
+    if(s_default_file != R_NilValue && IS_CHARACTER(s_default_file))
+        conParams->default_file = RS_DBI_copyString((char *) CHR_EL(s_default_file,0));
+
+    return RS_MySQL_createConnection(mgrHandle,conParams);
+}
+
+/* RS_MySQL_createConnection - internal function 
+ *
+ * Used by both RS_MySQL_newConnection and RS_MySQL_cloneConnection.
+ * It is responsible for the memory associated with conParams. 
+ */
+Con_Handle *
+RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams)
+{
+    S_EVALUATOR
+
+    RS_DBI_connection  *con;
+    Con_Handle  *conHandle;
+    MYSQL     *my_connection;
+
+    if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
+        RS_DBI_errorMessage("invalid MySQLManager", RS_DBI_ERROR);
+
+	/* Initialize MySQL connection */
     my_connection = mysql_init(NULL);
 
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID > 32348
@@ -314,166 +343,53 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle, s_object *con_params,
     mysql_options(my_connection, MYSQL_OPT_LOCAL_INFILE, 0);
 #endif
 
-    /* Load MySQL default connection values from the [client] and
-     * [rs-dbi] sections of the MySQL configuration files.  We
-     * recognize options in the [client] and [rs-dbi] sections, plus any
-     * other passed from S/R in the MySQLgroups character vector.  
-     * Note that we're faking the argc and argv -- it's just simpler (and the
-     * recommended way from MySQL perspective).  Re-initialize the
-     * getopt_long buffers by setting optind = 0 (defined in getopt.h),
-     * this is needed to avoid getopt_long "remembering" options from
-     * one invocation to the next.  
-     * TODO: This can't be thread-safe, can it?
-     *
+    /* Load MySQL default connection values from a group.
+	 *
+     * MySQL will combine the options found in the '[client]' group and one more group
+	 * specified by MYSQL_READ_DEFAULT_GROUP. Typically, this will
+	 * be '[rs-dbi]' but the user can override with another group. Note that
+	 * while our interface will allow a user to pass in a vector of groups,
+	 * only the first group in the vector will be combined with '[client]'.
+	 *
+	 * Should we make this an error in a later release?)
      */
+	if (conParams->groups)
+		mysql_options(my_connection, MYSQL_READ_DEFAULT_GROUP, conParams->groups);
 
-    if(GET_LENGTH(s_mysql_default_file)==1){
-        mysql_default_file = RS_DBI_copyString(CHR_EL(s_mysql_default_file,0));
-        mysql_options(my_connection, MYSQL_READ_DEFAULT_FILE, mysql_default_file);
-    }
-    ngroups = GET_LENGTH(MySQLgroups);
-    groups = (char **) S_alloc((long) ngroups+3, (int) sizeof(char **));
-    groups[0] = RS_DBI_copyString("client");  
-    groups[1] = RS_DBI_copyString("rs-dbi");
-    groups[ngroups+2] = NULL;       /* required sentinel */
-
-    /* the MySQL doc asserts that the [client] group is always processed,
-     * so we skip it...
-    */
-    mysql_options(my_connection, MYSQL_READ_DEFAULT_GROUP,  groups[1]);
-    for(i=0; i<ngroups; i++){
-        groups[i+2] = RS_DBI_copyString(CHR_EL(MySQLgroups,i));
-        mysql_options(my_connection, MYSQL_READ_DEFAULT_GROUP,  groups[i+2]);
-    }
-#if HAVE_GETOPT_LONG
-    argc = 1;
-    argv = (char **) S_alloc((long) 1, (int) sizeof(char **));
-    argv[0] = (char *) RS_DBI_copyString("RMySQL"); 
-
-    load_defaults("my",(const char **) groups, &argc, &argv);
-    option_index = optind = 0;
-    /* suppress message to stderr for unrecognized options, of which there
-     * may be many. 
-     * NOTE: the opterr variable is declared extern int in "getopt.h"
-     * */
-    opterr = 0;          
-    while(1){
-        int nc;
-        char c;
-        struct option long_options[] = {
-            {"host",     required_argument, NULL, 'h'},
-            {"user",     required_argument, NULL, 'u'},
-            {"password", required_argument, NULL, 'p'},
-            {"port",     required_argument, NULL, 'P'},
-            {"socket",   required_argument, NULL, 's'},
-            {"database", required_argument, NULL, 'd'},
-            {0, 0, 0, 0}
-        };
-        nc = getopt_long(argc, argv, "h:u:p:d:P:s:", long_options, &option_index);
-        if(nc == -1)
-            break;
-          c = (char) nc;
-        switch(c){
-        case 'h': host = optarg;   break;
-        case 'u': user = optarg;   break;
-        case 'p': passwd = optarg; break;
-        case 'd': dbname = optarg; break;
-        case 'P': port = (unsigned int) atoi(optarg); break;
-        case 's': unix_socket = optarg;  break;
-        }
-    }
-#endif  /* HAVE_GETOPT_LONG */
-  
-#define IS_EMPTY(s1)   !strcmp((s1), "")
-
-        /* R/S arguments take precedence over configuration file defaults. */
-    if(!IS_EMPTY(CHR_EL(con_params,0)))
-        user = (char *) CHR_EL(con_params,0);
-    if(!IS_EMPTY(CHR_EL(con_params,1)))
-        passwd= (char *) CHR_EL(con_params,1);
-    if(!IS_EMPTY(CHR_EL(con_params,2)))
-        host = (char *) CHR_EL(con_params,2);
-    if(!IS_EMPTY(CHR_EL(con_params,3)))
-        dbname = (char *) CHR_EL(con_params,3);
-    if(!IS_EMPTY(CHR_EL(con_params,4)))
-        unix_socket = (char *) CHR_EL(con_params,4);
-    p = (unsigned int) atol(CHR_EL(con_params,5));
-    port = (p > 0) ? p : 0;
-    client_flags = (unsigned int) atol(CHR_EL(con_params,6));
-
-    /* avoid overwriting my_connection with NULL in the case 
-     * mysql_real_conect() fails.
+    /* MySQL reads defaults from my.cnf or equivalent, but the user can supply
+	 * an alternative.
      */
-    tmp_conn = 
-        mysql_real_connect(my_connection, host, user, passwd, dbname, 
-             port, unix_socket, client_flags);
-    if(!tmp_conn){
+    if(conParams->default_file)
+        mysql_options(my_connection, MYSQL_READ_DEFAULT_FILE, conParams->default_file);
+
+    if(!mysql_real_connect(my_connection, 
+		conParams->host, conParams->username, conParams->password, conParams->dbname, 
+		conParams->port, conParams->unix_socket, conParams->client_flag)){
+
+		RS_MySQL_freeConParams(conParams);
+
         char buf[2048];
-        sprintf(buf, "could not connect %s@%s on dbname \"%s\"\nError:%s\n",
-          user, host, dbname, mysql_error(my_connection));
+        sprintf(buf, "Failed to connect to database: Error: %s\n", mysql_error(my_connection));
         RS_DBI_errorMessage(buf, RS_DBI_ERROR);
     }
-    my_connection = tmp_conn;
-    conParams = RS_mysql_allocConParams();
 
-#if ! HAVE_GETOPT_LONG
-    /* On Windows, MySQL (3.23+?) doesn't have the load_defaults() function
-     * included in the shared libMySQL.dll lib (only in the static, threaded
-     * mysqlclient.lib.) Thus we need to extract the host/dbname/user/passwd
-     * from the (non-API) internals of the MYSQL connection object (we're
-     * on thin ice here...) to put it in our internal conParams object.
-     * This is needed in the RS_DBI_connection object in order to clone 
-     * connections (for instance, in quickSQL, getInfo).
-     */
-    host = my_connection->host;
-    dbname = my_connection->db;
-    unix_socket = my_connection->unix_socket;   /* may be null */
-    passwd = my_connection->passwd;
-    tmp = my_connection->user;        /* possibly as 'user@machinename' */
-    user = (char *) S_alloc((long)strlen(tmp)+1, (int)sizeof(char));
-
-    for(i=0; tmp[i]; i++)
-        if(tmp[i]!='@') 
-           user[i] = tmp[i];
-        else {
-           user[i] = '\0';
-           break;
-        }
-#endif    /* ! HAVE_GETOPT_LONG */
-    /* save actual connection parameters */
-    if(!user) 
-        user = ""; 
-    conParams->user = RS_DBI_copyString(user);
-    if(!passwd) 
-        passwd = "";
-    conParams->passwd = RS_DBI_copyString(passwd);
-    if(!host) 
-        host = "";
-    conParams->host = RS_DBI_copyString(host);
-    if(!dbname) 
-        dbname = "";
-    conParams->dbname = RS_DBI_copyString(dbname);
-    if(!unix_socket) 
-        unix_socket = "";
-    conParams->unix_socket = RS_DBI_copyString(unix_socket);
-    conParams->port = port;
-    conParams->client_flags = client_flags;
   
     /* MySQL connections can only have 1 result set open at a time */  
     conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1); 
     con = RS_DBI_getConnection(conHandle);
     if(!con){
         mysql_close(my_connection);
-        RS_MySQL_freeConParams(conParams);
-        conParams = (RS_MySQL_conParams *) NULL;
+		RS_MySQL_freeConParams(conParams);
         RS_DBI_errorMessage("could not alloc space for connection object",
                            RS_DBI_ERROR);
     }
-    con->drvConnection = (void *) my_connection;
+
     con->conParams = (void *) conParams;
+    con->drvConnection = (void *) my_connection;
 
     return conHandle;
 }
+
 
 s_object *
 RS_MySQL_closeConnection(Con_Handle *conHandle)
@@ -1060,6 +976,7 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
                         CHARACTER_TYPE, CHARACTER_TYPE, INTEGER_TYPE,
                         INTEGER_TYPE, INTEGER_TYPE};
     Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
+	char *tmp;
 
     con = RS_DBI_getConnection(conHandle);
     conLen[7] = con->num_res;         /* num of open resultSets */
@@ -1074,9 +991,12 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
 #endif
     conParams = (RS_MySQL_conParams *) con->conParams;
   
-    SET_LST_CHR_EL(output,0,0,C_S_CPY(conParams->host));
-    SET_LST_CHR_EL(output,1,0,C_S_CPY(conParams->user));
-    SET_LST_CHR_EL(output,2,0,C_S_CPY(conParams->dbname));
+	tmp = conParams->host? conParams->host : (my_con->host?my_con->host:"");
+    SET_LST_CHR_EL(output,0,0,C_S_CPY(tmp));
+	tmp = conParams->username? conParams->username : (my_con->user?my_con->user:"");
+    SET_LST_CHR_EL(output,1,0,C_S_CPY(tmp));
+	tmp = conParams->dbname? conParams->dbname : (my_con->db?my_con->db:"");
+    SET_LST_CHR_EL(output,2,0,C_S_CPY(tmp));
     SET_LST_CHR_EL(output,3,0,C_S_CPY(mysql_get_host_info(my_con)));
     SET_LST_CHR_EL(output,4,0,C_S_CPY(mysql_get_server_info(my_con)));
 

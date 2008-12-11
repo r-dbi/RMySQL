@@ -1,9 +1,0 @@
-
-The files getopt.c and getopt.h in this directory are part of the 
-GNU libc, and they may be needed to compile RMySQL/SMySQL on non-GNU 
-systems.  
-
-If you use the GNU gcc compiler on non-GNU system (Solaris, Irix, 
-Windows even with cygwin) you may still need the getopt.h header file.
-
-These files were taken from the MySQL source distribution 3.22.27.

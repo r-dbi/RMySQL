@@ -91,30 +91,46 @@ function(obj, what="", ...)
 }
 
 "mysqlNewConnection" <-
-## note that dbname may be a database name, an empty string "", or NULL.
-## The distinction between "" and NULL is that "" is interpreted by 
-## the MySQL API as the default database (MySQL config specific)
-## while NULL means "no database".
-function(drv, dbname = "", username="",
-   password="", host="",
-   unix.socket = "", port = 0, client.flag = 0, 
-   groups = NULL, default.file = character(0))
+function(drv, dbname=NULL, username=NULL,
+   password=NULL, host=NULL,
+   unix.socket=NULL, port = 0, client.flag = 0, 
+   groups = 'rs-dbi', default.file = NULL)
 {
    if(!isIdCurrent(drv))
       stop("expired manager")
-   con.params <- as.character(c(username, password, host, 
-                                dbname, unix.socket, port, 
-                                as.integer(client.flag)))
-   groups <- as.character(groups)
-   if(length(default.file)==1){
-      default.file <- file.path(dirname(default.file), basename(default.file))
-      if(!file.exists(default.file))
-         stop(sprintf("mysql default file %s does not exist", default.file))
-   }
-   drvId <- as(drv, "integer")
-   conId <- .Call("RS_MySQL_newConnection", drvId, con.params, groups, 
-               default.file, PACKAGE = .MySQLPkgName)
-   new("MySQLConnection", Id = conId)
+
+	if (!is.null(dbname) && !is.character(dbname))
+         stop("Argument dbname must be a string or NULL")
+	if (!is.null(username) && !is.character(username))
+         stop("Argument username must be a string or NULL")
+	if (!is.null(password) && !is.character(password))
+         stop("Argument password must be a string or NULL")
+	if (!is.null(host) && !is.character(host))
+         stop("Argument host must be a string or NULL")
+	if (!is.null(unix.socket) && !is.character(unix.socket))
+         stop("Argument unix.socket must be a string or NULL")
+
+	if (is.null(port) || !is.numeric(port))
+         stop("Argument port must be an integer value")
+	if (is.null(client.flag) || !is.numeric(client.flag))
+         stop("Argument client.flag must be an integer value")
+
+	if (!is.null(groups) && !is.character(groups))
+         stop("Argument groups must be a string or NULL")
+
+	if(!is.null(default.file) && !is.character(default.file))
+         stop("Argument default.file must be a string")
+
+	if(!is.null(default.file) && !file.exists(default.file[1]))
+		stop(sprintf("mysql default file %s does not exist", default.file))
+   
+	drvId <- as(drv, "integer")
+	conId <- .Call("RS_MySQL_newConnection", drvId, 
+		dbname, username, password, host, unix.socket, 
+		as.integer(port), as.integer(client.flag), 
+		groups, default.file[1], PACKAGE = .MySQLPkgName)
+
+	new("MySQLConnection", Id = conId)
 }
 
 "mysqlCloneConnection" <-
@@ -673,13 +689,15 @@ function(value, file, batch, ...)
       batch <- N
    from <- 1 
    to <- min(batch, N)
+   conb <- file(file,open="wb")
    while(from<=N){
-      write.table(value[from:to,, drop=FALSE], file = file, append = TRUE, 
+      write.table(value[from:to,, drop=FALSE], file = conb, append = TRUE, 
             quote = FALSE, sep="\t", na = .MySQL.NA.string,
             row.names=FALSE, col.names=FALSE, eol = '\n', ...)
       from <- to+1
       to <- min(to+batch, N)
    }
+   close(conb)
    invisible(NULL)
 }
 

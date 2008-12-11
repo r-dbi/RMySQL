@@ -22,18 +22,18 @@
 \item{conn}{
   an \code{MySQLConnection} object as produced by \code{dbConnect}.
   }
-\item{username}{string of the MySQL login name.}
-\item{password}{string with the MySQL password.}
-\item{dbname}{string with the database name.}
-\item{host}{string identifying the host machine running the MySQL server
- an empty string \code{""} is interpreted as \code{"localhost"}.}
-\item{unix.socket}{(optional) unix socket or named pipe.}
-\item{port}{(optional) TCP/IP default port.}
+\item{username}{string of the MySQL login name or NULL. If NULL or the empty string \code{""}, the current user is assumed.}
+\item{password}{string with the MySQL password or NULL. If NULL, only entries in the user table for the users that have a blank (empty) password field are checked for a match.}
+\item{dbname}{string with the database name or NULL. If NOT NULL, the connection sets the default database to this value.}
+\item{host}{string identifying the host machine running the MySQL server or NULL.
+If NULL or the string \code{"localhost"}, a connection to the local host is assumed.}
+\item{unix.socket}{(optional) string of the unix socket or named pipe.}
+\item{port}{(optional) integer of the TCP/IP default port.}
 \item{client.flag}{(optional) integer setting various MySQL client flags.
 See the MySQL manual for details.}
 \item{group}{string identifying a section in the \code{default.file}
    to use for setting authentication parameters (see \code{\link{MySQL}}.)}
-\item{default.file}{filename with MySQL client options. Defaults to
+\item{default.file}{string of the filename with MySQL client options. Defaults to
    \code{\$HOME/.my.cnf}}
 \item{\dots }{Currently unused.}
 }

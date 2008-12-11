@@ -86,13 +86,14 @@ database = iptraffic\cr
 This file should be readeable only by you. 
 Inside each section, MySQL parameters may be specified one per line
 (e.g., \code{user = opto}).  
-The R MySQL implementation always parses the \code{[client]}
-and \code{[rs-dbi]} sections, but you may define you own
-project-specific sections to tailor its environment; 
-if the same parameter appears more than once, the last
-(closer to the bottom) occurrence is used.
+MySQL always considers default options from  the \code{[client]} group
+for connecting to a server. To override or add additional options, R MySQL
+combines default options from the \code{[rs-dbi]} group, but you may specifiy you own
+group in the \code{dbConnect} call to tailor your environment. Note that 
+to override options, you must place your group after the \code{[client]} group
+in configuration file.
 
-If you define a section, say, \code{[iptraffic]},
+For instance, if you define a group, say, \code{[iptraffic]},
 then instead of including all these parameters in the
 call to \code{dbConnect}, you simply supply the
 name of the \code{group},
@@ -102,11 +103,9 @@ The most important parameters are \code{user},
 \code{password}, \code{host}, 
 and \code{dbname}.
 }
+
 \note{
-The \code{dbname} cannot go in the
-\code{[client]} section, but you may safely include 
-it under the \code{[rs-dbi]} section or one you define
-yourself.
+Use the option \code{database} in place of\code{dbname} in configuration files.
 }
 \author{David A. James}
 \section{References}{

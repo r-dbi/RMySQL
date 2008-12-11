@@ -24,25 +24,14 @@
 extern  "C" {
 #endif
 
-/* We use HAVE_GETOPT_LONG to signal we can use getopt_long() 
- * (by default we assume we're running on a GNU-aware system)
- */
-#ifndef HAVE_GETOPT_LONG
-#   define HAVE_GETOPT_LONG 1
-#endif
-
 #ifdef WIN32
-#   include <windows.h>
-#   ifndef HAVE_GETOPT_LONG
-#      define HAVE_GETOPT_LONG 0
-#   endif
-#   undef ERROR
+# include <windows.h>
+# undef ERROR
 #endif
 
 #include <mysql.h>
 #include <mysql_version.h>
 #include <mysql_com.h>
-#include "getopt.h"             /* NOTE: this comes from mysql/include */
 #include <string.h>
 
 #include "RS-DBI.h"
@@ -56,16 +45,19 @@ extern  "C" {
  * themselves.
  */
 typedef struct st_sdbi_conParams {
-    char *host;
     char *dbname;
-    char *user;
-    char *passwd;
+    char *username;
+    char *password;
+    char *host;
     char *unix_socket;
     unsigned int  port; 
-    unsigned int  client_flags;
+    unsigned int  client_flag;
+	char *groups;
+	char *default_file;
 } RS_MySQL_conParams;
 
 RS_MySQL_conParams *RS_MySQL_allocConParams(void);
+RS_MySQL_conParams *RS_MySQL_cloneConParams(RS_MySQL_conParams *conParams);
 void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
 
 /* The following functions are the S/R entry points into the C implementation
@@ -85,10 +77,17 @@ s_object   *RS_MySQL_close(Mgr_Handle *mgrHandle);
 
 /* dbConnection */
 Con_Handle *RS_MySQL_newConnection(Mgr_Handle *mgrHandle, 
-    s_object *con_params,
-    s_object *MySQLgroups,
-    s_object *s_mysql_default_file);
-    Con_Handle *RS_MySQL_cloneConnection(Con_Handle *conHandle);
+    s_object *s_dbname,
+    s_object *s_username,
+    s_object *s_password,
+    s_object *s_myhost,
+    s_object *s_unix_socket,
+    s_object *s_port,
+    s_object *s_client_flag,
+    s_object *s_groups,
+    s_object *s_default_file);
+Con_Handle *RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams);
+Con_Handle *RS_MySQL_cloneConnection(Con_Handle *conHandle);
 s_object   *RS_MySQL_closeConnection(Con_Handle *conHandle);
 s_object   *RS_MySQL_getException(Con_Handle *conHandle);    /* err No, Msg */
 

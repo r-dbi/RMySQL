@@ -1,3 +1,19 @@
+Version 0.7-2
+
+* New maintainer is Jeffrey Horner <jeff.horner@vanderbilt.edu>.
+
+* We no longer distribute libmysql.dll. This library is now found
+  either by reading the MYSQL_HOME environment variable or by reading
+  the windows registry entries.
+
+* Removed dependence on MySQL C function load_defaults() as it was
+  meant for command-line tools, not for (re)connecting to a database.
+
+* Fixed \r issue with dbWriteTable().
+
+* Tests have been added and depend on proper values set in the
+  environment variables MYSQL_DATABASE, MYSQL_USER, and MYSQL_PASSWD.
+
 Version 0.6-1
 
 * Fixed a dormant bug in code that imporperly used "$" in 

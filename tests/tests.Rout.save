@@ -1,0 +1,91 @@
+
+R version 2.8.0 (2008-10-20)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(RMySQL)
+Loading required package: DBI
+> drv <- dbDriver("MySQL")
+> 
+> 
+> ## 0 dbConnect()
+> user <- Sys.getenv("MYSQL_USER", unset = NA)
+> if(is.na(user)) q()
+> ## a MySQL installation would usually have an open 'tests' db
+> dbname <- Sys.getenv("MYSQL_DATABASE")
+> if(!nzchar(dbname)) dbname <- "test"
+> 
+> conn <- dbConnect(drv, user=user, password=Sys.getenv("MYSQL_PASSWD"),
++                   dbname=dbname)
+> dbListTables(conn)
+[1] "USArrests" "iris"     
+> 
+> ## 1 Ensure that dbWriteTable doesn't add trailing \r
+> dbRemoveTable(conn, "myDF")         # precaution
+[1] FALSE
+> ## RMySQL is not very clever: it does not convert to factor,
+> ## and converts row names to character.
+> myDF <- data.frame(x = paste("x", 1:5, sep = ""),
++                    y = paste("y", 1:5, sep = ""),
++                    row.names = letters[1:5],
++                    stringsAsFactors = FALSE)
+> dbWriteTable(conn, name= "myDF", value = myDF)
+[1] TRUE
+> myDF2 <- dbReadTable(conn, "myDF")
+> stopifnot(identical(myDF, myDF2))
+> dbRemoveTable(conn, "myDF")
+[1] TRUE
+> dbDisconnect(conn)
+[1] TRUE
+> 
+> ## 2 Exercise fetch.default.rec and dbGetRowCount... along with 
+> ##   dbSendQuery() and fetch()
+> drv <- MySQL(fetch.default.rec=2)
+> conn <- dbConnect(drv, user=user, password=Sys.getenv("MYSQL_PASSWD"),
++                   dbname=dbname)
+> 
+> dbRemoveTable(conn, "iris")         # precaution
+[1] TRUE
+> dbWriteTable(conn,name='iris',value=iris,row.names=FALSE)
+[1] TRUE
+> rso <- dbSendQuery(conn,"select * from iris where Species='versicolor'")
+> x <- fetch(rso,n=2)
+> rowCount <- nrow(x)
+> stopifnot(rowCount==2)
+> stopifnot(rowCount==dbGetRowCount(rso))
+> while(nrow(x)) {
++ 	x <- fetch(rso)
++ 	rowCount <- rowCount + nrow(x)
++ 	stopifnot(rowCount==dbGetRowCount(rso))
++ }
+> 
+> ## 2  Exercise dbRowsAffected()
+> nrows <- nrow(iris[iris$Species=='versicolor',])
+> rso <- dbSendQuery(conn,"delete from iris where Species='versicolor'")
+> stopifnot(nrows==dbGetRowsAffected(rso))
+> 
+> ## 3 Exercise dbGetQuery()
+> stopifnot(
++ 	identical(
++ 		iris[iris$Species!='versicolor','Sepal.Length'],
++ 		dbGetQuery(conn,'select * from iris')$Sepal_Length
++ 	)
++ )
+> 
+> dbDisconnect(conn)
+[1] TRUE
+> dbUnloadDriver(drv)
+[1] TRUE
+> 
