@@ -742,6 +742,12 @@ function(con, strings)
   out
 }
 
+## For testing compiled against loaded mysql client library versions
+"mysqlVersionId" <-
+{
+	.Call("RS_MySQL_versionId",PACKAGE=.MySQLPkgName)
+}
+
 ## the following reserved words were taken from Section 6.1.7
 ## of the MySQL Manual, Version 4.1.1-alpha, html format.
 

@@ -1687,3 +1687,14 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
     MEM_UNPROTECT(1); 
     return output;
 }
+
+
+s_object *
+RS_MySQL_versionId(void)
+{
+	s_object  *ret;
+	PROTECT(ret = NEW_INTEGER(1));
+	INTEGER_DATA(ret)[0] = MYSQL_VERSION_ID;
+	UNPROTECT(1);
+	return ret;
+}

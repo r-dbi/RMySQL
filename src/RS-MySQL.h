@@ -112,6 +112,8 @@ s_object *RS_MySQL_resultSetInfo(Res_Handle *rsHandle);
 
 s_object *RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *statement);
 
+s_object *RS_MySQL_versionId(void);
+
 /* the following type names are from "mysql_com.h" */
 static struct data_types RS_MySQL_dataTypes[] = {
     { "FIELD_TYPE_DECIMAL",    FIELD_TYPE_DECIMAL},

@@ -13,4 +13,5 @@ else
 	  exit 2
 	fi
 fi
+${RHOME}/bin/R --vanilla --slave < inst/SaveMySQLVersion.R
 echo ""
