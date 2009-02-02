@@ -1,5 +1,14 @@
 /* $Id$
  *
+ * ----
+ * The name of the project is RMySQL, not RSMySQL, so at some point we
+ * will inevitably break compatibility with Splus. 
+ *
+ * FAIR WARNING!
+ *
+ * Jeff Horner Wed Jan 28 10:14:02 CST 2009
+ * ----
+ *
  * S4 (Splus5+) and R portability macros.
  *
  * This file provides additional macros to the ones in Rdefines.h (in R)
@@ -48,6 +57,7 @@ extern "C" {
 /* Some of these come from MASS, some from packages developed under
  * the Omega project, and some from RS-DBI itself.
  */
+
 
 #ifdef USING_R
 #  include "Rversion.h"

@@ -1,4 +1,5 @@
 echo "configure.win:"
+echo ""
 echo -n "checking for \$MYSQL_HOME... "
 if test -z "$MYSQL_HOME" ; then
 	echo "not found... searching registry..."
@@ -8,10 +9,9 @@ if test -z "$MYSQL_HOME" ; then
 	exit 1
 else
 	echo ${MYSQL_HOME}
-	if test ! -d "${MYSQL_HOME}"; then
+	if test ! -d ${MYSQL_HOME}; then
 	  echo "MYSQL_HOME is set but does not point to a directory"
 	  exit 2
 	fi
 fi
-${RHOME}/bin/R --vanilla --slave < inst/SaveMySQLVersion.R
 echo ""

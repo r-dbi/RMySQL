@@ -743,9 +743,10 @@ function(con, strings)
 }
 
 ## For testing compiled against loaded mysql client library versions
-"mysqlVersionId" <-
+"mysqlClientLibraryVersions" <-
+function()
 {
-	.Call("RS_MySQL_versionId",PACKAGE=.MySQLPkgName)
+	.Call("RS_MySQL_clientLibraryVersions",PACKAGE=.MySQLPkgName)
 }
 
 ## the following reserved words were taken from Section 6.1.7

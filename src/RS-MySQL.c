@@ -20,10 +20,7 @@
  */
 
 #include "RS-MySQL.h"
-
-/* as of version 4.0 mysql_get_client_version() only returns a string */
-static char *compiled_mysql_client_version = MYSQL_SERVER_VERSION;   /* sic.*/
-
+#include "R_ext/Rdynload.h"
 #ifndef USING_R
 #  error("the function RS_DBI_invokeBeginGroup() has not been implemented in S")
 #  error("the function RS_DBI_invokeEndGroup()   has not been implemented in S")
@@ -68,20 +65,7 @@ RS_MySQL_init(s_object *config_params, s_object *reload)
     Mgr_Handle *mgrHandle;
     Sint  fetch_default_rec, force_reload, max_con;
     const char *drvName = "MySQL";
-    const char *clientVersion = mysql_get_client_info();
 
-    /* make sure the versions of the runtime and compile-time of the 
-     * MySQL client library are reasonably close, e.g., first major
-     * and minor id, e.g., 41 for 4.1.*, 42 for 4.2.*, etc.
-     * TODO: Should we using PROTOCOL_VERSION here?
-     */
-    if (strncmp(clientVersion, compiled_mysql_client_version, (size_t) 2)){
-        char  buf[256];
-        (void) sprintf(buf, 
-                   "%s mismatch between compiled version %s and runtime version %s",
-                   drvName, compiled_mysql_client_version, clientVersion);
-        RS_DBI_errorMessage(buf, RS_DBI_WARNING);
-    }
     max_con = INT_EL(config_params,0); 
     fetch_default_rec = INT_EL(config_params,1);
     force_reload = LGL_EL(reload,0);
@@ -89,7 +73,7 @@ RS_MySQL_init(s_object *config_params, s_object *reload)
     mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec, 
         force_reload);
     return mgrHandle;
-  } 
+} 
 
 s_object *
 RS_MySQL_closeManager(Mgr_Handle *mgrHandle)
@@ -1688,13 +1672,40 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
     return output;
 }
 
-
 s_object *
-RS_MySQL_versionId(void)
+RS_MySQL_clientLibraryVersions(void)
 {
-	s_object  *ret;
-	PROTECT(ret = NEW_INTEGER(1));
-	INTEGER_DATA(ret)[0] = MYSQL_VERSION_ID;
-	UNPROTECT(1);
+	s_object *ret, *name;
+
+	PROTECT(name=NEW_CHARACTER(2));
+	SET_STRING_ELT(name, 0, COPY_TO_USER_STRING(MYSQL_SERVER_VERSION));
+	SET_STRING_ELT(name, 1, COPY_TO_USER_STRING(mysql_get_client_info()));
+	PROTECT(ret=NEW_INTEGER(2));
+	INTEGER_DATA(ret)[0] = (int)MYSQL_VERSION_ID;
+	INTEGER_DATA(ret)[1] = (int)mysql_get_client_version();
+	SET_NAMES(ret,name);
+	UNPROTECT(2);
 	return ret;
+}
+
+void R_init_RMySQL(DllInfo *info){
+	int compiled=MYSQL_VERSION_ID;
+	int loaded;
+
+	mysql_library_init(0,NULL,NULL);
+
+	loaded = (int)mysql_get_client_version();
+
+	/* Test release vs. compiled client library, warning
+	 * when the major or minor revision number differ. The integer format is XYYZZ
+	 * where X is the major revision, YY is the minor revision, and ZZ is the revision
+	 * within the minor revision.
+	 */
+	if ( (compiled-(compiled%100)) != (loaded-(loaded%100)) ){
+		warning("\n\n   RMySQL was compiled with MySQL %s but loading MySQL %s instead!\n   This may cause problems with your database connections.\n\n   Please install MySQL %s.\n\n   If you have already done so, you may need to set your environment\n   variable MYSQL_HOME to the proper install directory.",MYSQL_SERVER_VERSION,mysql_get_client_info(),MYSQL_SERVER_VERSION);
+	}
+}
+
+void R_unload_RMySQL(DllInfo *info){
+	mysql_library_end();
 }

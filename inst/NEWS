@@ -1,3 +1,11 @@
+Version 0.7-3
+
+* Added mysqlClientLibraryVersions() which returns the compiled and
+  loaded client library versions as a vector.
+
+* RMySQL will now check for MySQL minor version consistency and throw
+  an error when the client and loaded library versions don't match.
+
 Version 0.7-2
 
 * New maintainer is Jeffrey Horner <jeff.horner@vanderbilt.edu>.

@@ -18,33 +18,20 @@
 					stop("MYSQL_HOME was set but does not point to a directory",
 						call. = FALSE)
 			} else {
+				reg <- NULL
                 reg <- utils::readRegistry("SOFTWARE\\MySQL AB", hive="HLM", maxdepth=2)
                 if(is.null(reg))
                     stop("MySQL is not installed according to a Registry search")
 
-
-				# Find first existing Mysql home with MYSQL_VERSION taking precedence
-				MySQLversion <- Sys.getenv("MYSQL_VERSION")
 				for (i in reg){
 					MySQLhome <- file.path(i$Location,".")
-					if (nzchar(MySQLversion)){
-						if (i$Version==MySQLversion){
-							if (utils::file_test("-d",MySQLhome)){
-								break
-							} else {
-								stop(sprintf(
-									"MYSQL_VERSION was set but it's directory '%s' does not exist",
-									i$Location),
-									call. = FALSE)
-							}
-						}
-					} else if (utils::file_test("-d",MySQLhome))
+					if (utils::file_test("-d",MySQLhome))
 						break
 				}
 
-				## One more time for corner cases.
+				## One more time for loop fall-through. 
 				if (!utils::file_test("-d",MySQLhome))
-                    stop("MySQL is not installed according to a Registry search")
+                    stop("A MySQL Registry key was found (",i,"), but the Location key was empty. Please fix your registry.")
 
         	}
 
@@ -54,7 +41,7 @@
 			if (!utils::file_test("-d",MySQLdllPath))
 				MySQLdllPath <- file.path(MySQLhome,"lib/opt")
 			if (!utils::file_test("-d",MySQLdllPath))
-                    stop("MySQL is not installed according to a Registry search")
+                    stop("A MySQL Registry key was found but the folder ",MySQLhome," doesn't contain a bin or lib/opt folder. That's where we need to find libmySQL.dll. ")
 
             library.dynam("RMySQL", pkgname, libname, DLLpath = MySQLdllPath)
 		}

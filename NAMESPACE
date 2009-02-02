@@ -82,6 +82,7 @@ export(
   mysqlWriteTable,
   mysqlEscapeStrings,
   mysqlDataType,
+  mysqlClientLibraryVersions,
   safe.write
 )
 
