@@ -208,7 +208,7 @@
 \item{sep}{field separator character.}
 \item{eol}{end-of-line separator.}
 \item{skip}{number of lines to skip before reading data in the input file.}
-\item{quote}{the quote character used in the input file (defaults to \code{"}.}
+\item{quote}{the quote character used in the input file (defaults to \".}
 \item{allow.keywords}{
    logical indicating whether column names that happen to be MySQL
    keywords be used as column names in the resulting relation (table)

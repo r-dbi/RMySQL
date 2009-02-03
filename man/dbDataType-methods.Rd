@@ -10,10 +10,10 @@
    This method is a straight-forward implementation of the corresponding
    generic function.
 }
-\section{Methods}{\describe{
+\arguments{
 \item{dbObj}{
   any \code{MySQLObject} object, e.g., \code{MySQLDriver},
-  \code{MySQLConnection}, \code{MySQLResult}.}
+  \code{MySQLConnection}, \code{MySQLResult}.
   }
 \item{obj}{
   R/S-Plus object whose SQL type we want to determine.
