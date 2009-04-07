@@ -1,3 +1,9 @@
+Version 0.7-4
+
+* Fixed a bug whereby NULL was being fed to C_S_CPY() from 
+  RS_DBI_getTypeName().  Affected RS_MySQL_typeNames() and 
+  RS_DBI_SclassNames(). Changed to empty string.
+
 Version 0.7-3
 
 * Added mysqlClientLibraryVersions() which returns the compiled and

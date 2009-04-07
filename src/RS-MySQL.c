@@ -1047,13 +1047,15 @@ RS_MySQL_typeNames(s_object *type)
     s_object *typeNames;
     Sint n, *typeCodes;
     int i;
+	char *tname;
   
     n = LENGTH(type);
     typeCodes = INTEGER_DATA(type);
     MEM_PROTECT(typeNames = NEW_CHARACTER(n));
     for(i = 0; i < n; i++) {
-        SET_CHR_EL(typeNames, i,
-            C_S_CPY(RS_DBI_getTypeName(typeCodes[i], RS_MySQL_dataTypes)));
+		tname = RS_DBI_getTypeName(typeCodes[i], RS_MySQL_dataTypes);
+		if (!tname) tname = "";
+		SET_CHR_EL(typeNames, i, C_S_CPY(tname));
     }
     MEM_UNPROTECT(1);
     return typeNames;

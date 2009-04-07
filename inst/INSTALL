@@ -40,6 +40,8 @@ or 3. Use the --with-mysql-* RMySQL configuration arguments
 
           R CMD INSTALL --configure-args="--with-mysql-dir=$HOME/mysql" ...
 
+Also, besure that RMySQL can find the non-system libraries at run-time. This is typically managed by an environment variable (LD_LIBRARY_PATH or DYLD_LIBRARY_PATH for OSX) or the /etc/ld.so.cache.
+
 S/W Requirements:
 -----------------
 
