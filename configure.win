@@ -4,7 +4,7 @@ echo -n "checking for \$MYSQL_HOME... "
 if test -z "$MYSQL_HOME" ; then
 	echo "not found... searching registry..."
 	echo ""
-	${RHOME}/bin/R --vanilla --slave < inst/FindMySQLhome.R
+	${R_HOME}/bin${R_ARCH_BIN}/Rscript < inst/FindMySQLhome.R
 	echo ""
 	exit 1
 else
