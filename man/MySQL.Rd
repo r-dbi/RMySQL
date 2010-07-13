@@ -148,7 +148,6 @@ On meta-data:
 \code{\link[DBI]{dbGetStatement}}
 \code{\link[DBI]{dbHasCompleted}}
 \code{\link[DBI]{dbGetRowCount}}
-\code{\link[DBI]{dbGetAffectedRows}}
 }
 \examples{\dontrun{
 # create a MySQL instance and create one connection.

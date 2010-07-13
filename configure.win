@@ -1,10 +1,8 @@
-echo "configure.win:"
-echo ""
 echo -n "checking for \$MYSQL_HOME... "
 if test -z "$MYSQL_HOME" ; then
 	echo "not found... searching registry..."
 	echo ""
-	${R_HOME}/bin${R_ARCH_BIN}/Rscript < inst/FindMySQLhome.R
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript" inst/FindMySQLhome.R
 	echo ""
 	exit 1
 else
@@ -14,4 +12,9 @@ else
 	  exit 2
 	fi
 fi
-echo ""
+x86=`"${R_HOME}/bin${R_ARCH_BIN}/Rscript" -e 'cat(.Machine$sizeof.pointer==4)'`
+if test $x86 = "TRUE"; then
+	cp src/Makevars.win32 src/Makevars.win
+else
+	cp src/Makevars.win64 src/Makevars.win
+fi

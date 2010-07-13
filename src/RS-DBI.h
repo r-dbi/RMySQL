@@ -31,16 +31,15 @@ extern "C" {
 
 #include "S4R.h"
 
-/* Microsoft Visual C++ uses int _getpid()  */
-#ifdef MSVC
+/* WIN32 uses int _getpid()  */
+#if defined WIN32
 #include <process.h>
-#define getpid _getpid
-#define pid_t int
+ /* #define getpid _getpid */
+#include <ctype.h>
+ /* #define pid_t int */
 #else           
 #include <unistd.h>
 #endif
-
-pid_t getpid(); 
 
 /* We now define 4 important data structures:
  * RS_DBI_manager, RS_DBI_connection, RS_DBI_resultSet, and
@@ -260,7 +259,7 @@ void RS_na_set(void *ptr, Stype type);
 int  RS_is_na(void *ptr, Stype type);
 extern const struct data_types RS_dataTypeTable[];
 
-int isalpha(int c);
+/* int isalpha(int c); */
 
 #ifdef __cplusplus 
 }
