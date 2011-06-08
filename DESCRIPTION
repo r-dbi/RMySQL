@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.7-5
+Version: 0.8-0
 Date: 2010-07-13
 Title: R interface to the MySQL database
 Author: David A. James and Saikat DebRoy
@@ -12,3 +12,4 @@ Depends: R (>= 2.8.0), methods, DBI (>= 0.2-2), utils
 License: GPL-2
 URL: http://biostat.mc.vanderbilt.edu/RMySQL
 Collate:  S4R.R zzz.R MySQLSupport.R dbObjectId.R MySQL.R
+Packaged: 2011-06-03 17:41:17 UTC; hornerj

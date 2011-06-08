@@ -41,6 +41,8 @@ extern "C" {
 #include <unistd.h>
 #endif
 
+#include <ctype.h> /* for isalpha */
+
 /* We now define 4 important data structures:
  * RS_DBI_manager, RS_DBI_connection, RS_DBI_resultSet, and
  * RS_DBI_fields, corresponding to dbManager, dbConnection,
@@ -258,8 +260,6 @@ s_object *RS_DBI_copyFields(RS_DBI_fields *flds);
 void RS_na_set(void *ptr, Stype type);
 int  RS_is_na(void *ptr, Stype type);
 extern const struct data_types RS_dataTypeTable[];
-
-/* int isalpha(int c); */
 
 #ifdef __cplusplus 
 }
