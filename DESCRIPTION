@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.8-0
+Version: 0.9-0
 Date: 2010-07-13
 Title: R interface to the MySQL database
 Author: David A. James and Saikat DebRoy

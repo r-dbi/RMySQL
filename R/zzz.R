@@ -5,46 +5,95 @@
 .conflicts.OK <- TRUE
 
 .onLoad <-
-	if(.Platform$OS.type == "windows") {
-		function(libname, pkgname)
-		{
+if(.Platform$OS.type == "windows") {
+    # Find MySQL.  Return value is NULL if not found and otherwise is:
+    #     c(home = ..., lib = ..., dll = ..., include = ...)
+    # (or a subset of those components if just some of them found).
+    # It looks in MYSQL_HOME, registry, %ProgramFiles%\MySQL, C:\MySQL, ..., 
+    #   and C:\Apps\MySQL, ...  (where ... means check other disks too)
+    # e.g. findMySQLWindows()
+    #
+    # Thanks to Gabor Grothendieck ggrothendieck@gmail.com
+    #
+    function(libname, pkgname)
+    {
+	verbose <- FALSE
+	dir.exists <- function(x) {
+	    !is.null(x) && file.exists(x) && file.info(x)$isdir
+	}
 
-			## We try to suppress trailing slash pain
+	# check MYSQL_HOME environment variable
+	mysql <- Sys.getenv("MYSQL_HOME")
+	if (verbose && dir.exists(mysql)) cat("MYSQL_HOME defined as", mysql, "\n")
 
-			MySQLhome <- Sys.getenv("MYSQL_HOME")
-			if(nzchar(MySQLhome)) {
-                MySQLhome <- file.path(MySQLhome,".")
-				if (!utils::file_test("-d", MySQLhome))
-					stop("MYSQL_HOME was set but does not point to a directory",
-						call. = FALSE)
-			} else {
-				reg <- NULL
-                reg <- utils::readRegistry("SOFTWARE\\MySQL AB", hive="HLM", maxdepth=2)
-                if(is.null(reg))
-                    stop("MySQL is not installed according to a Registry search")
-
-				for (i in reg){
-					MySQLhome <- file.path(i$Location,".")
-					if (utils::file_test("-d",MySQLhome))
-						break
-				}
-
-				## One more time for loop fall-through. 
-				if (!utils::file_test("-d",MySQLhome))
-                    stop("A MySQL Registry key was found (",i,"), but the Location key was empty. Please fix your registry.")
-
-        	}
-
-			## Users may only install the libraries and not the full distribution
-			## so try 'bin' and 'lib/opt'
-			MySQLdllPath <- file.path(MySQLhome,"bin")
-			if (!utils::file_test("-d",MySQLdllPath))
-				MySQLdllPath <- file.path(MySQLhome,"lib/opt")
-			if (!utils::file_test("-d",MySQLdllPath))
-                    stop("A MySQL Registry key was found but the folder ",MySQLhome," doesn't contain a bin or lib/opt folder. That's where we need to find libmySQL.dll. ")
-
-            library.dynam("RMySQL", pkgname, libname, DLLpath = MySQLdllPath)
+	# check registry
+	if (!dir.exists(mysql)) {
+	    reg <- utils::readRegistry("SOFTWARE\\MySQL AB", hive="HLM", maxdepth=2)
+	    for (i in reg){
+		mysql <- i$Location
+		if (dir.exists(mysql)) {
+		    if (verbose) cat(mysql, "found in registry\n")
+		    break
 		}
-    } else {
-        function(libname, pkgname) library.dynam("RMySQL", pkgname, libname)
+	    }
+	}
+
+	# check %ProgramFiles%:\MySQL and these 
+	# C:\MySQL, ..., C:\Apps\MySQL, ...
+
+	if (!dir.exists(mysql)) {
+
+	    ProgramFilesMySQL <- file.path(Sys.getenv("ProgramFiles"), MySQL)
+	    default.disks <- c("C:", "D:", "E:", "F:", "G:")
+	    default.dirs <- file.path(c("", "/Apps"), MySQL)
+	    g <- with(expand.grid(disk = default.disks, dir = default.dirs), 
+		paste(disk, dir, sep = ""))
+	    lookup.paths <- c(ProgramFilesMySQL, g)
+
+	    if (verbose) cat("Looking in", toString(lookup.paths), "\n")
+	    mysql <- Find(dir.exists, lookup.paths)
+	    if (verbose && dir.exists(mysql)) cat("Found", mysql, "\n")
+
+	    # if still not found find other disks and look in them
+	    # we save this until the end since running wmic takes a bit longer
+	    if (!dir.exists(mysql)) {
+		# wmic should exist on Vista and Win7
+		wmic.out <- if (nzchar(Sys.which("wmic"))) {
+		    shell("wmic logicaldisk get name", intern = TRUE)
+		} else character(0)
+		all.disks <- grep(":", gsub("[^[:graph:]]", "", wmic.out), 
+		    value = TRUE)
+		other.disks <- setdiff(all.disks, default.disks)
+		more <- with(expand.grid(disk = default.disks, dir = default.dirs), 
+		    paste(disk, dir, sep = ""))
+		if (verbose) cat("Looking in", toString(more), "\n")
+		mysql <- Find(dir.exists, more)
+		if (verbose && dir.exists(mysql)) cat("Found", mysql, "\n")
+	    }
+	}
+
+	if (dir.exists(mysql)) {
+	    lib <- dir(path = mysql, pattern = "^libmysql.lib$",
+		recursive = TRUE, full = TRUE, ignore.case = TRUE)
+	    dll <- dir(path = mysql, pattern = "^libmysql.dll$",
+		recursive = TRUE, full = TRUE, ignore.case = TRUE)
+	    include <- dir(path = mysql, pattern = "^include$", include.dirs = TRUE,
+		recursive = TRUE, full = TRUE, ignore.case = TRUE)
+	    library.dynam("RMySQL", pkgname, libname, DLLpath = dll)
+	    #c(home = mysql, lib = lib, dll = dll, include = include)
+	} else {
+	    stop("Cannot find a suitable MySQL install")
+	}
     }
+} else {
+    function(libname, pkgname) library.dynam("RMySQL", pkgname, libname)
+}
+
+
+
+
+findMySQLWindows <- function(verbose = FALSE, MySQL = "MySQL") {
+
+
+}
+
