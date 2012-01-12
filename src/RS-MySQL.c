@@ -1,5 +1,5 @@
 /* 
- * $Id$
+ * $Id: RS-MySQL.c 360 2009-04-07 16:41:24Z j.horner $
  *
  *
  * Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
@@ -974,6 +974,8 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
             RS_DBI_ERROR);
 #endif
     conParams = (RS_MySQL_conParams *) con->conParams;
+
+    PROTECT(output);
   
 	tmp = conParams->host? conParams->host : (my_con->host?my_con->host:"");
     SET_LST_CHR_EL(output,0,0,C_S_CPY(tmp));
@@ -990,6 +992,7 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
     res = (Sint *) S_alloc( (long) con->length, (int) sizeof(Sint));
     nres = RS_DBI_listEntries(con->resultSetIds, con->length, res);
     if(nres != con->num_res){
+	UNPROTECT(1);
         RS_DBI_errorMessage(
             "internal error: corrupt RS_DBI resultSet table",
             RS_DBI_ERROR);
@@ -997,6 +1000,7 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
     for( i = 0; i < con->num_res; i++){
         LST_INT_EL(output,7,i) = (Sint) res[i];
     }
+    UNPROTECT(1);
 
     return output;
 
