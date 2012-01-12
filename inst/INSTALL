@@ -1,5 +1,7 @@
 $Id$
 
+1. LINUX/MAC
+
 Installation:
 
    R CMD INSTALL [-l<alternate-dir>] RMySQL_<version>.tar.gz
@@ -58,3 +60,45 @@ S/W Requirements:
    systems.  Under Red Hat, it's included in the rpm zlib-devel.
    I've been told that on debian it's in the zlib1g-dev package.
 
+Testing MySQL
+-------------
+
+This section is for users who wish to test RMySQL itself.  Most users will
+not need this.
+
+To run tests in the tests directory, set MYSQL_USER, MYSQL_PASSWORD and
+MYSQL_DATABASE, to appropriate values.  If MYSQL_USER and MYSQL_PASSWORD are
+missing then it assumes that user and password have been set in the MySQL
+option files -- typically my.cnf (or my.cnf or my.ini on Windows) but see:
+http://dev.mysql.com/doc/refman/5.1/en/option-files.html 
+If MYSQL_DATABASE is unspecified it defaults to "test".
+
+
+2. WINDOWS
+
+You need to have installed 'C Include Files / Lib Files' as part of your
+MySQL installation when installing the MySQL binary distribution.
+
+Then just set MYSQL_HOME to point to the top of the MySQL installation
+and install via Rcmd INSTALL in the usual way.  
+
+(Note that when running MySQL, as opposed to installing it, do not need 
+to set MYSQL_HOME if its in a place it can find such as registry, 
+%ProgramFiles%\MySQL, C:\MySQL, C:\Apps\MySQL or the same directories on 
+other disks.)
+
+e.g. assuming that MySQL is installed in the indicated location you might
+enter this into the Windows command line (not into R):
+
+   set MYSQL_HOME=C:\\Program Files\\MySQL\\MySQL Server 5.1
+   R CMD INSTALL RMySQL_*.tar.gz
+
+where RMySQL_*.tar.gz is replaced with the source tar.gz file name.
+
+Note that unless you have MySQL in a non-standard place you only need to
+set MYSQL_HOME while installing it but not for running it.  If its in a
+non-standard place where it can't find it then MYSQL_HOME should be set to
+run RMySQL as well.
+
+Also see the Testing MySQL under Linux/Mac above if you wish to test 
+RMySQL itself.

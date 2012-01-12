@@ -1,16 +1,24 @@
 library(RMySQL)
-drv <- dbDriver("MySQL")
 
 
 ## 0 dbConnect()
 user <- Sys.getenv("MYSQL_USER", unset = NA)
-if(is.na(user)) q()
-## a MySQL installation would usually have an open 'tests' db
-dbname <- Sys.getenv("MYSQL_DATABASE")
-if(!nzchar(dbname)) dbname <- "test"
+password <- Sys.getenv("MYSQL_PASSWORD", unset = NA)
+dbname <- Sys.getenv("MYSQL_DATABASE", unset = "test")
 
-conn <- dbConnect(drv, user=user, password=Sys.getenv("MYSQL_PASSWD"),
-                  dbname=dbname)
+drv <- dbDriver("MySQL")
+conn <- try(if (is.na(user) && is.na(password)) {
+   # in this leg user and password should be set in my.ini or my.cnf files
+   dbConnect(drv, dbname = dbname)
+} else {
+   # in this leg they were specified via environment variables
+   dbConnect(drv, user =  user, password = password, dbname = dbname)
+})
+if (inherits(conn, "try-error")) {
+  cat("unable to connect to MySQL\n")
+  q()
+}
+
 dbListTables(conn)
 
 ## 1 Ensure that dbWriteTable doesn't add trailing \r
@@ -30,8 +38,17 @@ dbDisconnect(conn)
 ## 2 Exercise fetch.default.rec and dbGetRowCount... along with 
 ##   dbSendQuery() and fetch()
 drv <- MySQL(fetch.default.rec=2)
-conn <- dbConnect(drv, user=user, password=Sys.getenv("MYSQL_PASSWD"),
-                  dbname=dbname)
+conn <- try(if (is.na(user) && is.na(password)) {
+   # in this leg user and password should be set in my.ini or my.cnf files
+   dbConnect(drv, dbname = dbname)
+} else {
+   # in this leg they were specified via environment variables
+   dbConnect(drv, user =  user, password = password, dbname = dbname)
+})
+if (inherits(conn, "try-error")) {
+  cat("unable to connect to MySQL\n")
+  q()
+}
 
 dbRemoveTable(conn, "iris")         # precaution
 dbWriteTable(conn,name='iris',value=iris,row.names=FALSE)
