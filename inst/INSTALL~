@@ -84,8 +84,8 @@ and install via Rcmd INSTALL in the usual way.
 
 (Note that when running MySQL, as opposed to installing it, do not need 
 to set MYSQL_HOME if its in a place it can find such as registry, 
-%ProgramFiles%\MySQL, C:\MySQL, C:\xampp\MySQL, C:\Apps\MySQL or the same 
-directories on other disks.)
+%ProgramFiles%\MySQL, C:\MySQL, C:\Apps\MySQL or the same directories on 
+other disks.)
 
 e.g. assuming that MySQL is installed in the indicated location you might
 enter this into the Windows command line (not into R):
