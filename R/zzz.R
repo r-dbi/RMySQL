@@ -95,12 +95,3 @@ if(.Platform$OS.type == "windows") {
 } else {
     function(libname, pkgname) library.dynam("RMySQL", pkgname, libname)
 }
-
-
-
-
-findMySQLWindows <- function(verbose = FALSE, MySQL = "MySQL") {
-
-
-}
-
