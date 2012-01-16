@@ -42,7 +42,7 @@ if(.Platform$OS.type == "windows") {
 
 	    ProgramFilesMySQL <- file.path(Sys.getenv("ProgramFiles"), "MySQL")
 	    default.disks <- c("C:", "D:", "E:", "F:", "G:")
-	    default.dirs <- file.path(c("", "/Apps"), "MySQL")
+	    default.dirs <- file.path(c("", "/xampp", "/Apps"), "MySQL")
 	    g <- with(expand.grid(disk = default.disks, dir = default.dirs), 
 		paste(disk, dir, sep = ""))
 	    lookup.paths <- c(ProgramFilesMySQL, g)
@@ -73,7 +73,6 @@ if(.Platform$OS.type == "windows") {
 		if (Sys.getenv("MYSQL_HOME")=="") {
 			bin <- dir(path = mysql, pattern = "^bin$", recursive = TRUE, 
 				full = TRUE, ignore.case = TRUE)
-			bin <- tail(bin, 1)
 			cwd <- getwd()
 			setwd(bin)
 			setwd("..")
@@ -84,6 +83,7 @@ if(.Platform$OS.type == "windows") {
 		recursive = TRUE, full = TRUE, ignore.case = TRUE)
 	    dll <- dir(path = mysql, pattern = "^libmysql.dll$",
 		recursive = TRUE, full = TRUE, ignore.case = TRUE)
+		dll <- dirname(dll)
 	    include <- dir(path = mysql, pattern = "^include$", include.dirs = TRUE,
 		recursive = TRUE, full = TRUE, ignore.case = TRUE)
 	    library.dynam("RMySQL", pkgname, libname, DLLpath = dll)

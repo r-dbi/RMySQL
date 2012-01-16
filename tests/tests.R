@@ -12,7 +12,9 @@ conn <- try(if (is.na(user) && is.na(password)) {
    dbConnect(drv, dbname = dbname)
 } else {
    # in this leg they were specified via environment variables
-   dbConnect(drv, user =  user, password = password, dbname = dbname)
+   if (is.na(user)) dbConnect(drv, password = password, dbname = dbname)
+   else if (is.na(password)) dbConnect(drv, user = user, dbname = dbname)
+   else dbConnect(drv, user =  user, password = password, dbname = dbname)
 })
 if (inherits(conn, "try-error")) {
   cat("unable to connect to MySQL\n")
