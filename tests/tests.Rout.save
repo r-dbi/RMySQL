@@ -1,8 +1,8 @@
 
-R version 2.14.1 Patched (2012-01-05 r58065)
-Copyright (C) 2012 The R Foundation for Statistical Computing
+R version 2.14.1 (2011-12-22)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: i386-pc-mingw32/i386 (32-bit)
+Platform: i486-pc-linux-gnu (32-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -22,15 +22,14 @@ Loading required package: DBI
 > 
 > ## 0 dbConnect()
 > user <- Sys.getenv("MYSQL_USER", unset = NA)
-> password <- Sys.getenv("MYSQL_PASSWORD", unset = NA)
+> password <- Sys.getenv("MYSQL_PASSWORD", unset = '')
 > dbname <- Sys.getenv("MYSQL_DATABASE", unset = "test")
 > 
 > drv <- dbDriver("MySQL")
-> conn <- try(if (is.na(user) && is.na(password)) {
+> conn <- try(if (is.na(user)) {
 +    # in this leg user and password should be set in my.ini or my.cnf files
 +    dbConnect(drv, dbname = dbname)
 + } else {
-+    # in this leg they were specified via environment variables
 +    dbConnect(drv, user =  user, password = password, dbname = dbname)
 + })
 > if (inherits(conn, "try-error")) {
@@ -38,8 +37,7 @@ Loading required package: DBI
 +   q()
 + }
 > 
-> dbListTables(conn)
-[1] "anscombe"    "h"           "iris"        "trendsource"
+> # dbListTables(conn)
 > 
 > ## 1 Ensure that dbWriteTable doesn't add trailing \r
 > dbRemoveTable(conn, "myDF")         # precaution
@@ -69,41 +67,11 @@ Loading required package: DBI
 +    # in this leg they were specified via environment variables
 +    dbConnect(drv, user =  user, password = password, dbname = dbname)
 + })
+Error in mysqlNewConnection(drv, ...) : 
+  RS-DBI driver: (Failed to connect to database: Error: Access denied for user 'NA'@'localhost' (using password: NO)
+)
 > if (inherits(conn, "try-error")) {
 +   cat("unable to connect to MySQL\n")
 +   q()
 + }
-> 
-> dbRemoveTable(conn, "iris")         # precaution
-[1] TRUE
-> dbWriteTable(conn,name='iris',value=iris,row.names=FALSE)
-[1] TRUE
-> rso <- dbSendQuery(conn,"select * from iris where Species='versicolor'")
-> x <- fetch(rso,n=2)
-> rowCount <- nrow(x)
-> stopifnot(rowCount==2)
-> stopifnot(rowCount==dbGetRowCount(rso))
-> while(nrow(x)) {
-+ 	x <- fetch(rso)
-+ 	rowCount <- rowCount + nrow(x)
-+ 	stopifnot(rowCount==dbGetRowCount(rso))
-+ }
-> 
-> ## 2  Exercise dbRowsAffected()
-> nrows <- nrow(iris[iris$Species=='versicolor',])
-> rso <- dbSendQuery(conn,"delete from iris where Species='versicolor'")
-> stopifnot(nrows==dbGetRowsAffected(rso))
-> 
-> ## 3 Exercise dbGetQuery()
-> stopifnot(
-+ 	identical(
-+ 		iris[iris$Species!='versicolor','Sepal.Length'],
-+ 		dbGetQuery(conn,'select * from iris')$Sepal_Length
-+ 	)
-+ )
-> 
-> dbDisconnect(conn)
-[1] TRUE
-> dbUnloadDriver(drv)
-[1] TRUE
-> 
+unable to connect to MySQL

@@ -3,25 +3,22 @@ library(RMySQL)
 
 ## 0 dbConnect()
 user <- Sys.getenv("MYSQL_USER", unset = NA)
-password <- Sys.getenv("MYSQL_PASSWORD", unset = NA)
+password <- Sys.getenv("MYSQL_PASSWORD", unset = '')
 dbname <- Sys.getenv("MYSQL_DATABASE", unset = "test")
 
 drv <- dbDriver("MySQL")
-conn <- try(if (is.na(user) && is.na(password)) {
+conn <- try(if (is.na(user)) {
    # in this leg user and password should be set in my.ini or my.cnf files
    dbConnect(drv, dbname = dbname)
 } else {
-   # in this leg they were specified via environment variables
-   if (is.na(user)) dbConnect(drv, password = password, dbname = dbname)
-   else if (is.na(password)) dbConnect(drv, user = user, dbname = dbname)
-   else dbConnect(drv, user =  user, password = password, dbname = dbname)
+   dbConnect(drv, user =  user, password = password, dbname = dbname)
 })
 if (inherits(conn, "try-error")) {
   cat("unable to connect to MySQL\n")
   q()
 }
 
-dbListTables(conn)
+# dbListTables(conn)
 
 ## 1 Ensure that dbWriteTable doesn't add trailing \r
 dbRemoveTable(conn, "myDF")         # precaution
