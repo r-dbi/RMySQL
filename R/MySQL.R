@@ -49,7 +49,47 @@ setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 ##
 ## Class: DBIObject
 ##
-setClass("MySQLObject", representation("DBIObject", "dbObjectId", "VIRTUAL"))
+setClass("MySQLObject", 
+  contains = c("DBIObject", "VIRTUAL"),
+  slots = list(Id = "integer")
+)
+
+## coercion methods 
+setAs("MySQLObject", "integer", 
+  def = function(from) as(slot(from,"Id"), "integer")
+)
+setAs("MySQLObject", "numeric",
+  def = function(from) as(slot(from, "Id"), "integer")
+)
+setAs("MySQLObject", "character",
+  def = function(from) as(slot(from, "Id"), "character")
+)   
+
+## formating, showing, printing,...
+setMethod("format", "MySQLObject", 
+  def = function(x, ...) {
+    paste("(", paste(as(x, "integer"), collapse=","), ")", sep="")
+  },
+  valueClass = "character"
+)
+
+setMethod("show", "MySQLObject", def = function(object) print(object))
+
+setMethod("print", "MySQLObject",
+  def = function(x, ...){
+    expired <- if(isIdCurrent(x)) "" else "Expired "
+    str <- paste("<", expired, class(x), ":", format(x), ">", sep="")
+    cat(str, "\n")
+    invisible(NULL)
+  }
+)
+
+## verify that obj refers to a currently open/loaded database
+isIdCurrent <- function(obj)  { 
+  obj <- as(obj, "integer")
+  .Call("RS_DBI_validHandle", obj, PACKAGE = .MySQLPkgName)
+}
+
 
 ##
 ## Class: dbDriver

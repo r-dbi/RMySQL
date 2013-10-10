@@ -13,7 +13,6 @@
 Class \code{"DBIResult"}, directly.
 Class \code{"MySQLObject"}, directly.
 Class \code{"DBIObject"}, by class "DBIResult".
-Class \code{"dbObjectId"}, by class "MySQLObject".
 }
 \section{Methods}{
   \describe{
