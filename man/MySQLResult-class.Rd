@@ -1,4 +1,3 @@
-% $Id$
 \name{MySQLResult-class}
 \docType{class}
 \alias{MySQLResult-class}

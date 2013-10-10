@@ -1,4 +1,3 @@
-% $Id$
 \name{MySQLConnection-class}
 \docType{class}
 \alias{MySQLConnection-class}

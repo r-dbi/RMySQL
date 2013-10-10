@@ -1,4 +1,3 @@
-% $Id$
 \name{dbApply}
 \alias{dbApply}
 \title{Apply R functions to remote groups of DBMS rows (experimental)}

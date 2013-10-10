@@ -15,3 +15,5 @@ src\/next-DBI.c
 src\/next-MySQL.h
 src\/next-MySQL.c
 src\/RCS
+^.*\.Rproj$
+^\.Rproj\.user$

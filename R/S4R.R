@@ -1,6 +1,3 @@
-## 
-## $Id$
-##
 ## R/S-Plus compatibility 
 
 usingR <- function(major=0, minor=0){

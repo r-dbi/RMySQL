@@ -1,4 +1,3 @@
-% $Id$
 \name{mysqlDBApply}
 \alias{mysqlDBApply}
 \title{Apply R/S-Plus functions to remote groups of DBMS rows (experimental)}

@@ -1,4 +1,3 @@
-% $Id$
 \name{MySQLDriver-class}
 \docType{class}
 \alias{MySQLDriver-class}
