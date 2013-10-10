@@ -1,4 +1,3 @@
-% $Id$
 \name{dbSendQuery-methods}
 \docType{methods}
 \alias{dbSendQuery-methods}

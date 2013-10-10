@@ -1,4 +1,3 @@
-% $Id$
 \name{MySQL}
 \alias{MySQL}
 \title{

@@ -1,4 +1,3 @@
-% $Id$
 \name{dbApply-methods}
 \docType{methods}
 \alias{dbApply-methods}

@@ -1,7 +1,3 @@
-## 
-## $Id$
-##
-
 .conflicts.OK <- TRUE
 
 .onLoad <-

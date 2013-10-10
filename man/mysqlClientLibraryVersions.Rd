@@ -1,4 +1,3 @@
-% $Id$
 \name{mysqlClientLibraryVersions}
 \alias{mysqlClientLibraryVersions}
 \title{MySQL Check for Compiled Versus Loaded Client Library Versions}
