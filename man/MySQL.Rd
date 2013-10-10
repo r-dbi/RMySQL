@@ -33,8 +33,7 @@ MySQL(max.con = 16, fetch.default.rec = 500, force.reload = FALSE)
 }
 \value{
 An object \code{MySQLDriver} that extends 
-\code{dbDriver} and 
-\code{dbObjectId}.
+\code{dbDriver}.
 This object is required to create connections
 to one or several MySQL database engines.
 }

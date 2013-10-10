@@ -10,7 +10,6 @@
 Class \code{"DBIConnection"}, directly.
 Class \code{"MySQLObject"}, directly.
 Class \code{"DBIObject"}, by class "DBIConnection".
-Class \code{"dbObjectId"}, by class "MySQLObject".
 }
 \section{Methods}{
   \describe{
