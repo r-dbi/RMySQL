@@ -18,7 +18,7 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##
 
-"mysqlInitDriver" <- 
+mysqlInitDriver <- 
 function(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
 ## create a MySQL database connection manager.  By default we allow
 ## up to "max.con" connections and single fetches of up to "fetch.default.rec"
@@ -37,7 +37,7 @@ function(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
    new("MySQLDriver", Id = drvId)
 }
 
-"mysqlCloseDriver"<- 
+mysqlCloseDriver <- 
 function(drv, ...)
 {
    if(!isIdCurrent(drv))
@@ -46,7 +46,7 @@ function(drv, ...)
    .Call("RS_MySQL_closeManager", drvId, PACKAGE = .MySQLPkgName)
 }
 
-"mysqlDescribeDriver" <-
+mysqlDescribeDriver <-
 function(obj, verbose = FALSE, ...)
 ## Print out nicely a brief description of the connection Driver
 {
@@ -70,7 +70,7 @@ function(obj, verbose = FALSE, ...)
    invisible(NULL)
 }
 
-"mysqlDriverInfo" <-
+mysqlDriverInfo <-
 function(obj, what="", ...)
 {
    if(!isIdCurrent(obj))
@@ -90,7 +90,7 @@ function(obj, what="", ...)
       info
 }
 
-"mysqlNewConnection" <-
+mysqlNewConnection <-
 function(drv, dbname=NULL, username=NULL,
    password=NULL, host=NULL,
    unix.socket=NULL, port = 0, client.flag = 0, 
@@ -133,7 +133,7 @@ function(drv, dbname=NULL, username=NULL,
 	new("MySQLConnection", Id = conId)
 }
 
-"mysqlCloneConnection" <-
+mysqlCloneConnection <-
 function(con, ...)
 {
    if(!isIdCurrent(con))
@@ -143,7 +143,7 @@ function(con, ...)
    new("MySQLConnection", Id = newId)
 }
 
-"mysqlDescribeConnection" <-
+mysqlDescribeConnection <-
 function(obj, verbose = FALSE, ...)
 {
    info <- dbGetInfo(obj)
@@ -169,7 +169,7 @@ function(obj, verbose = FALSE, ...)
    invisible(NULL)
 }
 
-"mysqlCloseConnection" <-
+mysqlCloseConnection <-
 function(con, ...)
 {
    if(!isIdCurrent(con))
@@ -185,7 +185,7 @@ function(con, ...)
    .Call("RS_MySQL_closeConnection", conId, PACKAGE = .MySQLPkgName)
 }
 
-"mysqlConnectionInfo" <-
+mysqlConnectionInfo <-
 function(obj, what="", ...)
 {
    if(!isIdCurrent(obj))
@@ -202,7 +202,7 @@ function(obj, what="", ...)
       info
 }
        
-"mysqlExecStatement" <-
+mysqlExecStatement <-
 function(con, statement)
 ## submits the sql statement to MySQL and creates a
 ## dbResult object if the SQL operation does not produce
@@ -219,7 +219,7 @@ function(con, statement)
 
 ## helper function: it exec's *and* retrieves a statement. It should
 ## be named somehting else.
-"mysqlQuickSQL" <-
+mysqlQuickSQL <-
 function(con, statement)
 {
    if(!isIdCurrent(con))
@@ -243,7 +243,7 @@ function(con, statement)
    res
 }
 
-"mysqlDescribeFields" <-
+mysqlDescribeFields <-
 function(res, ...)
 {
    flds <- dbGetInfo(res, "fieldDescription")[[1]][[1]]
@@ -259,7 +259,7 @@ function(res, ...)
    else data.frame(flds)
 }
 
-"mysqlDBApply" <-
+mysqlDBApply <-
 function(res, INDEX, FUN = stop("must specify FUN"), 
          begin = NULL, 
          group.begin =  NULL, 
@@ -354,7 +354,7 @@ function(res, INDEX, FUN = stop("must specify FUN"),
    out
 }
 
-"mysqlFetch" <-
+mysqlFetch <-
 function(res, n=0, ...)
 ## Fetch at most n records from the opened resultSet (n = -1 means
 ## all records, n=0 means extract as many as "default_fetch_rec",
@@ -385,7 +385,7 @@ function(res, n=0, ...)
 ## and INSERTS, ...  Later on we created a base class dbResult
 ## for non-Select SQL and a derived class resultSet for SELECTS.
 
-"mysqlResultInfo" <-
+mysqlResultInfo <-
 function(obj, what = "", ...)
 {
    if(!isIdCurrent(obj))
@@ -398,7 +398,7 @@ function(obj, what = "", ...)
       info
 }
 
-"mysqlDescribeResult" <-
+mysqlDescribeResult <-
 function(obj, verbose = FALSE, ...)
 {
 
@@ -419,7 +419,7 @@ function(obj, verbose = FALSE, ...)
    invisible(NULL)
 }
 
-"mysqlCloseResult" <-
+mysqlCloseResult <-
 function(res, ...)
 {
    if(!isIdCurrent(res))
@@ -428,7 +428,7 @@ function(res, ...)
    .Call("RS_MySQL_closeResultSet", rsId, PACKAGE = .MySQLPkgName)
 }
 
-"mysqlReadTable" <- 
+mysqlReadTable <- 
 function(con, name, row.names = "row_names", check.names = TRUE, ...)
 ## Use NULL, "", or 0 as row.names to prevent using any field as row.names.
 {
@@ -458,7 +458,7 @@ function(con, name, row.names = "row_names", check.names = TRUE, ...)
    out
 } 
 
-"mysqlImportFile" <-
+mysqlImportFile <-
 function(con, name, value, field.types = NULL, overwrite = FALSE, 
   append = FALSE, header, row.names, nrows = 50, sep = ",", 
   eol="\n", skip = 0, quote = '"', ...)
@@ -548,7 +548,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   TRUE
 }
 
-"mysqlWriteTable" <-
+mysqlWriteTable <-
 function(con, name, value, field.types, row.names = TRUE, 
    overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE)
 ## Create table "name" (must be an SQL identifier) and populate
@@ -645,7 +645,7 @@ function(con, name, value, field.types, row.names = TRUE,
    TRUE
 }
 
-"dbBuildTableDefinition" <-
+dbBuildTableDefinition <-
 function(dbObj, name, obj, field.types = NULL, row.names = TRUE, ...)
 {
   if(!is.data.frame(obj))
@@ -671,7 +671,7 @@ function(dbObj, name, obj, field.types = NULL, row.names = TRUE, ...)
 }
 
 ## the following is almost exactly from the ROracle driver 
-"safe.write" <- 
+safe.write <- 
 function(value, file, batch, ...)
 ## safe.write makes sure write.table doesn't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
@@ -701,7 +701,7 @@ function(value, file, batch, ...)
    invisible(NULL)
 }
 
-"mysqlDataType" <-
+mysqlDataType <-
 function(obj, ...)
 ## find a suitable SQL data type for the R/S object obj
 ## TODO: Lots and lots!! (this is a very rough first draft)
@@ -728,7 +728,7 @@ function(obj, ...)
 }
 
 ## the following code was kindly provided ny J. T. Lindgren.
-"mysqlEscapeStrings" <-
+mysqlEscapeStrings <-
 function(con, strings)
 {
   ## Escapes the given strings
@@ -743,7 +743,7 @@ function(con, strings)
 }
 
 ## For testing compiled against loaded mysql client library versions
-"mysqlClientLibraryVersions" <-
+mysqlClientLibraryVersions <-
 function()
 {
 	.Call("RS_MySQL_clientLibraryVersions",PACKAGE=.MySQLPkgName)
@@ -752,7 +752,7 @@ function()
 ## the following reserved words were taken from Section 6.1.7
 ## of the MySQL Manual, Version 4.1.1-alpha, html format.
 
-".MySQLKeywords" <-
+.MySQLKeywords <-
 c("ADD", "ALL", "ALTER", "ANALYZE", "AND", "AS", "ASC", "ASENSITIVE", 
   "AUTO_INCREMENT", "BDB", "BEFORE", "BERKELEYDB", "BETWEEN", "BIGINT", 
   "BINARY", "BLOB", "BOTH", "BY", "CALL", "CASCADE", "CASE", "CHANGE", 
