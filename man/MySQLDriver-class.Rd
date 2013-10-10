@@ -13,7 +13,6 @@
 Class \code{"DBIDriver"}, directly.
 Class \code{"MySQLObject"}, directly.
 Class \code{"DBIObject"}, by class "DBIDriver".
-Class \code{"dbObjectId"}, by class "MySQLObject".
 }
 \section{Methods}{
   \describe{
