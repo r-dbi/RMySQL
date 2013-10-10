@@ -1,6 +1,3 @@
-##
-## $Id$
-##
 ## Copyright (C) 1999 The Omega Project for Statistical Computing.
 ##
 ## This library is free software; you can redistribute it and/or
@@ -21,7 +18,6 @@
 ## Constants
 ##
 
-.MySQLRCS <- "$Id$"
 .MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
 .MySQLVersion <- "0.5-12"      ##package.description(.MySQLPkgName, fields = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)

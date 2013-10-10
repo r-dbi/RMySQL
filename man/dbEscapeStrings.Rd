@@ -1,4 +1,3 @@
-% $Id$
 \name{dbEscapeStrings}
 \alias{dbEscapeStrings}
 \title{Escape SQL-special characters in strings}

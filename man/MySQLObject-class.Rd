@@ -1,4 +1,3 @@
-% $Id$
 \name{MySQLObject-class}
 \docType{class}
 \alias{MySQLObject-class}

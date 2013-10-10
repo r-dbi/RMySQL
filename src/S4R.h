@@ -1,5 +1,4 @@
-/* $Id$
- *
+/* 
  * ----
  * The name of the project is RMySQL, not RSMySQL, so at some point we
  * will inevitably break compatibility with Splus. 

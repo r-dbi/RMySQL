@@ -1,4 +1,3 @@
-% $Id$
 \name{dbNextResult}
 \alias{dbNextResult}
 \alias{dbMoreResults}
