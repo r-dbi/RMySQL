@@ -73,16 +73,12 @@ setMethod("format", "MySQLObject",
   valueClass = "character"
 )
 
-setMethod("show", "MySQLObject", def = function(object) print(object))
-
-setMethod("print", "MySQLObject",
-  def = function(x, ...){
-    expired <- if(isIdCurrent(x)) "" else "Expired "
-    str <- paste("<", expired, class(x), ":", format(x), ">", sep="")
-    cat(str, "\n")
-    invisible(NULL)
-  }
-)
+setMethod("show", "MySQLObject", def = function(object) {
+  expired <- if(isIdCurrent(object)) "" else "Expired "
+  str <- paste("<", expired, class(object), ":", format(object), ">", sep="")
+  cat(str, "\n")
+  invisible(NULL)
+})
 
 ## verify that obj refers to a currently open/loaded database
 isIdCurrent <- function(obj)  { 
