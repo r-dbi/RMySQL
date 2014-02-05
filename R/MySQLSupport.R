@@ -621,11 +621,12 @@ function(con, name, value, field.types, row.names = TRUE,
 
    fn <- tempfile("rsdbi")
    fn <- gsub("\\\\", "/", fn)  # Since MySQL on Windows wants \ double (BDR)
-   safe.write(value, file = fn)
+   safe.write(value, file = fn, fileEncoding = "utf8")
    on.exit(unlink(fn), add = TRUE)
    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
-                  " INTO TABLE ", name, 
-                  " LINES TERMINATED BY '\n' ", 
+                  " INTO TABLE ", name,
+                  " CHARACTER SET utf8",
+                  " LINES TERMINATED BY '\n' ",
                   "( ", paste(names(field.types), collapse=", "), ");",
                sep="")
    rs <- try(dbSendQuery(con, sql4))
