@@ -120,7 +120,7 @@ function(drv, dbname=NULL, username=NULL,
 
 	if(!is.null(default.file) && !file.exists(default.file[1]))
 		stop(sprintf("mysql default file %s does not exist", default.file))
-   
+
 	drvId <- as(drv, "integer")
 	conId <- .Call("RS_MySQL_newConnection", drvId, 
 		dbname, username, password, host, unix.socket, 
@@ -133,8 +133,7 @@ function(drv, dbname=NULL, username=NULL,
 mysqlCloneConnection <-
 function(con, ...)
 {
-   if(!isIdCurrent(con))
-      stop(paste("expired", class(con)))
+   if(!isIdCurrent(con)) stop(paste("expired", class(con)))
    conId <- as(con, "integer")
    newId <- .Call("RS_MySQL_cloneConnection", conId, PACKAGE = .MySQLPkgName)
    new("MySQLConnection", Id = newId)
@@ -193,6 +192,7 @@ function(obj, what="", ...)
    for(i in seq(along = info$rsId))
        rsId[[i]] <- new("MySQLResult", Id = c(id, info$rsId[i]))
    info$rsId <- rsId
+
    if(!missing(what))
       info[what]
    else
@@ -214,19 +214,27 @@ function(con, statement)
    new("MySQLResult", Id = rsId)
 }
 
+.clearResultSets <- function(con){
+   ## are there resultSets pending on con?
+   rsList <- dbListResults(con)
+   if(length(rsList)>0){     
+      warning("There are pending result sets. Removing.",call.=FALSE)
+      lapply(rsList,dbClearResult) ## clear all pending results
+   }
+   NULL
+}
+
 ## helper function: it exec's *and* retrieves a statement. It should
 ## be named somehting else.
 mysqlQuickSQL <-
 function(con, statement)
 {
-   if(!isIdCurrent(con))
-      stop(paste("expired", class(con)))
-   nr <- length(dbListResults(con))
-   if(nr>0){                     ## are there resultSets pending on con?
-      new.con <- dbConnect(con)   ## yep, create a clone connection
-      on.exit(dbDisconnect(new.con))
-      rs <- dbSendQuery(new.con, statement)
-   } else rs <- dbSendQuery(con, statement)
+   if(!isIdCurrent(con)) stop(paste("expired", class(con)))
+
+   ## are there resultSets pending on con?
+   .clearResultSets(con)
+
+   rs <- dbSendQuery(con, statement)
    if(dbHasCompleted(rs)){
       dbClearResult(rs)            ## no records to fetch, we're done
       invisible()
@@ -463,13 +471,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   if(overwrite && append)
     stop("overwrite and append cannot both be TRUE")
 
-  ## Do we need to clone the connection (ie., if it is in use)?
-  if(length(dbListResults(con))!=0){ 
-    new.con <- dbConnect(con)              ## there's pending work, so clone
-    on.exit(dbDisconnect(new.con))
-  } 
-  else 
-    new.con <- con
+  .clearResultSets(con)
 
   if(dbExistsTable(con,name)){
     if(overwrite){
@@ -511,9 +513,9 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
     ## need to init table, say, with the first nrows lines
     d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows, ...)
     sql <- 
-      dbBuildTableDefinition(new.con, name, obj=d, field.types = field.types,
+      dbBuildTableDefinition(con, name, obj=d, field.types = field.types,
         row.names = row.names)
-    rs <- try(dbSendQuery(new.con, sql))
+    rs <- try(dbSendQuery(con, sql))
     if(inherits(rs, ErrorClass)){
       warning("could not create table: aborting mysqlImportFile")
       return(FALSE)
@@ -536,7 +538,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   else
      sql <- sprintf(fmt, fn, name, sep, quote, eol, skip + as.integer(header))
 
-  rs <- try(dbSendQuery(new.con, sql))
+  rs <- try(dbSendQuery(con, sql))
   if(inherits(rs, ErrorClass)){
      warning("could not load data into table")
      return(FALSE)
@@ -583,14 +585,8 @@ function(con, name, value, field.types, row.names = TRUE,
       field.types[i] <- dbDataType(dbObj=con, field.types$row.names)
    names(field.types) <- make.db.names(con, names(field.types), 
                              allow.keywords = allow.keywords)
-   ## Do we need to clone the connection (ie., if it is in use)?
-   if(length(dbListResults(con))!=0){ 
-      new.con <- dbConnect(con)              ## there's pending work, so clone
-      on.exit(dbDisconnect(new.con))
-   } 
-   else {
-      new.con <- con
-   }
+
+   .clearResultSets(con)
 
    if(dbExistsTable(con,name)){
       if(overwrite){
@@ -611,7 +607,7 @@ function(con, name, value, field.types, row.names = TRUE,
                           sep="")
       sql3 <- "\n)\n"
       sql <- paste(sql1, sql2, sql3, sep="")
-      rs <- try(dbSendQuery(new.con, sql))
+      rs <- try(dbSendQuery(con, sql))
       if(inherits(rs, ErrorClass)){
          warning("could not create table: aborting mysqlWriteTable")
          return(FALSE)
@@ -632,7 +628,7 @@ function(con, name, value, field.types, row.names = TRUE,
                   " LINES TERMINATED BY '\n' ", 
                   "( ", paste(names(field.types), collapse=", "), ");",
                sep="")
-   rs <- try(dbSendQuery(new.con, sql4))
+   rs <- try(dbSendQuery(con, sql4))
    if(inherits(rs, ErrorClass)){
       warning("could not load data into table")
       return(FALSE)
