@@ -663,6 +663,24 @@ function(dbObj, name, obj, field.types = NULL, row.names = TRUE, ...)
   paste("CREATE TABLE", name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
 }
 
+## Escape problematic characters in the data frame.
+## These are: - tab, as this is the field separator
+##            - newline, as this is the record separator
+##            - backslash, the escaping character
+## Obviously, not all data types can contain these, e.g. numeric types
+## can not. So we only substitute character and factor types.
+## (FIXME: is there anything else?)
+escape <- function(table) {
+  table <- as.data.frame(table)
+  repcols <- which(sapply(table, is.character) | sapply(table, is.factor))
+  for (rc in repcols) {
+    table[,rc] <- gsub("\\\\", "\\\\\\\\", table[,rc])
+    table[,rc] <- gsub("\\n", "\\\\n", table[,rc])
+    table[,rc] <- gsub("\\t", "\\\\t", table[,rc])
+  }
+  table
+}
+
 ## the following is almost exactly from the ROracle driver 
 safe.write <- 
 function(value, file, batch, ...)
@@ -684,8 +702,8 @@ function(value, file, batch, ...)
    to <- min(batch, N)
    conb <- file(file,open="wb")
    while(from<=N){
-      write.table(value[from:to,, drop=FALSE], file = conb, append = TRUE, 
-            quote = FALSE, sep="\t", na = .MySQL.NA.string,
+      write.table(escape(value[from:to,, drop=FALSE]), file = conb,
+            append = TRUE, quote = FALSE, sep="\t", na = .MySQL.NA.string,
             row.names=FALSE, col.names=FALSE, eol = '\n', ...)
       from <- to+1
       to <- min(to+batch, N)
