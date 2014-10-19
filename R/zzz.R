@@ -21,7 +21,7 @@ if(.Platform$OS.type == "windows") {
 
 	# check registry
 	if (!dir.exists(mysql)) {
-	    reg <- utils::readRegistry("SOFTWARE\\MySQL AB", hive="HLM", maxdepth=2)
+	    reg <- utils::readRegistry("SOFTWARE\\MySQL AB", hive="HLM", maxdepth=2, view="32-bit")
 	    for (i in reg){
 		mysql <- i$Location
 		if (dir.exists(mysql)) {
