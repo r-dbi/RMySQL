@@ -12,7 +12,7 @@ if(.Platform$OS.type == "windows") {
     {
 	verbose <- TRUE
 	dir.exists <- function(x) {
-	    !is.null(x) && file.exists(x) && file.info(x)$isdir
+	    !is.null(x) & file.exists(x) & file.info(x)$isdir
 	}
 
 	# check MYSQL_HOME environment variable
@@ -21,20 +21,21 @@ if(.Platform$OS.type == "windows") {
 
 	# check registry
 	if (!dir.exists(mysql)) {
-	    reg <- utils::readRegistry("SOFTWARE\\MySQL AB", hive="HLM", maxdepth=2)
-	    for (i in reg){
-		mysql <- i$Location
-		if (dir.exists(mysql)) {
-		    if (verbose) cat(mysql, "found in registry\n")
-		    break
-		}
-	    }
+	    mysql = character(0)
+	    reg <- utils::readRegistry("SOFTWARE\\MySQL AB", hive="HLM", maxdepth=2, view="32-bit")
+	    reg <- Filter(is.list, reg)
+	    reg <- Filter(function(i) "Version" %in% names(i) & "Location" %in% names(i), reg)
+	    reg <- reg[order(grepl("Server", names(reg)), sapply(reg, function(i) i$Version), decreasing=TRUE)]
+	    mysql <- sapply(reg, function(i) i$Location)
+	    mysql <- sub("[\\/]$", "", mysql)
+	    mysql <- Filter(dir.exists, mysql)
+	    if (verbose) for (i in mysql) cat(i, "found in registry\n")
 	}
 
 	# check %ProgramFiles%:\MySQL and these 
 	# C:\MySQL, ..., C:\Apps\MySQL, ...
 
-	if (!dir.exists(mysql)) {
+	if (length(mysql) == 0) {
 
 	    ProgramFilesMySQL <- file.path(Sys.getenv("ProgramFiles"), "MySQL")
 	    default.disks <- c("C:", "D:", "E:", "F:", "G:")
@@ -44,12 +45,12 @@ if(.Platform$OS.type == "windows") {
 	    lookup.paths <- c(ProgramFilesMySQL, g)
 
 	    if (verbose) cat("Looking in", toString(lookup.paths), "\n")
-	    mysql <- Find(dir.exists, lookup.paths)
-        if (dir.exists(mysql) && verbose) cat("Found", mysql, "\n")
+	    mysql <- Filter(dir.exists, lookup.paths)
+	    if (verbose) for (i in mysql) cat("Found", i, "by guessing\n")
 
 	    # if still not found find other disks and look in them
 	    # we save this until the end since running wmic takes a bit longer
-	    if (!dir.exists(mysql)) {
+	    if (length(mysql) == 0) {
 		# wmic should exist on Vista and Win7
 		wmic.out <- if (nzchar(Sys.which("wmic"))) {
 		    shell("wmic logicaldisk get name", intern = TRUE)
@@ -60,32 +61,38 @@ if(.Platform$OS.type == "windows") {
 		more <- with(expand.grid(disk = default.disks, dir = default.dirs), 
 		    paste(disk, dir, sep = ""))
 		if (verbose) cat("Looking in", toString(more), "\n")
-		mysql <- Find(dir.exists, more)
-		if (verbose && dir.exists(mysql)) cat("Found", mysql, "\n")
+		mysql <- Filter(dir.exists, more)
+		if (verbose) for (i in mysql) cat("Found", i, "by searching\n")
 	    }
 	}
 
-	if (dir.exists(mysql)) {
+	if (length(mysql) == 0)
+	    stop("Cannot find a suitable MySQL install")
+
+	for (i in mysql) {
+	    if (verbose) cat("Searching for libmysql.dll in", i, "\n")
+	    dll <- dir(path = i, pattern = "^libmysql\\.dll$",
+		       recursive = TRUE, full = TRUE, ignore.case = TRUE)
+	    if (length(dll) != 0) {
+		if (verbose) cat(dll[1], "found\n")
 		if (Sys.getenv("MYSQL_HOME")=="") {
-			bin <- dir(path = mysql, pattern = "^bin$", recursive = TRUE, 
-				full = TRUE, ignore.case = TRUE)
+		    bin <- dir(path = i, pattern = "^bin$", recursive = TRUE,
+			       full = TRUE, ignore.case = TRUE)
+		    if (length(bin) == 1) {
 			cwd <- getwd()
 			setwd(bin)
 			setwd("..")
 			Sys.setenv(MYSQL_HOME=getwd())
 			setwd(cwd)
+		    }
+		    else {
+			Sys.setenv(MYSQL_HOME=i)
+		    }
 		}
-	    lib <- dir(path = mysql, pattern = "^libmysql.lib$",
-		recursive = TRUE, full = TRUE, ignore.case = TRUE)
-	    dll <- dir(path = mysql, pattern = "^libmysql.dll$",
-		recursive = TRUE, full = TRUE, ignore.case = TRUE)
-		dll <- dirname(dll)
-	    include <- dir(path = mysql, pattern = "^include$", include.dirs = TRUE,
-		recursive = TRUE, full = TRUE, ignore.case = TRUE)
-	    library.dynam("RMySQL", pkgname, libname, DLLpath = dll)
-	    #c(home = mysql, lib = lib, dll = dll, include = include)
-	} else {
-	    stop("Cannot find a suitable MySQL install")
+		dll <- dirname(dll[1])
+		library.dynam("RMySQL", pkgname, libname, DLLpath = dll)
+		break
+	    }
 	}
     }
 } else {
