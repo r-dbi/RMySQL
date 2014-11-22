@@ -5,7 +5,14 @@ Installation:
    R CMD INSTALL [-l<alternate-dir>] RMySQL_<version>.tar.gz
 
 During installation, RMySQL looks for the MySQL headers and libraries
-in the system directories.  If these are not installed in system-wide
+in the system directories.
+
+If these files are not present in your system you may need to install
+them with, for example:
+
+       sudo apt-get install libmysqlclient-dev
+
+If the files are installed in a non-standard location, or system-wide
 directories (or if you want to use an alternate MySQL distribution),
 you may specify which MySQL directory(ies) to use through one of the
 following:
@@ -41,6 +48,8 @@ or 3. Use the --with-mysql-* RMySQL configuration arguments
           R CMD INSTALL --configure-args="--with-mysql-dir=$HOME/mysql" ...
 
 Also, besure that RMySQL can find the non-system libraries at run-time. This is typically managed by an environment variable (LD_LIBRARY_PATH or DYLD_LIBRARY_PATH for OSX) or the /etc/ld.so.cache.
+
+
 
 S/W Requirements:
 -----------------
