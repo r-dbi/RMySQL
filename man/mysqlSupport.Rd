@@ -25,7 +25,6 @@
 \alias{.MySQLPkgRCS}
 \alias{.MySQL.NA.string}
 \alias{.MySQLSQLKeywords}
-\alias{.conflicts.OK}
 \alias{CLIENT_LONG_PASSWORD}     % new more secure passwords 
 \alias{CLIENT_FOUND_ROWS}        % Found instead of affected rows 
 \alias{CLIENT_LONG_FLAG}         % Get all column flags 
@@ -283,7 +282,6 @@
 \code{.MySQL.NA.string} (character that MySQL uses to 
 denote \code{NULL} on input),
 \code{.MySQLSQLKeywords} (a lot!)
-\code{.conflicts.OK}.
 %\non_function{}
 }
 \keyword{datasets}

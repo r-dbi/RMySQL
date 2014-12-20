@@ -1,2 +1,0 @@
-PKG_CPPFLAGS = -I"${MYSQL_HOME}"/include
-PKG_LIBS = "${MYSQL_HOME}"/lib/libmySQL.dll

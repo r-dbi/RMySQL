@@ -1,0 +1,2 @@
+PKG_CPPFLAGS= -I../windows/mariadb-5.5/include
+PKG_LIBS= -L../windows/mariadb-5.5/lib${R_ARCH} -lmariadbclient -lz -lws2_32

@@ -1,7 +1,7 @@
 import(methods)
 import(DBI)
 
-#useDynLib(RMySQL)
+useDynLib(RMySQL)
 
 ## Classes
 exportClasses(
