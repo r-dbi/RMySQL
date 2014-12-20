@@ -53,6 +53,7 @@ while(nrow(x)) {
 nrows <- nrow(iris[iris$Species=='versicolor',])
 rso <- dbSendQuery(conn,"delete from iris where Species='versicolor'")
 stopifnot(nrows==dbGetRowsAffected(rso))
+dbClearResult(rso)
 
 ## 3 Exercise dbGetQuery()
 stopifnot(
