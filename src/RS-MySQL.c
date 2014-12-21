@@ -1594,7 +1594,7 @@ add_group(s_object *group_names, s_object *data,
 /* the following function was kindly provided by Mikhail Kondrin 
  * it returns the last inserted index. 
  * TODO: It returns an int, but it can potentially be inadequate
- *       if the index is anîunsigned integer.  Should we return
+ *       if the index is anï¿½unsigned integer.  Should we return
  *       a numeric instead?
  */
 s_object *
@@ -1706,10 +1706,15 @@ void R_init_RMySQL(DllInfo *info){
 	 * when the major or minor revision number differ. The integer format is XYYZZ
 	 * where X is the major revision, YY is the minor revision, and ZZ is the revision
 	 * within the minor revision.
-	 */
-	if ( (compiled-(compiled%100)) != (loaded-(loaded%100)) ){
-		warning("\n\n   RMySQL was compiled with MySQL %s but loading MySQL %s instead!\n   This may cause problems with your database connections.\n\n   Please install MySQL %s.\n\n   If you have already done so, you may need to set your environment\n   variable MYSQL_HOME to the proper install directory.",MYSQL_SERVER_VERSION,mysql_get_client_info(),MYSQL_SERVER_VERSION);
-	}
+   
+   * Jeroen 2014: this is incorrect. It merely compares the VERSION and VERSION.server
+   * files contained within the connector library. It has nothing to do with build vs
+   * compile. Disabling this.
+   *
+	 * if ( (compiled-(compiled%100)) != (loaded-(loaded%100)) ){
+	 *	warning("\n\n   RMySQL was compiled with MySQL %s but loading MySQL %s instead!\n   This may cause problems with your database connections.\n\n   Please install MySQL %s.\n\n   If you have already done so, you may need to set your environment\n   variable MYSQL_HOME to the proper install directory.",MYSQL_SERVER_VERSION,mysql_get_client_info(),MYSQL_SERVER_VERSION);
+	 * }
+   */
 }
 
 void R_unload_RMySQL(DllInfo *info){
