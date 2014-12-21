@@ -1,2 +1,14 @@
 PKG_CPPFLAGS= -I../windows/mariadb-5.5/include
 PKG_LIBS= -L../windows/mariadb-5.5/lib${R_ARCH} -lmariadbclient -lz -lws2_32
+
+SOURCES = $(wildcard *.c)
+
+OBJECTS = $(SOURCES:.c=.o)
+
+all: clean winlibs $(OBJECTS)
+
+clean:
+	rm -f $(OBJECTS)
+
+winlibs:
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
