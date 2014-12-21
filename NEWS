@@ -1,4 +1,4 @@
 0.10
  - New maintainer
- - Internal changes to static link against mariadb client lib on windows
- - Many small fixes
+ - Internal changes to support static linking on Windows.
+ - Asorted fixes 
