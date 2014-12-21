@@ -17,3 +17,4 @@ src\/next-MySQL.c
 src\/RCS
 ^.*\.Rproj$
 ^\.Rproj\.user$
+.travis.yml
