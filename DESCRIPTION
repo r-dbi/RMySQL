@@ -1,12 +1,11 @@
 Package: RMySQL
 Version: 0.9.99
 Date: 2014-12-20
-Title: R interface to the MySQL database
+Title: Database Interface and MySQL Driver for R
 Author: David A. James, Saikat DebRoy, Jeffrey Horner
 Maintainer: Jeroen Ooms <jeroen.ooms@stat.ucla.edu>
-Description: Database interface and MySQL driver for R.
-   This version complies with the database interface 
-   definition as implemented in the package DBI 0.2-2.
+Description: Implements MySQL and MariaDB database client using
+    the DBI interface. 
 Depends: R (>= 2.8.0), methods, DBI (>= 0.2-2), utils
 License: GPL-2
 URL: https://github.com/jeroenooms/RMySQL
