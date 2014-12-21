@@ -18,3 +18,4 @@ src\/RCS
 ^.*\.Rproj$
 ^\.Rproj\.user$
 .travis.yml
+^windows$
