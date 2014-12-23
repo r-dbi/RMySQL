@@ -27,6 +27,7 @@ matrix:
 before_install:
   - sudo apt-get install libmysqlclient-dev
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - sudo apt-get install r-bioc-biobase r-cran-rjava r-cran-xlsxjars
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
 install:
