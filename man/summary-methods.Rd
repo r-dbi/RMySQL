@@ -4,6 +4,7 @@
 \alias{summary-methods}
 \alias{format-methods}
 \alias{show-methods}
+\alias{coerce,dbObjectId,integer-method}
 \alias{coerce,MySQLObject,integer-method}
 \alias{coerce,MySQLObject,numeric-method}
 \alias{coerce,MySQLObject,character-method}

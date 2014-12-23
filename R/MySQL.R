@@ -480,3 +480,9 @@ setMethod("dbNextResult",
    }
 )
 
+#### Temporary compatibility fix for TSMySQL
+setClass("dbObjectId")
+setAs("dbObjectId", "integer", 
+  def = function(from) as(slot(from,"Id"), "integer")
+)
+####

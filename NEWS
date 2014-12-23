@@ -1,4 +1,4 @@
 0.10
- - New maintainer
+ - New maintainer.
  - Internal changes to support static linking on Windows.
- - Asorted fixes 
+ - Assorted fixes accumulated since last release 3 years ago.

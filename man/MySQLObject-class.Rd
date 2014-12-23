@@ -1,6 +1,7 @@
 \name{MySQLObject-class}
 \docType{class}
 \alias{MySQLObject-class}
+\alias{dbObjectId-class}
 \title{Class MySQLObject}
 \description{
    Base class for all MySQL-specific DBI classes

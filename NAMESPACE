@@ -5,6 +5,7 @@ useDynLib(RMySQL)
 
 ## Classes
 exportClasses(
+   dbObjectId,
    MySQLObject,
    MySQLDriver,
    MySQLConnection,
