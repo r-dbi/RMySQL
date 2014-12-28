@@ -2,9 +2,11 @@
 
 export(MySQL)
 export(dbApply)
+export(dbBuildTableDefinition)
 export(dbEscapeStrings)
 export(dbMoreResults)
 export(dbNextResult)
+export(mysqlClientLibraryVersions)
 exportClasses(MySQLDriver)
 exportClasses(MySQLResult)
 exportMethods(dbApply)

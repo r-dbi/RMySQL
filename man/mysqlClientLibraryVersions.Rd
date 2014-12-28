@@ -14,5 +14,7 @@ client library version.
 \description{
 This function prints out the compiled and loaded client library versions.
 }
-\keyword{database}
+\examples{
+mysqlClientLibraryVersions()
+}
 

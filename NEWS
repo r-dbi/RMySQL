@@ -12,5 +12,4 @@
     `mysqlExecStatement`, `mysqlQuickSQL`, `mysqlDBApply`, `mysqlFetch`,
     `mysqlResultInfo`, `mysqlDescribeResult`, `mysqlDescribeFields`,
     `mysqlCloseResult`, `mysqlImportFile`, `mysqlReadTable`, `mysqlWriteTable`,
-    `mysqlEscapeStrings`, `mysqlDataType`, `mysqlClientLibraryVersions`,
-    `safe.write`.
+    `mysqlEscapeStrings`, `mysqlDataType`, `safe.write`.

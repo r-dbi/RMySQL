@@ -5,7 +5,7 @@
 \alias{dbEscapeStrings}
 \alias{dbEscapeStrings,MySQLConnection,character-method}
 \alias{dbEscapeStrings,MySQLResult,character-method}
-\title{Escape SQL-special characters in strings}
+\title{Escape SQL-special characters in strings.}
 \usage{
 dbEscapeStrings(con, strings, ...)
 
@@ -24,7 +24,7 @@ dbEscapeStrings(con, strings, ...)
 A character vector with SQL special characters properly escaped.
 }
 \description{
-Escape SQL-special characters in strings
+Escape SQL-special characters in strings.
 }
 \examples{
 \dontrun{
@@ -33,11 +33,4 @@ sql <- dbEscapeString(con, tmp)
 dbGetQuery(con, sql)
 }
 }
-\seealso{
-\code{\link{MySQL}} \code{\link[DBI]{dbSendQuery}}
-\code{\link[DBI]{fetch}}
-}
-\keyword{database}
-\keyword{interface}
-\keyword{programming}
 

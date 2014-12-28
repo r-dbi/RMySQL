@@ -24,26 +24,16 @@ dbMoreResults(con, ...)
 \value{
 \code{dbNextResult} returns a result set or \code{NULL}.
 
-\code{dbMoreResults} returns a logical specifying whether or not there are
-additional result sets to process in the connection.
+  \code{dbMoreResults} returns a logical specifying whether or not there are
+  additional result sets to process in the connection.
 }
 \description{
-Fetches the next result set from the output of a multi-statement SQL script
-or stored procedure; checkes whether there are additonal result sets to
-process.
-}
-\details{
 SQL scripts (i.e., multiple SQL statements separated by ';') and stored
-procedures oftentimes generate multiple result sets.  These DBI generic
-functions provide a means to process them sequentially.
-
-\code{dbNextResult} fetches the next result from the sequence of pending
-results sets; \code{dbMoreResults} returns a logical to indicate whether
-there are additional results to process.
-}
-\section{Note}{
- Currently only the \code{\link{MySQL}} driver implements
-these methods.  See 'methods?dbNextMethod'.
+procedures oftentimes generate multiple result sets.  These generic
+functions provide a means to process them sequentially. \code{dbNextResult}
+fetches the next result from the sequence of pending results sets;
+\code{dbMoreResults} returns a logical to indicate whether there are
+additional results to process.
 }
 \examples{
 \dontrun{
@@ -66,11 +56,4 @@ if(dbMoreResults(con)){
    }
 }
 }
-\seealso{
-\code{\link{MySQL}} \code{\link[DBI]{dbConnect}}
-\code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
-}
-\keyword{database}
-\keyword{interface}
-\keyword{programming}
 

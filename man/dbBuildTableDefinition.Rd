@@ -28,24 +28,8 @@ a table}
 An SQL string
 }
 \description{
-Build the SQL CREATE TABLE definition as a string for the input data.frame
-}
-\details{
 The output SQL statement is a simple \code{CREATE TABLE} with suitable for
 \code{dbGetQuery}
 }
-\references{
-See the Database Interface definition document \code{DBI.pdf} in
-the base directory of this package or
-\url{http://stat.bell-labs.com/RS-DBI}.
-}
-\seealso{
-\code{\link{MySQL}}, \code{\link[DBI]{dbConnect}},
-\code{\link[DBI]{dbSendQuery}}, \code{\link[DBI]{dbGetQuery}},
-\code{\link[DBI]{fetch}}, \code{\link[DBI]{dbCommit}},
-\code{\link[DBI]{dbGetInfo}}, \code{\link[DBI]{dbReadTable}}.
-}
-\keyword{database}
-\keyword{interface}
-\keyword{methods}
+\keyword{internal}
 
