@@ -1,3 +1,31 @@
+#' Class MySQLResult
+#'
+#' MySQL's query results class.  This classes encapsulates the result of an SQL
+#' statement (either \code{select} or not).
+#'
+#'
+#' @name MySQLResult-class
+#' @docType class
+#' @section Generators: The main generator is \code{\link[DBI]{dbSendQuery}}.
+#' @seealso DBI base classes:
+#'
+#' \code{\link[DBI]{DBIObject-class}} \code{\link[DBI]{DBIDriver-class}}
+#' \code{\link[DBI]{DBIConnection-class}} \code{\link[DBI]{DBIResult-class}}
+#'
+#' MySQL classes:
+#'
+#' \code{\link{MySQLObject-class}} \code{\link{MySQLDriver-class}}
+#' \code{\link{MySQLConnection-class}} \code{\link{MySQLResult-class}}
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://developer.r-project.org/db}.
+#' @keywords database interface classes
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL")
+#' con <- dbConnect(drv, dbname = "rsdbi.db")
+#' }
+#'
 setClass("MySQLResult", representation("DBIResult", "MySQLObject"))
 
 setAs("MySQLResult", "MySQLConnection",
@@ -16,6 +44,57 @@ setMethod("dbClearResult", "MySQLResult",
   }
 )
 
+
+#' Fetch records from a previously executed query
+#'
+#' This method is a straight-forward implementation of the corresponding
+#' generic function.
+#'
+#' The \code{RMySQL} implementations retrieves only \code{n} records, and if
+#' \code{n} is missing it only returns up to \code{fetch.default.rec} as
+#' specified in the call to \code{\link{MySQL}} (500 by default).
+#'
+#' @name fetch-methods
+#' @aliases fetch-methods fetch,MySQLResult,numeric-method
+#' fetch,MySQLResult,missing-method
+#' @docType methods
+#' @section Methods: \describe{
+#'
+#' \item{res}{ an \code{MySQLResult} object.  } \item{n}{ maximum number of
+#' records to retrieve per fetch.  Use \code{n = -1} to retrieve all pending
+#' records; use a value of \code{n = 0} for fetching the default number of rows
+#' \code{fetch.default.rec} defined in the \code{\link{MySQL}} initialization
+#' invocation.  } \item{list()}{currently not used.}\item{ }{currently not
+#' used.} }
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbConnect}},
+#' \code{\link[DBI]{dbSendQuery}}, \code{\link[DBI]{dbGetQuery}},
+#' \code{\link[DBI]{dbClearResult}}, \code{\link[DBI]{dbCommit}},
+#' \code{\link[DBI]{dbGetInfo}}, \code{\link[DBI]{dbReadTable}}.
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL")
+#' con <- dbConnect(drv, user = "opto", password="pure-light",
+#'                  host = "localhost", dbname="lasers")
+#' res <- dbSendQuery(con, statement = paste(
+#'                       "SELECT w.laser_id, w.wavelength, p.cut_off",
+#'                       "FROM WL w, PURGE P",
+#'                       "WHERE w.laser_id = p.laser_id",
+#'                       "ORDER BY w.laser_id"))
+#' # we now fetch the first 100 records from the resultSet into a data.frame
+#' data1 <- fetch(res, n = 100)
+#' dim(data1)
+#'
+#' dbHasCompleted(res)
+#'
+#' # let's get all remaining records
+#' data2 <- fetch(res, n = -1)
+#' }
+#'
+NULL
 setMethod("fetch", signature(res="MySQLResult", n="numeric"),
   def = function(res, n, ...){
     n <- as(n, "integer")

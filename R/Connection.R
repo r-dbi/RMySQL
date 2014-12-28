@@ -1,9 +1,85 @@
-
-##
-## Class: DBIConnection
-##
+#' Class MySQLConnection
+#'
+#' MySQLConnection class.
+#'
+#'
+#' @name MySQLConnection-class
+#' @docType class
+#' @section Generators: The method \code{\link[DBI]{dbConnect}} is the main
+#' generator.
+#' @seealso DBI base classes:
+#'
+#' \code{\link[DBI]{DBIObject-class}} \code{\link[DBI]{DBIDriver-class}}
+#' \code{\link[DBI]{DBIConnection-class}} \code{\link[DBI]{DBIResult-class}}
+#'
+#' MySQL classes:
+#'
+#' \code{\link{MySQLObject-class}} \code{\link{MySQLDriver-class}}
+#' \code{\link{MySQLConnection-class}} \code{\link{MySQLResult-class}}
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://developer.r-project.org/db}.
+#' @keywords database interface classes
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL)
+#' con <- dbConnect(drv, dbname = "rsdbi.db")
+#' }
 setClass("MySQLConnection", representation("DBIConnection", "MySQLObject"))
 
+#' Create a connection object to an MySQL DBMS
+#'
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#'
+#' @section Methods: \describe{ \item{drv}{ an object of class
+#' \code{MySQLDriver}, or the character string "MySQL" or an
+#' \code{MySQLConnection}.  } \item{conn}{ an \code{MySQLConnection} object as
+#' produced by \code{dbConnect}.  } \item{username}{string of the MySQL login
+#' name or NULL. If NULL or the empty string \code{""}, the current user is
+#' assumed.} \item{password}{string with the MySQL password or NULL. If NULL,
+#' only entries in the user table for the users that have a blank (empty)
+#' password field are checked for a match.} \item{dbname}{string with the
+#' database name or NULL. If NOT NULL, the connection sets the default database
+#' to this value.} \item{host}{string identifying the host machine running the
+#' MySQL server or NULL. If NULL or the string \code{"localhost"}, a connection
+#' to the local host is assumed.} \item{unix.socket}{(optional) string of the
+#' unix socket or named pipe.} \item{port}{(optional) integer of the TCP/IP
+#' default port.} \item{client.flag}{(optional) integer setting various MySQL
+#' client flags. See the MySQL manual for details.} \item{group}{string
+#' identifying a section in the \code{default.file} to use for setting
+#' authentication parameters (see \code{\link{MySQL}}.)}
+#' \item{default.file}{string of the filename with MySQL client options.
+#' Defaults to \code{\$HOME/.my.cnf}} \item{list()}{Currently unused.}\item{
+#' }{Currently unused.} }
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbConnect}},
+#' \code{\link[DBI]{dbSendQuery}}, \code{\link[DBI]{dbGetQuery}},
+#' \code{\link[DBI]{fetch}}, \code{\link[DBI]{dbCommit}},
+#' \code{\link[DBI]{dbGetInfo}}, \code{\link[DBI]{dbReadTable}}.
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @examples
+#' \dontrun{
+#' # create an MySQL instance and create one connection.
+#' drv <- dbDriver("MySQL")
+#'
+#' # open the connection using user, passsword, etc., as
+#' con <- dbConnect(drv, group = "rs-dbi")
+#'
+#' # Run an SQL statement by creating first a resultSet object
+#' rs <- dbSendQuery(con, statement = paste(
+#'                       "SELECT w.laser_id, w.wavelength, p.cut_off",
+#'                       "FROM WL w, PURGE P",
+#'                       "WHERE w.laser_id = p.laser_id",
+#'                       "SORT BY w.laser_id")
+#' # we now fetch records from the resultSet into a data.frame
+#' data <- fetch(rs, n = -1)   # extract all rows
+#' dim(data)
+#' }
+#'
+#' @export
 setMethod("dbConnect", "MySQLDriver",
   function(drv, dbname=NULL, username=NULL,
     password=NULL, host=NULL,
@@ -48,7 +124,8 @@ setMethod("dbConnect", "MySQLDriver",
   }
 )
 
-## clone a connection
+#' @export
+#' @rdname dbConnect-MySQLDriver
 setMethod("dbConnect", "MySQLConnection",
   function(drv, ...) {
     if(!isIdCurrent(drv)) stop(paste("expired", class(drv)))
@@ -58,6 +135,8 @@ setMethod("dbConnect", "MySQLConnection",
   }
 )
 
+#' @export
+#' @rdname dbConnect-MySQLDriver
 setMethod("dbDisconnect", "MySQLConnection",
   function(conn, ...) {
     if(!isIdCurrent(conn))
@@ -78,6 +157,38 @@ setMethod("dbDisconnect", "MySQLConnection",
 ## dbResult object if the SQL operation does not produce
 ## output, otherwise it produces a resultSet that can
 ## be used for fetching rows.
+#' Execute a statement on a given database connection
+#'
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#'
+#'
+#' @name dbSendQuery-methods
+#' @aliases dbSendQuery-methods dbGetQuery-methods dbClearResult-methods
+#' dbGetException-methods dbSendQuery,MySQLConnection,character-method
+#' dbGetQuery,MySQLConnection,character-method dbClearResult,MySQLResult-method
+#' dbGetException,MySQLConnection-method dbGetException,MySQLResult-method
+#' @docType methods
+#' @section Methods: \describe{ \item{conn}{ an \code{MySQLConnection} object.
+#' } \item{statement}{a character vector of length 1 with the SQL statement.}
+#' \item{res}{an \code{MySQLResult} object.} \item{list()}{additional
+#' parameters.}\item{ }{additional parameters.} }
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbDriver}},
+#' \code{\link[DBI]{dbConnect}}, \code{\link[DBI]{fetch}},
+#' \code{\link[DBI]{dbCommit}}, \code{\link[DBI]{dbGetInfo}},
+#' \code{\link[DBI]{dbReadTable}}.
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL")
+#' con <- dbConnect(drv, "usr", "password", "dbname")
+#' res <- dbSendQuery(con, "SELECT * from liv25")
+#' data <- fetch(res, n = -1)
+#' }
+#'
 setMethod("dbSendQuery", c("MySQLConnection", "character"),
   function(conn, statement) {
     if(!isIdCurrent(conn))
@@ -120,6 +231,55 @@ setMethod("dbGetException", "MySQLConnection",
   }
 )
 
+#' Database interface meta-data
+#'
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#'
+#' @name dbGetInfo-methods
+#' @aliases dbGetInfo dbGetDBIVersion-methods dbGetStatement-methods
+#' dbGetRowCount-methods dbGetRowsAffected-methods dbColumnInfo-methods
+#' dbHasCompleted-methods dbGetInfo,MySQLObject-method
+#' dbGetInfo,MySQLDriver-method dbGetInfo,MySQLConnection-method
+#' dbGetInfo,MySQLResult-method dbGetStatement,MySQLResult-method
+#' dbGetRowCount,MySQLResult-method dbGetRowsAffected,MySQLResult-method
+#' dbColumnInfo,MySQLResult-method dbColumnInfo,MySQLConnection-method
+#' dbHasCompleted,MySQLResult-method
+#' @docType methods
+#' @section Methods: \describe{ \item{dbObj}{ any object that implements some
+#' functionality in the R/S-Plus interface to databases (a driver, a connection
+#' or a result set).  } \item{res}{ an \code{MySQLResult}.}
+#' \item{list()}{currently not being used.} }
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbDriver}},
+#' \code{\link[DBI]{dbConnect}}, \code{\link[DBI]{dbSendQuery}},
+#' \code{\link[DBI]{dbGetQuery}}, \code{\link[DBI]{fetch}},
+#' \code{\link[DBI]{dbCommit}}, \code{\link[DBI]{dbGetInfo}},
+#' \code{\link[DBI]{dbListTables}}, \code{\link[DBI]{dbReadTable}}.
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL")
+#' con <- dbConnect(drv, group = "wireless")
+#'
+#' dbListTables(con)
+#'
+#' rs <- dbSendQuery(con, query.sql)
+#' dbGetStatement(rs)
+#' dbHasCompleted(rs)
+#'
+#' info <- dbGetInfo(rs)
+#' names(dbGetInfo(drv))
+#'
+#' # DBIConnection info
+#' names(dbGetInfo(con))
+#'
+#' # DBIResult info
+#' names(dbGetInfo(rs))
+#' }
+#'
 setMethod("dbGetInfo", "MySQLConnection",
   function(dbObj, what="", ...)    {
     if(!isIdCurrent(dbObj))
@@ -180,7 +340,116 @@ setMethod("dbListTables", "MySQLConnection",
   }
 )
 
-## Use NULL, "", or 0 as row.names to prevent using any field as row.names.
+#' Convenience functions for Importing/Exporting DBMS tables
+#'
+#' These functions mimic their R/S-Plus counterpart \code{get}, \code{assign},
+#' \code{exists}, \code{remove}, and \code{objects}, except that they generate
+#' code that gets remotely executed in a database engine.
+#'
+#'
+#' @name dbReadTable-methods
+#' @aliases dbReadTable-methods dbWriteTable-methods dbExistsTable-methods
+#' dbRemoveTable-methods dbReadTable,MySQLConnection,character-method
+#' dbWriteTable,MySQLConnection,character,character-method
+#' dbWriteTable,MySQLConnection,character,data.frame-method
+#' dbExistsTable,MySQLConnection,character-method
+#' dbRemoveTable,MySQLConnection,character-method
+#' @docType methods
+#' @return A \code{data.frame} in the case of \code{dbReadTable}; otherwise a
+#' logical indicating whether the operation was successful.
+#' @note Note that data.frames are only approximately analogous to tables
+#' (relations) in relational DBMS, and thus you should not expect complete
+#' agreement in their semantics.  Tables in RDBMS are best thought of as
+#' \emph{relations} with a number of constraints imposed by the relational
+#' database model, and data.frames, with their roots in statistical modeling,
+#' as self-contained "sequence of observations on some chosen variables"
+#' (Chambers and Hastie (1992), p.46).  In particular the \code{data.frame}
+#' returned by \code{dbReadTable} only has primitive data, e.g., it does not
+#' coerce character data to factors.  Also, column names in a data.frame are
+#' \emph{not} guaranteed to be equal to the column names in a MySQL
+#' exported/imported table (e.g., by default MySQL reserved identifiers may not
+#' be used as column names --- and with 218 keywords like \code{"BEFORE"},
+#' \code{"DESC"}, and \code{"FROM"} the likelihood of name conflicts is not
+#' small.) Use \code{isSQLKeyword(con, names(value))} to check whether the
+#' data.frame names in \code{value} coincide with MySQL reserver words.
+#'
+#' MySQL table names are \emph{not} case sensitive, e.g., table names
+#' \code{ABC} and \code{abc} are considered equal.
+#' @section Methods: \describe{ \item{conn}{ an \code{MySQLConnection} database
+#' connection object.  } \item{name}{ a character string specifying a table
+#' name.  } \item{value}{ a data.frame (or coercible to data.frame).  }
+#' \item{row.names}{ in the case of \code{dbReadTable}, this argument can be a
+#' string or an index specifying the column in the DBMS table to be used as
+#' \code{row.names} in the output data.frame (a \code{NULL}, \code{""}, or 0
+#' specifies that no column should be used as \code{row.names} in the output).
+#'
+#' In the case of \code{dbWriteTable}, this argument should be a logical
+#' specifying whether the \code{row.names} should be output to the output DBMS
+#' table; if \code{TRUE}, an extra field whose name will be whatever the
+#' R/S-Plus identifier \code{"row.names"} maps to the DBMS (see
+#' \code{\link[DBI]{make.db.names}}).  } \item{overwrite}{ a logical specifying
+#' whether to overwrite an existing table or not.  Its default is \code{FALSE}.
+#' } \item{append}{ a logical specifying whether to append to an existing table
+#' in the DBMS.  Its default is \code{FALSE}.  } \item{allow.keywords}{
+#' \code{dbWriteTable} accepts a logical \code{allow.keywords} to allow or
+#' prevent MySQL reserved identifiers to be used as column names. By default it
+#' is \code{FALSE}.  } \item{dots}{ optional arguments.
+#'
+#' When \code{dbWriteTable} is used to import data from a file, you may
+#' optionally specify \code{header=}, \code{row.names=}, \code{col.names=},
+#' \code{sep=}, \code{eol=}, \code{field.types=}, \code{skip=}, and
+#' \code{quote=}.
+#'
+#' \code{header} is a logical indicating whether the first data line (but see
+#' \code{skip}) has a header or not.  If missing, it value is determined
+#' following \code{\link{read.table}} convention, namely, it is set to TRUE if
+#' and only if the first row has one fewer field that the number of columns.
+#'
+#' \code{row.names} is a logical to specify whether the first column is a set
+#' of row names.  If missing its default follows the \code{\link{read.table}}
+#' convention.
+#'
+#' \code{col.names} a character vector with column names (these names will be
+#' filtered with \code{\link[DBI]{make.db.names}} to ensure valid SQL
+#' identifiers. (See also \code{field.types} below.)
+#'
+#' \code{sep=} specifies the field separator, and its default is \code{','}.
+#'
+#' \code{eol=} specifies the end-of-line delimiter, and its default is
+#' \code{'\n'}.
+#'
+#' \code{skip} specifies number of lines to skip before reading the data, and
+#' it defaults to 0.
+#'
+#' \code{field.types} is a list of named field SQL types where
+#' \code{names(field.types)} provide the new table's column names (if missing,
+#' field types are inferred using \code{\link[DBI]{dbDataType}}).  }
+#'
+#' }
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{isSQLKeyword}},
+#' \code{\link[DBI]{dbDriver}}, \code{\link[DBI]{dbConnect}},
+#' \code{\link[DBI]{dbSendQuery}}, \code{\link[DBI]{dbGetQuery}},
+#' \code{\link[DBI]{fetch}}, \code{\link[DBI]{dbCommit}},
+#' \code{\link[DBI]{dbGetInfo}}, \code{\link[DBI]{dbListTables}},
+#' \code{\link[DBI]{dbReadTable}}.
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @examples
+#' \dontrun{
+#' conn <- dbConnect("MySQL", group = "wireless")
+#' if(dbExistsTable(con, "fuel_frame")){
+#'    dbRemoveTable(conn, "fuel_frame")
+#'    dbWriteTable(conn, "fuel_frame", fuel.frame)
+#' }
+#' if(dbExistsTable(conn, "RESULTS")){
+#'    dbWriteTable(conn, "RESULTS", results2000, append = T)
+#' else
+#'    dbWriteTable(conn, "RESULTS", results2000)
+#' }
+#' }
+#'
 setMethod("dbReadTable", signature(conn="MySQLConnection", name="character"),
   function(conn, name, row.names = "row_names", check.names = TRUE, ...) {
     out <- dbGetQuery(conn, paste("SELECT * from", name))
@@ -412,7 +681,38 @@ setMethod("dbRemoveTable",
   valueClass = "logical"
 )
 
-## return field names (no metadata)
+#' List items from an MySQL DBMS and from objects
+#'
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#'
+#'
+#' @name dbListTables-methods
+#' @aliases dbListTables-methods dbListFields-methods dbListConnections-methods
+#' dbListResults-methods dbListTables,MySQLConnection-method
+#' dbListFields,MySQLConnection,character-method
+#' dbListFields,MySQLResult,missing-method dbListConnections,MySQLDriver-method
+#' dbListResults,MySQLConnection-method
+#' @docType methods
+#' @section Methods: \describe{ \item{drv}{an \code{MySQLDriver}.}
+#' \item{conn}{an \code{MySQLConnection}.} \item{name}{a character string with
+#' the table name.} \item{list()}{currently not used.} }
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbGetInfo}},
+#' \code{\link[DBI]{dbColumnInfo}}, \code{\link[DBI]{dbDriver}},
+#' \code{\link[DBI]{dbConnect}}, \code{\link[DBI]{dbSendQuery}}
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL")
+#' # after working awhile...
+#' for(con in dbListConnections(drv)){
+#'    dbGetStatement(dbListResults(con))
+#' }
+#' }
+#'
 setMethod("dbListFields",
   signature(conn="MySQLConnection", name="character"),
   def = function(conn, name, ...){
@@ -424,14 +724,43 @@ setMethod("dbListFields",
   valueClass = "character"
 )
 
+#' DBMS Transaction Management
+#'
+#' Commits or roll backs the current transaction in an MySQL connection
+#'
+#' @section Methods: \describe{ \item{conn}{a \code{MySQLConnection} object, as
+#' produced by the function \code{dbConnect}.} \item{list()}{currently
+#' unused.}\item{ }{currently unused.} }
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbConnect}},
+#' \code{\link[DBI]{dbSendQuery}}, \code{\link[DBI]{dbGetQuery}},
+#' \code{\link[DBI]{fetch}}, \code{\link[DBI]{dbCommit}},
+#' \code{\link[DBI]{dbGetInfo}}, \code{\link[DBI]{dbReadTable}}.
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL")
+#' con <- dbConnect(drv, group = "group")
+#' rs <- dbSendQuery(con,
+#'       "delete * from PURGE as p where p.wavelength<0.03")
+#' if(dbGetInfo(rs, what = "rowsAffected") > 250){
+#'   warning("dubious deletion -- rolling back transaction")
+#'   dbRollback(con)
+#' }
+#' }
 setMethod("dbCommit", "MySQLConnection",
   def = function(conn, ...) .NotYetImplemented()
 )
 
+#' @export
+#' @rdname dbCommit
 setMethod("dbRollback", "MySQLConnection",
   def = function(conn, ...) .NotYetImplemented()
 )
 
+#' @export
 setMethod("dbCallProc", "MySQLConnection",
   def = function(conn, ...) .NotYetImplemented()
 )

@@ -13,14 +13,36 @@ mysqlEscapeStrings <-
     out
   }
 
+#' Escape SQL-special characters in strings
+#'
+#' @param con a connection object (see \code{\link[DBI]{dbConnect}}).
+#' @param strings a character vector.
+#' @param ... any additional arguments to be passed to the dispatched method.
+#' @return A character vector with SQL special characters properly escaped.
+#' @seealso \code{\link{MySQL}} \code{\link[DBI]{dbSendQuery}}
+#' \code{\link[DBI]{fetch}}
+#' @keywords programming interface database
+#' @export
+#' @examples
+#' \dontrun{
+#' tmp <- sprintf("select * from emp where lname = %s", "O'Reilly")
+#' sql <- dbEscapeString(con, tmp)
+#' dbGetQuery(con, sql)
+#' }
+#'
 setGeneric("dbEscapeStrings",
   def = function(con, strings, ...) standardGeneric("dbEscapeStrings"))
 
+#' @rdname dbEscapeStrings
+#' @export
 setMethod("dbEscapeStrings",
   sig = signature(con = "MySQLConnection", strings = "character"),
   def = mysqlEscapeStrings,
   valueClass = "character"
 )
+
+#' @rdname dbEscapeStrings
+#' @export
 setMethod("dbEscapeStrings",
   sig = signature(con = "MySQLResult", strings = "character"),
   def = function(con, strings, ...)
@@ -28,28 +50,95 @@ setMethod("dbEscapeStrings",
   valueClass = "character"
 )
 
+#' Apply R/S-Plus functions to remote groups of DBMS rows (experimental)
+#'
+#' Applies R/S-Plus functions to groups of remote DBMS rows without bringing an
+#' entire result set all at once.  The result set is expected to be sorted by
+#' the grouping field.
+#'
+#' @export
+#' @section Methods: \describe{ \item{res}{a MySQL result set (see
+#' \code{\link[DBI]{dbSendQuery}}).} \item{...}{any additional arguments to be
+#' passed to \code{FUN}.} }
+#' @seealso \code{\link{MySQL}} \code{\link{mysqlDBApply}}
+#' \code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords programming interface database
+#' @examples
+#' \dontrun{
+#' ## compute quanitiles for each network agent
+#' con <- dbConnect(MySQL(), group="vitalAnalysis")
+#' rs <- dbSendQuery(con,
+#'              "select Agent, ip_addr, DATA from pseudo_data order by Agent")
+#' out <- dbApply(rs, INDEX = "Agent",
+#'         FUN = function(x, grp) quantile(x$DATA, names=FALSE))
+#' }
 setGeneric("dbApply", def = function(res, ...) standardGeneric("dbApply"))
+
+#' @export
+#' @rdname dbApply
 setMethod("dbApply", "MySQLResult",
   def = function(res, ...)  mysqlDBApply(res, ...),
 )
 
-setGeneric("dbMoreResults",
-  def = function(con, ...) standardGeneric("dbMoreResults"),
-  valueClass = "logical"
-)
-
-setMethod("dbMoreResults",
-  signature(con = "MySQLConnection"),
-  def = function(con, ...)
-    .Call("RS_MySQL_moreResultSets", as(con, "integer"),
-      PACKAGE=.MySQLPkgName)
-)
-
+#' Fetch next result set from an SQL script or stored procedure (experimental)
+#'
+#' Fetches the next result set from the output of a multi-statement SQL script
+#' or stored procedure; checkes whether there are additonal result sets to
+#' process.
+#'
+#'
+#' SQL scripts (i.e., multiple SQL statements separated by ';') and stored
+#' procedures oftentimes generate multiple result sets.  These DBI generic
+#' functions provide a means to process them sequentially.
+#'
+#' \code{dbNextResult} fetches the next result from the sequence of pending
+#' results sets; \code{dbMoreResults} returns a logical to indicate whether
+#' there are additional results to process.
+#'
+#' @aliases dbNextResult dbMoreResults
+#' @param con a connection object (see \code{\link[DBI]{dbConnect}}).
+#' @param ... any additional arguments to be passed to the dispatched method
+#' @return \code{dbNextResult} returns a result set or \code{NULL}.
+#'
+#' \code{dbMoreResults} returns a logical specifying whether or not there are
+#' additional result sets to process in the connection.
+#' @section Note: Currently only the \code{\link{MySQL}} driver implements
+#' these methods.  See 'methods?dbNextMethod'.
+#' @seealso \code{\link{MySQL}} \code{\link[DBI]{dbConnect}}
+#' \code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
+#' @keywords programming interface database
+#' @export
+#' @examples
+#' \dontrun{
+#' con <- dbConnect(MySQL(),
+#'           dbname = "rs-dbi",
+#'           client.flag=CLIENT_MULTI_STATEMENTS)
+#' sql.script <- paste(
+#'    "select * from abc",
+#'    "select * def",
+#'    collapse = ";")
+#'
+#' rs1 <- dbSendQuery(con, sql.script)
+#' data1 <- fetch(rs1, n = -1)
+#'
+#' if(dbMoreResults(con)){
+#'    rs2 <- dbNextResult(con)
+#'    ## you could use dbHasCompleted(rs2) to determine whether
+#'    ## rs2 is a select-like that generates output or not.
+#'    data2 <- fetch(rs2, n = -1)
+#'    }
+#' }
+#'
 setGeneric("dbNextResult",
   def = function(con, ...) standardGeneric("dbNextResult")
   #valueClass = "DBIResult" or NULL
 )
 
+#' @export
+#' @rdname dbNextResult
 setMethod("dbNextResult",
   signature(con = "MySQLConnection"),
   def = function(con, ...){
@@ -62,6 +151,87 @@ setMethod("dbNextResult",
   }
 )
 
+#' @export
+#' @rdname dbNextResult
+setGeneric("dbMoreResults",
+  def = function(con, ...) standardGeneric("dbMoreResults"),
+  valueClass = "logical"
+)
+
+#' @export
+#' @rdname dbNextResult
+setMethod("dbMoreResults",
+  signature(con = "MySQLConnection"),
+  def = function(con, ...)
+    .Call("RS_MySQL_moreResultSets", as(con, "integer"),
+      PACKAGE=.MySQLPkgName)
+)
+
+
+#' Apply R/S-Plus functions to remote groups of DBMS rows (experimental)
+#'
+#' Applies R/S-Plus functions to groups of remote DBMS rows without bringing an
+#' entire result set all at once.  The result set is expected to be sorted by
+#' the grouping field.
+#'
+#' \code{dbApply} This function is meant to handle somewhat gracefully(?) large
+#' amounts of data from the DBMS by bringing into R manageable chunks (about
+#' \code{batchSize} records at a time, but not more than \code{maxBatch}); the
+#' idea is that the data from individual groups can be handled by R, but not
+#' all the groups at the same time.
+#'
+#' The MySQL implementation \code{mysqlDBApply} allows us to register R
+#' functions that get invoked when certain fetching events occur. These include
+#' the ``begin'' event (no records have been yet fetched), ``begin.group'' (the
+#' record just fetched belongs to a new group), ``new record'' (every fetched
+#' record generates this event), ``group.end'' (the record just fetched was the
+#' last row of the current group), ``end'' (the very last record from the
+#' result set). Awk and perl programmers will find this paradigm very familiar
+#' (although SAP's ABAP language is closer to what we're doing).
+#'
+#' @param res a result set (see \code{\link[DBI]{dbSendQuery}}).
+#' @param INDEX a character or integer specifying the field name or field
+#' number that defines the various groups.
+#' @param FUN a function to be invoked upon identifying the last row from every
+#' group. This function will be passed a data frame holding the records of the
+#' current group, a character string with the group label, plus any other
+#' arguments passed to \code{dbApply} as \code{"..."}.
+#' @param begin a function of no arguments to be invoked just prior to retrieve
+#' the first row from the result set.
+#' @param end a function of no arguments to be invoked just after retrieving
+#' the last row from the result set.
+#' @param group.begin a function of one argument (the group label) to be
+#' invoked upon identifying a row from a new group
+#' @param new.record a function to be invoked as each individual record is
+#' fetched.  The first argument to this function is a one-row data.frame
+#' holding the new record.
+#' @param batchSize the default number of rows to bring from the remote result
+#' set. If needed, this is automatically extended to hold groups bigger than
+#' \code{batchSize}.
+#' @param maxBatch the absolute maximum of rows per group that may be extracted
+#' from the result set.
+#' @param ... any additional arguments to be passed to \code{FUN}.
+#' @param simplify Not yet implemented
+#' @return A list with as many elements as there were groups in the result set.
+#' @note This is an experimental version implemented only in R (there are
+#' plans, time permitting, to implement it in S-Plus).
+#'
+#' The terminology that we're using is closer to SQL than R.  In R what we're
+#' referring to ``groups'' are the individual levels of a factor (grouping
+#' field in our terminology).
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbSendQuery}},
+#' \code{\link[DBI]{fetch}}.
+#' @keywords programming interface database
+#' @examples
+#' \dontrun{
+#' ## compute quanitiles for each network agent
+#' con <- dbConnect(MySQL(), group="vitalAnalysis")
+#' res <- dbSendQuery(con,
+#'              "select Agent, ip_addr, DATA from pseudo_data order by Agent")
+#' out <- dbApply(res, INDEX = "Agent",
+#'         FUN = function(x, grp) quantile(x$DATA, names=FALSE))
+#' }
+#'
 mysqlDBApply <-
   function(res, INDEX, FUN = stop("must specify FUN"),
     begin = NULL,
@@ -167,6 +337,34 @@ mysqlDBApply <-
 
 
 
+
+
+#' Build the SQL CREATE TABLE definition as a string
+#'
+#' Build the SQL CREATE TABLE definition as a string for the input data.frame
+#'
+#' The output SQL statement is a simple \code{CREATE TABLE} with suitable for
+#' \code{dbGetQuery}
+#'
+#' @param dbObj any DBI object (used only to dispatch according to the engine
+#' (e.g., MySQL, Oracle, PostgreSQL, SQLite)
+#' @param name name of the new SQL table
+#' @param obj an R object coerceable to data.frame for which we want to create
+#' a table
+#' @param field.types optional named list of the types for each field in
+#' \code{obj}
+#' @param row.names logical, should row.name of \code{value} be exported as a
+#' \code{row\_names} field? Default is TRUE
+#' @param \dots reserved for future use
+#' @return An SQL string
+#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbConnect}},
+#' \code{\link[DBI]{dbSendQuery}}, \code{\link[DBI]{dbGetQuery}},
+#' \code{\link[DBI]{fetch}}, \code{\link[DBI]{dbCommit}},
+#' \code{\link[DBI]{dbGetInfo}}, \code{\link[DBI]{dbReadTable}}.
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
 dbBuildTableDefinition <-
   function(dbObj, name, obj, field.types = NULL, row.names = TRUE, ...)
   {
@@ -211,6 +409,32 @@ escape <- function(table) {
 }
 
 ## the following is almost exactly from the ROracle driver
+
+
+#' Write a data.frame avoiding exceeding memory limits
+#'
+#' This function batches calls to \code{write.table} to avoid exceeding memory
+#' limits for very large data.frames.
+#'
+#' The function has a while loop invoking \code{\link{write.table}} for subsets
+#' of \code{batch} rows of \code{value}.  Since this is a helper function for
+#' \code{mysqlWriteTable}, it has hardcoded other arguments to
+#' \code{write.table}.
+#'
+#' @param value a data.frame;
+#' @param file a file object (connection, file name, etc).
+#' @param batch maximum number of rows to write at a time.
+#' @param \dots any other arguments are passed to \code{write.table}.
+#' @return \code{NULL}, invisibly.
+#' @note No error checking whatsoever is done.
+#' @seealso \code{\link{write.table}}
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#'    ctr.file <- file("dump.sqloader", "w")
+#'    safe.write(big.data, file = ctr.file, batch = 25000)
+#' }
+#'
 safe.write <-
   function(value, file, batch, ...)
     ## safe.write makes sure write.table doesn't exceed available memory by batching
@@ -269,6 +493,17 @@ mysqlDataType <-
 
 
 ## For testing compiled against loaded mysql client library versions
+
+
+#' MySQL Check for Compiled Versus Loaded Client Library Versions
+#'
+#' This function prints out the compiled and loaded client library versions.
+#'
+#'
+#' @return A named integer vector of length two, the first element representing
+#' the compiled library version and the second element representint the loaded
+#' client library version.
+#' @keywords database
 mysqlClientLibraryVersions <-
   function()
   {
