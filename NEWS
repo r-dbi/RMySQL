@@ -2,3 +2,15 @@
  - New maintainer.
  - Internal changes to support static linking on Windows.
  - Assorted fixes accumulated since last release 3 years ago.
+
+ -  The following internal functions are no longer exported: please
+    use the corresponding DBI generic instead:
+
+    `isIdCurrent`, `mysqlInitDriver`, `mysqlCloseDriver`, `mysqlDescribeDriver`,
+    `mysqlDriverInfo`, `mysqlNewConnection`, `mysqlCloneConnection`,
+    `mysqlDescribeConnection`, `mysqlConnectionInfo`, `mysqlCloseConnection`,
+    `mysqlExecStatement`, `mysqlQuickSQL`, `mysqlDBApply`, `mysqlFetch`,
+    `mysqlResultInfo`, `mysqlDescribeResult`, `mysqlDescribeFields`,
+    `mysqlCloseResult`, `mysqlImportFile`, `mysqlReadTable`, `mysqlWriteTable`,
+    `mysqlEscapeStrings`, `mysqlDataType`, `mysqlClientLibraryVersions`,
+    `safe.write`.

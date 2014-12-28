@@ -8,39 +8,51 @@ setAs("MySQLResult", "MySQLDriver",
 )
 
 setMethod("dbClearResult", "MySQLResult",
-  def = function(res, ...) mysqlCloseResult(res, ...),
-  valueClass = "logical"
+  function(res, ...) {
+    if(!isIdCurrent(res))
+      return(TRUE)
+    rsId <- as(res, "integer")
+    .Call("RS_MySQL_closeResultSet", rsId, PACKAGE = .MySQLPkgName)
+  }
 )
 
 setMethod("fetch", signature(res="MySQLResult", n="numeric"),
   def = function(res, n, ...){
-    out <- mysqlFetch(res, n, ...)
-    if(is.null(out))
-      out <- data.frame(out)
-    out
-  },
-  valueClass = "data.frame"
+    n <- as(n, "integer")
+    rsId <- as(res, "integer")
+    rel <- .Call("RS_MySQL_fetch", rsId, nrec = n, PACKAGE = .MySQLPkgName)
+    if(length(rel)==0 || length(rel[[1]])==0)
+      return(data.frame())
+    ## create running row index as of previous fetch (if any)
+    cnt <- dbGetRowCount(res)
+    nrec <- length(rel[[1]])
+    indx <- seq(from = cnt - nrec + 1, length = nrec)
+    attr(rel, "row.names") <- as.integer(indx)
+    class(rel) <- "data.frame"
+  }
 )
 
 setMethod("fetch",
   signature(res="MySQLResult", n="missing"),
-  def = function(res, n, ...){
-    out <-  mysqlFetch(res, n=0, ...)
-    if(is.null(out))
-      out <- data.frame(out)
-    out
-  },
-  valueClass = "data.frame"
+  function(res, n, ...) fetch(res, n = 0, ...)
 )
 
 setMethod("dbGetInfo", "MySQLResult",
-  def = function(dbObj, ...) mysqlResultInfo(dbObj, ...),
-  valueClass = "list"
+  function(dbObj, what = "", ...) {
+    if(!isIdCurrent(dbObj))
+      stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
+    id <- as(dbObj, "integer")
+    info <- .Call("RS_MySQL_resultSetInfo", id, PACKAGE = .MySQLPkgName)
+    if(!missing(what))
+      info[what]
+    else
+      info
+  }
 )
 
 setMethod("dbGetStatement", "MySQLResult",
   def = function(res, ...){
-    st <-  dbGetInfo(res, "statement")[[1]]
+    st <- dbGetInfo(res, "statement")[[1]]
     if(is.null(st))
       st <- character()
     st
@@ -60,8 +72,19 @@ setMethod("dbListFields",
 )
 
 setMethod("dbColumnInfo", "MySQLResult",
-  def = function(res, ...) mysqlDescribeFields(res, ...),
-  valueClass = "data.frame"
+  function(res, ...) {
+    flds <- dbGetInfo(res, "fieldDescription")[[1]][[1]]
+    if(!is.null(flds)){
+      flds$Sclass <- .Call("RS_DBI_SclassNames", flds$Sclass,
+        PACKAGE = .MySQLPkgName)
+      flds$type <- .Call("RS_MySQL_typeNames", as.integer(flds$type),
+        PACKAGE = .MySQLPkgName)
+      ## no factors
+      structure(flds, row.names = paste(seq(along=flds$type)),
+        class = "data.frame")
+    }
+    else data.frame(flds)
+  }
 )
 
 setMethod("dbGetRowsAffected", "MySQLResult",
@@ -88,5 +111,22 @@ setMethod("dbGetException", "MySQLResult",
 )
 
 setMethod("summary", "MySQLResult",
-  def = function(object, ...) mysqlDescribeResult(object, ...)
+  function(object, verbose = FALSE, ...) {
+
+    if(!isIdCurrent(object)){
+      print(object)
+      invisible(return(NULL))
+    }
+    print(object)
+    cat("  Statement:", dbGetStatement(object), "\n")
+    cat("  Has completed?", if(dbHasCompleted(object)) "yes" else "no", "\n")
+    cat("  Affected rows:", dbGetRowsAffected(object), "\n")
+    cat("  Rows fetched:", dbGetRowCount(object), "\n")
+    flds <- dbColumnInfo(object)
+    if(verbose && !is.null(flds)){
+      cat("  Fields:\n")
+      out <- print(dbColumnInfo(object))
+    }
+    invisible(NULL)
+  }
 )

@@ -17,7 +17,7 @@ safe.write(value, file, batch, ...)
 \details{
    The function has a while loop invoking \code{\link{write.table}}
    for subsets of \code{batch} rows of \code{value}.  Since this is
-   a helper function for \code{\link[RMySQL]{mysqlWriteTable}}, it has 
+   a helper function for \code{mysqlWriteTable}, it has
    hardcoded other arguments to \code{write.table}.
 }
 \value{
@@ -25,7 +25,7 @@ safe.write(value, file, batch, ...)
 }
 \note{No error checking whatsoever is done.}
 
-\seealso{\code{\link{write.table}}} 
+\seealso{\code{\link{write.table}}}
 
 \examples{\dontrun{
    ctr.file <- file("dump.sqloader", "w")

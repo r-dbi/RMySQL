@@ -13,14 +13,14 @@
   Convenience functions for Importing/Exporting DBMS tables
 }
 \description{
-  These functions mimic their R/S-Plus counterpart 
+  These functions mimic their R/S-Plus counterpart
   \code{get},
   \code{assign},
-  \code{exists}, 
+  \code{exists},
   \code{remove}, and
   \code{objects},
   except that they generate code that gets remotely executed
-  in a database engine.  
+  in a database engine.
 }
 \section{Methods}{\describe{
 \item{conn}{
@@ -34,13 +34,13 @@
   }
 \item{row.names}{
   in the case of \code{dbReadTable}, this argument can be a string or
-  an index specifying the column in the DBMS table to be used as 
-  \code{row.names} in the output data.frame (a \code{NULL}, \code{""}, or 0 
+  an index specifying the column in the DBMS table to be used as
+  \code{row.names} in the output data.frame (a \code{NULL}, \code{""}, or 0
   specifies that no column should be used as \code{row.names} in the output).
 
   In the case of \code{dbWriteTable}, this argument should be a logical
   specifying whether the \code{row.names} should be output to the
-  output DBMS table; if \code{TRUE}, an extra field whose name will be 
+  output DBMS table; if \code{TRUE}, an extra field whose name will be
   whatever the R/S-Plus identifier \code{"row.names"} maps to the DBMS
   (see \code{\link[DBI]{make.db.names}}).
   }
@@ -53,16 +53,16 @@
   in the DBMS.  Its default is \code{FALSE}.
   }
 \item{allow.keywords}{
-   \code{dbWriteTable} accepts a logical \code{allow.keywords} 
-    to allow or prevent MySQL reserved identifiers to be used as 
+   \code{dbWriteTable} accepts a logical \code{allow.keywords}
+    to allow or prevent MySQL reserved identifiers to be used as
     column names. By default it is \code{FALSE}.
    }
 \item{dots}{
   optional arguments.
 
-  When \code{dbWriteTable} is used to import data from a file, 
+  When \code{dbWriteTable} is used to import data from a file,
   you may optionally specify \code{header=}, \code{row.names=},
-  \code{col.names=}, \code{sep=}, \code{eol=}, \code{field.types=}, 
+  \code{col.names=}, \code{sep=}, \code{eol=}, \code{field.types=},
   \code{skip=}, and \code{quote=}.
 
   \code{header} is a logical indicating whether the first data line
@@ -72,23 +72,23 @@
   fewer field that the number of columns.
 
   \code{row.names} is a logical to specify whether the first column
-  is a set of row names.  If missing its default follows the 
+  is a set of row names.  If missing its default follows the
   \code{\link{read.table}} convention.
-  
+
   \code{col.names} a character vector with column names (these names
-  will be filtered with \code{\link[DBI]{make.db.names}} to 
+  will be filtered with \code{\link[DBI]{make.db.names}} to
   ensure valid SQL identifiers. (See also \code{field.types} below.)
 
   \code{sep=} specifies the field separator, and its default is \code{','}.
 
-  \code{eol=} specifies the end-of-line delimiter, and its default is 
+  \code{eol=} specifies the end-of-line delimiter, and its default is
   \code{'\n'}.
 
   \code{skip} specifies number of lines to skip before reading the data,
-  and it defaults to 0. 
+  and it defaults to 0.
 
-  \code{field.types} is a list of named field SQL types where 
-  \code{names(field.types)} provide the new table's column names 
+  \code{field.types} is a list of named field SQL types where
+  \code{names(field.types)} provide the new table's column names
   (if missing, field types are inferred using \code{\link[DBI]{dbDataType}}).
  }
 
@@ -96,8 +96,8 @@
 }
 
 \value{
-   A \code{data.frame} in the case of \code{dbReadTable}; otherwise a logical 
-   indicating whether the operation was successful.  
+   A \code{data.frame} in the case of \code{dbReadTable}; otherwise a logical
+   indicating whether the operation was successful.
 }
 \note{
    Note that data.frames are only approximately analogous to tables
@@ -107,21 +107,21 @@
    imposed by the relational database model, and data.frames, with
    their roots in statistical modeling, as self-contained "sequence
    of observations on some chosen variables" (Chambers and Hastie
-   (1992), p.46). 
+   (1992), p.46).
    In particular the \code{data.frame} returned by \code{dbReadTable}
    only has primitive data, e.g., it does not coerce character data
    to factors.
-   Also, column names in a data.frame are \emph{not} guaranteed to be 
+   Also, column names in a data.frame are \emph{not} guaranteed to be
    equal to the column names in a MySQL exported/imported table
    (e.g., by default MySQL reserved identifiers may not be used
    as column names --- and with 218 keywords like \code{"BEFORE"},
    \code{"DESC"}, and \code{"FROM"} the likelihood of name conflicts
    is not small.) Use \code{isSQLKeyword(con, names(value))} to check
-   whether the data.frame names in \code{value} coincide with 
+   whether the data.frame names in \code{value} coincide with
    MySQL reserver words.
 
    MySQL table names are \emph{not} case sensitive, e.g., table
-   names \code{ABC} and \code{abc} are considered equal.  
+   names \code{ABC} and \code{abc} are considered equal.
 }
 \references{
    See the Database Interface definition document
@@ -130,7 +130,6 @@
 }
 \seealso{
   \code{\link{MySQL}},
-  \code{\link{mysqlImportFile}},
   \code{\link[DBI]{isSQLKeyword}},
   \code{\link[DBI]{dbDriver}},
   \code{\link[DBI]{dbConnect}},
