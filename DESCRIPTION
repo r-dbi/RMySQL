@@ -11,4 +11,4 @@ URL: https://github.com/rstats-db/rmysql
 BugReports: https://github.com/rstats-db/rmysql/issues
 SystemRequirements: libmysqlclient-dev (deb), mariadb-devel (rpm), or mysql-connector-c (brew)
 NeedsCompilation: yes
-Collate: S4R.R MySQLSupport.R MySQL.R Connection.R Driver.R Result.R Extensions.R
+Collate: MySQLSupport.R MySQL.R Connection.R Driver.R Result.R Extensions.R

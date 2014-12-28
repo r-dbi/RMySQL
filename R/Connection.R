@@ -109,7 +109,7 @@ setMethod("dbRemoveTable",
   def = function(conn, name, ...){
     if(dbExistsTable(conn, name)){
       rc <- try(dbGetQuery(conn, paste("DROP TABLE", name)))
-      !inherits(rc, ErrorClass)
+      !inherits(rc, "try-error")
     }
     else FALSE
   },

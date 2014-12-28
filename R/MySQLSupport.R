@@ -15,26 +15,26 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ##
 
-mysqlInitDriver <- 
+mysqlInitDriver <-
 function(max.con=16, fetch.default.rec = 500, force.reload=FALSE)
 ## create a MySQL database connection manager.  By default we allow
 ## up to "max.con" connections and single fetches of up to "fetch.default.rec"
 ## records.  These settings may be changed by re-loading the driver
-## using the "force.reload" = T flag (note that this will close all 
+## using the "force.reload" = T flag (note that this will close all
 ## currently open connections).
-## Returns an object of class "MySQLManger".  
+## Returns an object of class "MySQLManger".
 ## Note: This class is a singleton.
 {
    if(fetch.default.rec<=0)
       stop("default num of records per fetch must be positive")
    config.params <- as(c(max.con, fetch.default.rec), "integer")
    force <- as.logical(force.reload)
-   drvId <- .Call("RS_MySQL_init", config.params, force, 
+   drvId <- .Call("RS_MySQL_init", config.params, force,
                   PACKAGE = .MySQLPkgName)
    new("MySQLDriver", Id = drvId)
 }
 
-mysqlCloseDriver <- 
+mysqlCloseDriver <-
 function(drv, ...)
 {
    if(!isIdCurrent(drv))
@@ -73,7 +73,7 @@ function(obj, what="", ...)
    if(!isIdCurrent(obj))
       stop(paste("expired", class(obj)))
    drvId <- as(obj, "integer")
-   info <- .Call("RS_MySQL_managerInfo", drvId, PACKAGE = .MySQLPkgName)  
+   info <- .Call("RS_MySQL_managerInfo", drvId, PACKAGE = .MySQLPkgName)
    ## replace drv/connection id w. actual drv/connection objects
    conObjs <- vector("list", length = info$"num_con")
    ids <- info$connectionIds
@@ -90,7 +90,7 @@ function(obj, what="", ...)
 mysqlNewConnection <-
 function(drv, dbname=NULL, username=NULL,
    password=NULL, host=NULL,
-   unix.socket=NULL, port = 0, client.flag = 0, 
+   unix.socket=NULL, port = 0, client.flag = 0,
    groups = 'rs-dbi', default.file = NULL)
 {
    if(!isIdCurrent(drv))
@@ -122,9 +122,9 @@ function(drv, dbname=NULL, username=NULL,
 		stop(sprintf("mysql default file %s does not exist", default.file))
 
 	drvId <- as(drv, "integer")
-	conId <- .Call("RS_MySQL_newConnection", drvId, 
-		dbname, username, password, host, unix.socket, 
-		as.integer(port), as.integer(client.flag), 
+	conId <- .Call("RS_MySQL_newConnection", drvId,
+		dbname, username, password, host, unix.socket,
+		as.integer(port), as.integer(client.flag),
 		groups, default.file[1], PACKAGE = .MySQLPkgName)
 
 	new("MySQLConnection", Id = conId)
@@ -150,7 +150,7 @@ function(obj, verbose = FALSE, ...)
    cat("  Connection type:", info$conType, "\n")
    if(verbose){
       cat("  MySQL server version: ", info$serverVersion, "\n")
-      cat("  MySQL client version: ", 
+      cat("  MySQL client version: ",
          dbGetInfo(as(obj, "MySQLDriver"), what="clientVersion")[[1]], "\n")
       cat("  MySQL protocol version: ", info$protocolVersion, "\n")
       cat("  MySQL server thread id: ", info$threadId, "\n")
@@ -160,7 +160,7 @@ function(obj, verbose = FALSE, ...)
          cat("   ", i, " ")
          print(info$rsId[[i]])
       }
-   } else 
+   } else
       cat("  No resultSet available\n")
    invisible(NULL)
 }
@@ -198,7 +198,7 @@ function(obj, what="", ...)
    else
       info
 }
-       
+
 mysqlExecStatement <-
 function(con, statement)
 ## submits the sql statement to MySQL and creates a
@@ -217,7 +217,7 @@ function(con, statement)
 .clearResultSets <- function(con){
    ## are there resultSets pending on con?
    rsList <- dbListResults(con)
-   if(length(rsList)>0){     
+   if(length(rsList)>0){
       warning("There are pending result sets. Removing.",call.=FALSE)
       lapply(rsList,dbClearResult) ## clear all pending results
    }
@@ -243,7 +243,7 @@ function(con, statement)
    res <- fetch(rs, n = -1)
    if(dbHasCompleted(rs))
       dbClearResult(rs)
-   else 
+   else
       warning("pending rows")
    res
 }
@@ -253,9 +253,9 @@ function(res, ...)
 {
    flds <- dbGetInfo(res, "fieldDescription")[[1]][[1]]
    if(!is.null(flds)){
-      flds$Sclass <- .Call("RS_DBI_SclassNames", flds$Sclass, 
+      flds$Sclass <- .Call("RS_DBI_SclassNames", flds$Sclass,
                         PACKAGE = .MySQLPkgName)
-      flds$type <- .Call("RS_MySQL_typeNames", as.integer(flds$type), 
+      flds$type <- .Call("RS_MySQL_typeNames", as.integer(flds$type),
                         PACKAGE = .MySQLPkgName)
       ## no factors
       structure(flds, row.names = paste(seq(along=flds$type)),
@@ -265,22 +265,22 @@ function(res, ...)
 }
 
 mysqlDBApply <-
-function(res, INDEX, FUN = stop("must specify FUN"), 
-         begin = NULL, 
-         group.begin =  NULL, 
-         new.record = NULL, 
-         end = NULL, 
-         batchSize = 100, maxBatch = 1e6, 
+function(res, INDEX, FUN = stop("must specify FUN"),
+         begin = NULL,
+         group.begin =  NULL,
+         new.record = NULL,
+         end = NULL,
+         batchSize = 100, maxBatch = 1e6,
          ..., simplify = TRUE)
 ## (Experimental)
-## This function is meant to handle somewhat gracefully(?) large amounts 
-## of data from the DBMS by bringing into R manageable chunks (about 
+## This function is meant to handle somewhat gracefully(?) large amounts
+## of data from the DBMS by bringing into R manageable chunks (about
 ## batchSize records at a time, but not more than maxBatch); the idea
 ## is that the data from individual groups can be handled by R, but
-## not all the groups at the same time.  
+## not all the groups at the same time.
 ##
 ## dbApply apply functions to groups of rows coming from a remote
-## database resultSet upon the following fetching events: 
+## database resultSet upon the following fetching events:
 ##   begin         (prior to fetching the first record)
 ##   group.begin   (the record just fetched begins a new group)
 ##   new_record    (a new record just fetched)
@@ -288,15 +288,15 @@ function(res, INDEX, FUN = stop("must specify FUN"),
 ##   end           (the record just fetched is the very last record)
 ##
 ## The "begin", "begin.group", etc., specify R functions to be
-## invoked upon the corresponding events.  (For compatibility 
+## invoked upon the corresponding events.  (For compatibility
 ## with other apply functions the arg FUN is used to specify the
 ## most common case where we only specify the "group.end" event.)
-## 
+##
 ## The following describes the exact order and form of invocation for the
 ## various callbacks in the underlying  C code.  All callback functions
 ## (except FUN) are optional.
 ##  begin()
-##    group.begin(group.name)   
+##    group.begin(group.name)
 ##    new.record(df.record)
 ##    FUN(df.group, group.name, ...)   (aka group.end)
 ##  end()
@@ -321,11 +321,11 @@ function(res, INDEX, FUN = stop("must specify FUN"),
    if(INDEX<1)
       stop(paste("INDEX field", INDEX, "not in result set"))
 
-   "null.or.fun" <- function(fun) # get fun obj, but a NULL is ok 
+   "null.or.fun" <- function(fun) # get fun obj, but a NULL is ok
    {
-      if(is.null(fun)) 
-         fun 
-      else 
+      if(is.null(fun))
+         fun
+      else
          match.fun(fun)
    }
    begin <- null.or.fun(begin)
@@ -343,7 +343,7 @@ function(res, INDEX, FUN = stop("must specify FUN"),
 
       })
    ## BEGIN event handler (re-entrant, only prior to reading first row)
-   if(!is.null(begin) && dbGetRowCount(res)==0) 
+   if(!is.null(begin) && dbGetRowCount(res)==0)
       begin()
    rho <- environment()
    funs <- list(begin = begin, end = end,
@@ -364,18 +364,18 @@ function(res, n=0, ...)
 ## Fetch at most n records from the opened resultSet (n = -1 means
 ## all records, n=0 means extract as many as "default_fetch_rec",
 ## as defined by MySQLDriver (see describe(drv, T)).
-## The returned object is a data.frame. 
+## The returned object is a data.frame.
 ## Note: The method dbHasCompleted() on the resultSet tells you whether
-## or not there are pending records to be fetched. 
-## 
+## or not there are pending records to be fetched.
+##
 ## TODO: Make sure we don't exhaust all the memory, or generate
 ## an object whose size exceeds option("object.size").  Also,
 ## are we sure we want to return a data.frame?
-{    
+{
    n <- as(n, "integer")
    rsId <- as(res, "integer")
    rel <- .Call("RS_MySQL_fetch", rsId, nrec = n, PACKAGE = .MySQLPkgName)
-   if(length(rel)==0 || length(rel[[1]])==0) 
+   if(length(rel)==0 || length(rel[[1]])==0)
       return(NULL)
    ## create running row index as of previous fetch (if any)
    cnt <- dbGetRowCount(res)
@@ -418,7 +418,7 @@ function(obj, verbose = FALSE, ...)
    cat("  Rows fetched:", dbGetRowCount(obj), "\n")
    flds <- dbColumnInfo(obj)
    if(verbose && !is.null(flds)){
-      cat("  Fields:\n")  
+      cat("  Fields:\n")
       out <- print(dbColumnInfo(obj))
    }
    invisible(NULL)
@@ -433,7 +433,7 @@ function(res, ...)
    .Call("RS_MySQL_closeResultSet", rsId, PACKAGE = .MySQLPkgName)
 }
 
-mysqlReadTable <- 
+mysqlReadTable <-
 function(con, name, row.names = "row_names", check.names = TRUE, ...)
 ## Use NULL, "", or 0 as row.names to prevent using any field as row.names.
 {
@@ -444,12 +444,12 @@ function(con, name, row.names = "row_names", check.names = TRUE, ...)
    nms <- names(out)
    j <- switch(mode(row.names),
            "character" = if(row.names=="") 0 else
-               match(tolower(row.names), tolower(nms), 
+               match(tolower(row.names), tolower(nms),
                      nomatch = if(missing(row.names)) 0 else -1),
            "numeric" = row.names,
            "NULL" = 0,
            0)
-   if(j==0) 
+   if(j==0)
       return(out)
    if(j<0 || j>ncol(out)){
       warning("row.names not set on output data.frame (non-existing field)")
@@ -461,11 +461,11 @@ function(con, name, row.names = "row_names", check.names = TRUE, ...)
       row.names(out) <- rnms
    } else warning("row.names not set on output (duplicate elements in field)")
    out
-} 
+}
 
 mysqlImportFile <-
-function(con, name, value, field.types = NULL, overwrite = FALSE, 
-  append = FALSE, header, row.names, nrows = 50, sep = ",", 
+function(con, name, value, field.types = NULL, overwrite = FALSE,
+  append = FALSE, header, row.names, nrows = 50, sep = ",",
   eol="\n", skip = 0, quote = '"', ...)
 {
   if(overwrite && append)
@@ -490,7 +490,7 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   fn <- file.path(dirname(value), basename(value))
   if(missing(header) || missing(row.names)){
     f <- file(fn, open="r")
-    if(skip>0) 
+    if(skip>0)
       readLines(f, n=skip)
     txtcon <- textConnection(readLines(f, n=2))
     flds <- count.fields(txtcon, sep)
@@ -512,22 +512,22 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
   if(new.table){
     ## need to init table, say, with the first nrows lines
     d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows, ...)
-    sql <- 
+    sql <-
       dbBuildTableDefinition(con, name, obj=d, field.types = field.types,
         row.names = row.names)
     rs <- try(dbSendQuery(con, sql))
-    if(inherits(rs, ErrorClass)){
+    if(inherits(rs, "try-error")){
       warning("could not create table: aborting mysqlImportFile")
       return(FALSE)
-    } 
-    else 
+    }
+    else
       dbClearResult(rs)
   }
   else if(!append){
     warning(sprintf("table %s already exists -- use append=TRUE?", name))
   }
 
-  fmt <- 
+  fmt <-
      paste("LOAD DATA LOCAL INFILE '%s' INTO TABLE  %s ",
            "FIELDS TERMINATED BY '%s' ",
            if(!is.null(quote)) "OPTIONALLY ENCLOSED BY '%s' " else "",
@@ -539,25 +539,25 @@ function(con, name, value, field.types = NULL, overwrite = FALSE,
      sql <- sprintf(fmt, fn, name, sep, quote, eol, skip + as.integer(header))
 
   rs <- try(dbSendQuery(con, sql))
-  if(inherits(rs, ErrorClass)){
+  if(inherits(rs, "try-error")){
      warning("could not load data into table")
      return(FALSE)
-  } 
+  }
   dbClearResult(rs)
   TRUE
 }
 
 mysqlWriteTable <-
-function(con, name, value, field.types, row.names = TRUE, 
+function(con, name, value, field.types, row.names = TRUE,
    overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE)
 ## Create table "name" (must be an SQL identifier) and populate
 ## it with the values of the data.frame "value"
 ## TODO: This function should execute its sql as a single transaction,
 ##       and allow converter functions.
 ## TODO: In the unlikely event that value has a field called "row_names"
-##       we could inadvertently overwrite it (here the user should set 
+##       we could inadvertently overwrite it (here the user should set
 ##       row.names=F)  I'm (very) reluctantly adding the code re: row.names,
-##       because I'm not 100% comfortable using data.frames as the basic 
+##       because I'm not 100% comfortable using data.frames as the basic
 ##       data for relations.
 {
    if(overwrite && append)
@@ -572,10 +572,10 @@ function(con, name, value, field.types, row.names = TRUE,
       ## the following mapping should be coming from some kind of table
       ## also, need to use converter functions (for dates, etc.)
       field.types <- lapply(value, dbDataType, dbObj = con)
-   } 
+   }
 
    ## Do we need to coerce any field prior to write it out?
-   ## TODO: MySQL 4.1 introduces the boolean data type.  
+   ## TODO: MySQL 4.1 introduces the boolean data type.
    for(i in seq(along = value)){
       if(is(value[[i]], "logical"))
          value[[i]] <- as(value[[i]], "integer")
@@ -583,7 +583,7 @@ function(con, name, value, field.types, row.names = TRUE,
    i <- match("row.names", names(field.types), nomatch=0)
    if(i>0) ## did we add a row.names value?  If so, it's a text field.
       field.types[i] <- dbDataType(dbObj=con, field.types$row.names)
-   names(field.types) <- make.db.names(con, names(field.types), 
+   names(field.types) <- make.db.names(con, names(field.types),
                              allow.keywords = allow.keywords)
 
    .clearResultSets(con)
@@ -599,8 +599,8 @@ function(con, name, value, field.types, row.names = TRUE,
          warning(paste("table",name,"exists in database: aborting mysqlWriteTable"))
          return(FALSE)
       }
-   } 
-   if(!dbExistsTable(con,name)){      ## need to re-test table for existence 
+   }
+   if(!dbExistsTable(con,name)){      ## need to re-test table for existence
       ## need to create a new (empty) table
       sql1 <- paste("create table ", name, "\n(\n\t", sep="")
       sql2 <- paste(paste(names(field.types), field.types), collapse=",\n\t",
@@ -608,11 +608,11 @@ function(con, name, value, field.types, row.names = TRUE,
       sql3 <- "\n)\n"
       sql <- paste(sql1, sql2, sql3, sep="")
       rs <- try(dbSendQuery(con, sql))
-      if(inherits(rs, ErrorClass)){
+      if(inherits(rs, "try-error")){
          warning("could not create table: aborting mysqlWriteTable")
          return(FALSE)
-      } 
-      else 
+      }
+      else
          dbClearResult(rs)
    }
 
@@ -624,16 +624,16 @@ function(con, name, value, field.types, row.names = TRUE,
    safe.write(value, file = fn)
    on.exit(unlink(fn), add = TRUE)
    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
-                  " INTO TABLE ", name, 
-                  " LINES TERMINATED BY '\n' ", 
+                  " INTO TABLE ", name,
+                  " LINES TERMINATED BY '\n' ",
                   "( ", paste(names(field.types), collapse=", "), ");",
                sep="")
    rs <- try(dbSendQuery(con, sql4))
-   if(inherits(rs, ErrorClass)){
+   if(inherits(rs, "try-error")){
       warning("could not load data into table")
       return(FALSE)
-   } 
-   else 
+   }
+   else
       dbClearResult(rs)
    TRUE
 }
@@ -645,17 +645,17 @@ function(dbObj, name, obj, field.types = NULL, row.names = TRUE, ...)
     obj <- as.data.frame(obj)
   if(!is.null(row.names) && row.names){
     obj  <- cbind(row.names(obj), obj)  ## can't use row.names= here
-    names(obj)[1] <- "row.names" 
+    names(obj)[1] <- "row.names"
   }
   if(is.null(field.types)){
     ## the following mapping should be coming from some kind of table
     ## also, need to use converter functions (for dates, etc.)
     field.types <- lapply(obj, dbDataType, dbObj = dbObj)
-  } 
+  }
   i <- match("row.names", names(field.types), nomatch=0)
   if(i>0) ## did we add a row.names value?  If so, it's a text field.
     field.types[i] <- dbDataType(dbObj, field.types$row.names)
-  names(field.types) <- 
+  names(field.types) <-
     make.db.names(dbObj, names(field.types), allow.keywords = FALSE)
 
   ## need to create a new (empty) table
@@ -681,12 +681,12 @@ escape <- function(table) {
   table
 }
 
-## the following is almost exactly from the ROracle driver 
-safe.write <- 
+## the following is almost exactly from the ROracle driver
+safe.write <-
 function(value, file, batch, ...)
 ## safe.write makes sure write.table doesn't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
-{  
+{
    N <- nrow(value)
    if(N<1){
       warning("no rows in data.frame")
@@ -696,9 +696,9 @@ function(value, file, batch, ...)
    on.exit(options(digits))
    if(missing(batch) || is.null(batch))
       batch <- 10000
-   else if(batch<=0) 
+   else if(batch<=0)
       batch <- N
-   from <- 1 
+   from <- 1
    to <- min(batch, N)
    conb <- file(file,open="wb")
    while(from<=N){
@@ -716,7 +716,7 @@ mysqlDataType <-
 function(obj, ...)
 ## find a suitable SQL data type for the R/S object obj
 ## TODO: Lots and lots!! (this is a very rough first draft)
-## need to register converters, abstract out MySQL and generalize 
+## need to register converters, abstract out MySQL and generalize
 ## to Oracle, Informix, etc.  Perhaps this should be table-driven.
 ## NOTE: MySQL data types differ from the SQL92 (e.g., varchar truncate
 ## trailing spaces).  MySQL enum() maps rather nicely to factors (with
@@ -726,7 +726,7 @@ function(obj, ...)
    rs.mode <- storage.mode(obj)
    if(rs.class=="numeric" || rs.class == "integer"){
       sql.type <- if(rs.mode=="integer") "bigint" else  "double"
-   } 
+   }
    else {
       sql.type <- switch(rs.class,
                      character = "text",
@@ -764,41 +764,41 @@ function()
 ## of the MySQL Manual, Version 4.1.1-alpha, html format.
 
 .MySQLKeywords <-
-c("ADD", "ALL", "ALTER", "ANALYZE", "AND", "AS", "ASC", "ASENSITIVE", 
-  "AUTO_INCREMENT", "BDB", "BEFORE", "BERKELEYDB", "BETWEEN", "BIGINT", 
-  "BINARY", "BLOB", "BOTH", "BY", "CALL", "CASCADE", "CASE", "CHANGE", 
-  "CHAR", "CHARACTER", "CHECK", "COLLATE", "COLUMN", "COLUMNS", 
-  "CONDITION", "CONNECTION", "CONSTRAINT", "CONTINUE", "CREATE", 
-  "CROSS", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", 
-  "CURSOR", "DATABASE", "DATABASES", "DAY_HOUR", "DAY_MICROSECOND", 
-  "DAY_MINUTE", "DAY_SECOND", "DEC", "DECIMAL", "DECLARE", "DEFAULT", 
-  "DELAYED", "DELETE", "DESC", "DESCRIBE", "DISTINCT", "DISTINCTROW", 
-  "DIV", "DOUBLE", "DROP", "ELSE", "ELSEIF", "ENCLOSED", "ESCAPED", 
-  "EXISTS", "EXIT", "EXPLAIN", "FALSE", "FETCH", "FIELDS", "FLOAT", 
-  "FOR", "FORCE", "FOREIGN", "FOUND", "FROM", "FULLTEXT", "GRANT", 
-  "GROUP", "HAVING", "HIGH_PRIORITY", "HOUR_MICROSECOND", "HOUR_MINUTE", 
-  "HOUR_SECOND", "IF", "IGNORE", "IN", "INDEX", "INFILE", "INNER", 
-  "INNODB", "INOUT", "INSENSITIVE", "INSERT", "INT", "INTEGER", 
-  "INTERVAL", "INTO", "IO_THREAD", "IS", "ITERATE", "JOIN", "KEY", 
-  "KEYS", "KILL", "LEADING", "LEAVE", "LEFT", "LIKE", "LIMIT", 
-  "LINES", "LOAD", "LOCALTIME", "LOCALTIMESTAMP", "LOCK", "LONG", 
-  "LONGBLOB", "LONGTEXT", "LOOP", "LOW_PRIORITY", "MASTER_SERVER_ID", 
-  "MATCH", "MEDIUMBLOB", "MEDIUMINT", "MEDIUMTEXT", "MIDDLEINT", 
-  "MINUTE_MICROSECOND", "MINUTE_SECOND", "MOD", "NATURAL", "NOT", 
-  "NO_WRITE_TO_BINLOG", "NULL", "NUMERIC", "ON", "OPTIMIZE", "OPTION", 
-  "OPTIONALLY", "OR", "ORDER", "OUT", "OUTER", "OUTFILE", "PRECISION", 
-  "PRIMARY", "PRIVILEGES", "PROCEDURE", "PURGE", "READ", "REAL", 
-  "REFERENCES", "REGEXP", "RENAME", "REPEAT", "REPLACE", "REQUIRE", 
-  "RESTRICT", "RETURN", "RETURNS", "REVOKE", "RIGHT", "RLIKE", 
-  "SECOND_MICROSECOND", "SELECT", "SENSITIVE", "SEPARATOR", "SET", 
-  "SHOW", "SMALLINT", "SOME", "SONAME", "SPATIAL", "SPECIFIC", 
-  "SQL", "SQLEXCEPTION", "SQLSTATE", "SQLWARNING", "SQL_BIG_RESULT", 
-  "SQL_CALC_FOUND_ROWS", "SQL_SMALL_RESULT", "SSL", "STARTING", 
-  "STRAIGHT_JOIN", "STRIPED", "TABLE", "TABLES", "TERMINATED", 
-  "THEN", "TINYBLOB", "TINYINT", "TINYTEXT", "TO", "TRAILING", 
-  "TRUE", "TYPES", "UNDO", "UNION", "UNIQUE", "UNLOCK", "UNSIGNED", 
-  "UPDATE", "USAGE", "USE", "USER_RESOURCES", "USING", "UTC_DATE", 
-  "UTC_TIME", "UTC_TIMESTAMP", "VALUES", "VARBINARY", "VARCHAR", 
-  "VARCHARACTER", "VARYING", "WHEN", "WHERE", "WHILE", "WITH", 
+c("ADD", "ALL", "ALTER", "ANALYZE", "AND", "AS", "ASC", "ASENSITIVE",
+  "AUTO_INCREMENT", "BDB", "BEFORE", "BERKELEYDB", "BETWEEN", "BIGINT",
+  "BINARY", "BLOB", "BOTH", "BY", "CALL", "CASCADE", "CASE", "CHANGE",
+  "CHAR", "CHARACTER", "CHECK", "COLLATE", "COLUMN", "COLUMNS",
+  "CONDITION", "CONNECTION", "CONSTRAINT", "CONTINUE", "CREATE",
+  "CROSS", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP",
+  "CURSOR", "DATABASE", "DATABASES", "DAY_HOUR", "DAY_MICROSECOND",
+  "DAY_MINUTE", "DAY_SECOND", "DEC", "DECIMAL", "DECLARE", "DEFAULT",
+  "DELAYED", "DELETE", "DESC", "DESCRIBE", "DISTINCT", "DISTINCTROW",
+  "DIV", "DOUBLE", "DROP", "ELSE", "ELSEIF", "ENCLOSED", "ESCAPED",
+  "EXISTS", "EXIT", "EXPLAIN", "FALSE", "FETCH", "FIELDS", "FLOAT",
+  "FOR", "FORCE", "FOREIGN", "FOUND", "FROM", "FULLTEXT", "GRANT",
+  "GROUP", "HAVING", "HIGH_PRIORITY", "HOUR_MICROSECOND", "HOUR_MINUTE",
+  "HOUR_SECOND", "IF", "IGNORE", "IN", "INDEX", "INFILE", "INNER",
+  "INNODB", "INOUT", "INSENSITIVE", "INSERT", "INT", "INTEGER",
+  "INTERVAL", "INTO", "IO_THREAD", "IS", "ITERATE", "JOIN", "KEY",
+  "KEYS", "KILL", "LEADING", "LEAVE", "LEFT", "LIKE", "LIMIT",
+  "LINES", "LOAD", "LOCALTIME", "LOCALTIMESTAMP", "LOCK", "LONG",
+  "LONGBLOB", "LONGTEXT", "LOOP", "LOW_PRIORITY", "MASTER_SERVER_ID",
+  "MATCH", "MEDIUMBLOB", "MEDIUMINT", "MEDIUMTEXT", "MIDDLEINT",
+  "MINUTE_MICROSECOND", "MINUTE_SECOND", "MOD", "NATURAL", "NOT",
+  "NO_WRITE_TO_BINLOG", "NULL", "NUMERIC", "ON", "OPTIMIZE", "OPTION",
+  "OPTIONALLY", "OR", "ORDER", "OUT", "OUTER", "OUTFILE", "PRECISION",
+  "PRIMARY", "PRIVILEGES", "PROCEDURE", "PURGE", "READ", "REAL",
+  "REFERENCES", "REGEXP", "RENAME", "REPEAT", "REPLACE", "REQUIRE",
+  "RESTRICT", "RETURN", "RETURNS", "REVOKE", "RIGHT", "RLIKE",
+  "SECOND_MICROSECOND", "SELECT", "SENSITIVE", "SEPARATOR", "SET",
+  "SHOW", "SMALLINT", "SOME", "SONAME", "SPATIAL", "SPECIFIC",
+  "SQL", "SQLEXCEPTION", "SQLSTATE", "SQLWARNING", "SQL_BIG_RESULT",
+  "SQL_CALC_FOUND_ROWS", "SQL_SMALL_RESULT", "SSL", "STARTING",
+  "STRAIGHT_JOIN", "STRIPED", "TABLE", "TABLES", "TERMINATED",
+  "THEN", "TINYBLOB", "TINYINT", "TINYTEXT", "TO", "TRAILING",
+  "TRUE", "TYPES", "UNDO", "UNION", "UNIQUE", "UNLOCK", "UNSIGNED",
+  "UPDATE", "USAGE", "USE", "USER_RESOURCES", "USING", "UTC_DATE",
+  "UTC_TIME", "UTC_TIMESTAMP", "VALUES", "VARBINARY", "VARCHAR",
+  "VARCHARACTER", "VARYING", "WHEN", "WHERE", "WHILE", "WITH",
   "WRITE", "XOR", "YEAR_MONTH", "ZEROFILL"
   )
