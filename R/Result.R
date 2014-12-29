@@ -49,21 +49,19 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #' }
 #' @rdname query
 #' @useDynLib RMySQL RS_MySQL_fetch
-setMethod("fetch", signature(res="MySQLResult", n="numeric"),
-  def = function(res, n, ...){
-    n <- as.integer(n)
-    rel <- .Call(RS_MySQL_fetch, res@Id, nrec = n)
-    if(length(rel)==0 || length(rel[[1]])==0)
-      return(data.frame())
-    ## create running row index as of previous fetch (if any)
-    cnt <- dbGetRowCount(res)
-    nrec <- length(rel[[1]])
-    indx <- seq(from = cnt - nrec + 1, length = nrec)
-    attr(rel, "row.names") <- as.integer(indx)
-    class(rel) <- "data.frame"
-    rel
+setMethod("fetch", c("MySQLResult", "numeric"), function(res, n, ...) {
+  rel <- .Call(RS_MySQL_fetch, res@Id, nrec = as.integer(n))
+
+  if (length(rel) > 0) {
+    n <- length(rel[[1]])
+  } else {
+    n <- 0
   }
-)
+
+  attr(rel, "row.names") <- .set_row_names(n)
+  class(rel) <- "data.frame"
+  rel
+})
 
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to
 #'    retrieve all pending records; use \code{0} for to fetch the default
@@ -99,42 +97,42 @@ setMethod("dbClearResult", "MySQLResult", function(res, ...) {
 #' @rdname query
 #' @param what optional
 #' @export
-#' @useDynLib RMySQL RS_MySQL_resultSetInfo
+#' @useDynLib RMySQL RS_MySQL_resultSetInfo RS_DBI_SclassNames RS_MySQL_typeNames
 setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
   checkValid(dbObj)
 
   info <- .Call(RS_MySQL_resultSetInfo, dbObj@Id)
-  if(!missing(what))
+
+  flds <- info$fieldDescription[[1]]
+  if (!is.null(flds)) {
+    attr(flds, "row.names") <- .set_row_names(length(flds$type))
+    class(flds) <- "data.frame"
+
+    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
+    flds$type <- .Call(RS_MySQL_typeNames, as.integer(flds$type))
+  }
+  info$fields <- flds
+  info$fieldDescription <- NULL
+
+  if (!missing(what)) {
     info[what]
-  else
+  } else {
     info
+  }
 })
 
 #' @rdname query
 #' @export
-setMethod("dbGetStatement", "MySQLResult",
-  def = function(res, ...){
-    st <- dbGetInfo(res, "statement")[[1]]
-    if(is.null(st))
-      st <- character()
-    st
-  },
-  valueClass = "character"
-)
+setMethod("dbGetStatement", "MySQLResult", function(res, ...) {
+  dbGetInfo(res)$statement
+})
 
 #' @param name Table name.
 #' @rdname query
 #' @export
-setMethod("dbListFields",
-  signature(conn="MySQLResult", name="missing"),
-  def = function(conn, name, ...){
-    flds <- dbGetInfo(conn, "fields")$fields$name
-    if(is.null(flds))
-      flds <- character()
-    flds
-  },
-  valueClass = "character"
-)
+setMethod("dbListFields", c("MySQLResult", "missing"), function(conn, name, ...) {
+  dbGetInfo(conn)$fields$name
+})
 
 #' Database interface meta-data.
 #'
@@ -151,9 +149,8 @@ setMethod("dbListFields",
 #' dbGetStatement(rs)
 #' dbHasCompleted(rs)
 #'
-#' info <- dbGetInfo(rs)
-#' names(info)
-#' info$fields
+#' dbGetInfo(rs)
+#' dbColumnInfo(rs)
 #'
 #' dbClearResult(rs)
 #' dbRemoveTable(con, "t1")
@@ -164,36 +161,26 @@ NULL
 
 #' @export
 #' @rdname result-meta
-#' @useDynLib RMySQL RS_DBI_SclassNames RS_MySQL_typeNames
 setMethod("dbColumnInfo", "MySQLResult", function(res, ...) {
-  flds <- dbGetInfo(res, "fieldDescription")[[1]][[1]]
-  if(!is.null(flds)){
-    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
-    flds$type <- .Call(RS_MySQL_typeNames, as.integer(flds$type))
-    ## no factors
-    structure(flds, row.names = paste(seq(along=flds$type)),
-      class = "data.frame")
-  }
-  else data.frame(flds)
-}
-)
+  dbGetInfo(res)$fields
+})
 
 #' @export
 #' @rdname result-meta
 setMethod("dbGetRowsAffected", "MySQLResult", function(res, ...) {
-  dbGetInfo(res, "rowsAffected")[[1]]
+  dbGetInfo(res)$rowsAffected
 })
 
 #' @export
 #' @rdname result-meta
 setMethod("dbGetRowCount", "MySQLResult", function(res, ...) {
-  dbGetInfo(res, "rowCount")[[1]]
+  dbGetInfo(res)$rowCount
 })
 
 #' @export
 #' @rdname result-meta
 setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
-  dbGetInfo(res, "completed")[[1]] == 1
+  dbGetInfo(res)$completed == 1
 })
 
 #' @export
@@ -214,10 +201,11 @@ setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
   cat("  Has completed?", if(dbHasCompleted(object)) "yes" else "no", "\n")
   cat("  Affected rows:", dbGetRowsAffected(object), "\n")
   cat("  Rows fetched:", dbGetRowCount(object), "\n")
+
   flds <- dbColumnInfo(object)
-  if(verbose && !is.null(flds)){
+  if (verbose && !is.null(flds)) {
     cat("  Fields:\n")
-    out <- print(dbColumnInfo(object))
+    print(dbColumnInfo(object))
   }
   invisible(NULL)
 })
@@ -225,19 +213,8 @@ setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
 #' @export
 #' @rdname result-meta
 setMethod("show", "MySQLResult", function(object) {
-  expired <- if(dbIsValid(object)) "" else "Expired "
+  expired <- if (dbIsValid(object)) "" else "Expired "
   cat("<", expired, "MySQLResult:", paste(object@Id, collapse = ","), ">\n",
     sep = "")
   invisible(NULL)
 })
-
-
-.clearResultSets <- function(con){
-  ## are there resultSets pending on con?
-  rsList <- dbListResults(con)
-  if(length(rsList)>0){
-    warning("There are pending result sets. Removing.",call.=FALSE)
-    lapply(rsList,dbClearResult) ## clear all pending results
-  }
-  NULL
-}

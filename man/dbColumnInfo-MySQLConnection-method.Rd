@@ -5,7 +5,7 @@
 \alias{dbColumnInfo,MySQLConnection-method}
 \title{Experimental dbColumnInfo method for a connection}
 \usage{
-\S4method{dbColumnInfo}{MySQLConnection}(res, ...)
+\S4method{dbColumnInfo}{MySQLConnection}(res, name, ...)
 }
 \description{
 Experimental dbColumnInfo method for a connection

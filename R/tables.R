@@ -132,8 +132,6 @@ setMethod("dbWriteTable",
     names(field.types) <- make.db.names(conn, names(field.types),
       allow.keywords = allow.keywords)
 
-    .clearResultSets(conn)
-
     if(dbExistsTable(conn,name)){
       if(overwrite){
         if(!dbRemoveTable(conn, name)){
@@ -195,8 +193,6 @@ setMethod("dbWriteTable",
     eol="\n", skip = 0, quote = '"', ...)   {
     if(overwrite && append)
       stop("overwrite and append cannot both be TRUE")
-
-    .clearResultSets(conn)
 
     if(dbExistsTable(conn,name)){
       if(overwrite){
@@ -276,68 +272,41 @@ setMethod("dbWriteTable",
 
 #' @export
 #' @rdname dbReadTable
-setMethod("dbListTables", "MySQLConnection",
-  function(conn, ...) {
-    tbls <- dbGetQuery(conn, "show tables")
-    if(length(tbls)>0)
-      tbls <- tbls[,1]
-    else
-      tbls <- character()
-    tbls
+setMethod("dbListTables", "MySQLConnection", function(conn, ...) {
+  dbGetQuery(conn, "SHOW TABLES")[[1]]
+})
+
+#' @export
+#' @rdname dbReadTable
+setMethod("dbExistsTable", c("MySQLConnection", "character"),
+  function(conn, name, ...) {
+    name %in% dbListTables(conn)
   }
 )
 
 #' @export
 #' @rdname dbReadTable
-setMethod("dbExistsTable",
-  signature(conn="MySQLConnection", name="character"),
-  def = function(conn, name, ...){
-    ## TODO: find out the appropriate query to the MySQL metadata
-    avail <- dbListTables(conn)
-    if(length(avail)==0) avail <- ""
-    match(tolower(name), tolower(avail), nomatch=0)>0
-  },
-  valueClass = "logical"
+setMethod("dbRemoveTable", c("MySQLConnection", "character"),
+  function(conn, name, ...){
+    if (!dbExistsTable(conn, name)) return(FALSE)
+
+    dbGetQuery(conn, paste("DROP TABLE", name))
+    TRUE
+  }
 )
 
 #' @export
 #' @rdname dbReadTable
-setMethod("dbRemoveTable",
-  signature(conn="MySQLConnection", name="character"),
-  def = function(conn, name, ...){
-    if(dbExistsTable(conn, name)){
-      rc <- try(dbGetQuery(conn, paste("DROP TABLE", name)))
-      !inherits(rc, "try-error")
-    }
-    else FALSE
-  },
-  valueClass = "logical"
-)
-
-#' @export
-#' @rdname dbReadTable
-setMethod("dbListFields",
-  signature(conn="MySQLConnection", name="character"),
-  def = function(conn, name, ...){
-    flds <- dbGetQuery(conn, paste("describe", name))[,1]
-    if(length(flds)==0)
-      flds <- character()
-    flds
-  },
-  valueClass = "character"
+setMethod("dbListFields", c("MySQLConnection", "character"),
+  function(conn, name, ...){
+    dbGetQuery(conn, paste("DESCRIBE", name))[[1]]
+  }
 )
 
 #' Experimental dbColumnInfo method for a connection
 #'
 #' @export
 #' @keywords internal
-setMethod("dbColumnInfo", "MySQLConnection",
-  def = function(res, ...){
-    dots <- list(...)
-    if(length(dots) == 0)
-      stop("must specify one MySQL object (table) name")
-    if(length(dots) > 1)
-      warning("dbColumnInfo: only one MySQL object name (table) may be specified", call.=FALSE)
-    dbGetQuery(res, paste("describe", dots[[1]]))
-  }
-)
+setMethod("dbColumnInfo", "MySQLConnection", function(res, name, ...) {
+  dbGetQuery(res, paste("DESCRIBE", name))
+})

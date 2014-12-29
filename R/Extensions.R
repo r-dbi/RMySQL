@@ -6,8 +6,7 @@ NULL
 mysqlEscapeStrings <- function(con, strings) {
   checkValid(con)
 
-  strings <- as.character(strings)
-  out <- .Call(RS_MySQL_escapeStrings, con@Id, strings)
+  out <- .Call(RS_MySQL_escapeStrings, con@Id, as.character(strings))
   names(out) <- names(strings)
   out
 }
@@ -229,41 +228,35 @@ setMethod("dbApply", "MySQLResult",
 #' dbRemoveTable(con, "mtcars")
 #' dbDisconnect(con)
 #' }
-setGeneric("dbNextResult",
-  def = function(con, ...) standardGeneric("dbNextResult")
-  #valueClass = "DBIResult" or NULL
-)
+setGeneric("dbNextResult", function(con, ...) {
+  standardGeneric("dbNextResult")
+})
 
 #' @export
 #' @rdname dbNextResult
 #' @useDynLib RMySQL RS_MySQL_nextResultSet
-setMethod("dbNextResult",
-  signature(con = "MySQLConnection"),
-  def = function(con, ...){
-    for(rs in dbListResults(con)){
-      dbClearResult(rs)
-    }
-    id = .Call(RS_MySQL_nextResultSet, con@Id)
-    new("MySQLResult", Id = id)
+setMethod("dbNextResult", "MySQLConnection", function(con, ...) {
+  for(rs in dbListResults(con)){
+    dbClearResult(rs)
   }
+
+  id = .Call(RS_MySQL_nextResultSet, con@Id)
+  new("MySQLResult", Id = id)
+}
 )
 
 #' @export
 #' @rdname dbNextResult
-setGeneric("dbMoreResults",
-  def = function(con, ...) standardGeneric("dbMoreResults"),
-  valueClass = "logical"
-)
+setGeneric("dbMoreResults", function(con, ...) {
+  standardGeneric("dbMoreResults")
+})
 
 #' @export
 #' @rdname dbNextResult
 #' @useDynLib RMySQL RS_MySQL_moreResultSets
-setMethod("dbMoreResults",
-  signature(con = "MySQLConnection"),
-  def = function(con, ...)
-    .Call(RS_MySQL_moreResultSets, con@Id)
-)
-
+setMethod("dbMoreResults", "MySQLConnection", function(con, ...) {
+  .Call(RS_MySQL_moreResultSets, con@Id)
+})
 
 #' Build the SQL CREATE TABLE definition as a string
 #'
@@ -329,32 +322,30 @@ escape <- function(table) {
 ## safe.write makes sure write.table doesn't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
 safe.write <- function(value, file, batch, ...) {
-    N <- nrow(value)
-    if(N<1){
-      warning("no rows in data.frame")
-      return(NULL)
-    }
-    digits <- options(digits = 17)
-    on.exit(options(digits))
-    if(missing(batch) || is.null(batch))
-      batch <- 10000
-    else if(batch<=0)
-      batch <- N
-    from <- 1
-    to <- min(batch, N)
-    conb <- file(file,open="wb")
-    while(from<=N){
-      write.table(escape(value[from:to,, drop=FALSE]), file = conb,
-        append = TRUE, quote = FALSE, sep="\t", na = .MySQL.NA.string,
-        row.names=FALSE, col.names=FALSE, eol = '\n', ...)
-      from <- to+1
-      to <- min(to+batch, N)
-    }
-    close(conb)
-    invisible(NULL)
+  N <- nrow(value)
+  if(N<1){
+    warning("no rows in data.frame")
+    return(NULL)
   }
-
-
+  digits <- options(digits = 17)
+  on.exit(options(digits))
+  if(missing(batch) || is.null(batch))
+    batch <- 10000
+  else if(batch<=0)
+    batch <- N
+  from <- 1
+  to <- min(batch, N)
+  conb <- file(file,open="wb")
+  while(from<=N){
+    write.table(escape(value[from:to,, drop=FALSE]), file = conb,
+      append = TRUE, quote = FALSE, sep="\t", na = .MySQL.NA.string,
+      row.names=FALSE, col.names=FALSE, eol = '\n', ...)
+    from <- to+1
+    to <- min(to+batch, N)
+  }
+  close(conb)
+  invisible(NULL)
+}
 
 #' MySQL Check for Compiled Versus Loaded Client Library Versions
 #'
@@ -370,45 +361,3 @@ safe.write <- function(value, file, batch, ...) {
 mysqlClientLibraryVersions <- function() {
   .Call(RS_MySQL_clientLibraryVersions)
 }
-
-## the following reserved words were taken from Section 6.1.7
-## of the MySQL Manual, Version 4.1.1-alpha, html format.
-.MySQLKeywords <-
-  c("ADD", "ALL", "ALTER", "ANALYZE", "AND", "AS", "ASC", "ASENSITIVE",
-    "AUTO_INCREMENT", "BDB", "BEFORE", "BERKELEYDB", "BETWEEN", "BIGINT",
-    "BINARY", "BLOB", "BOTH", "BY", "CALL", "CASCADE", "CASE", "CHANGE",
-    "CHAR", "CHARACTER", "CHECK", "COLLATE", "COLUMN", "COLUMNS",
-    "CONDITION", "CONNECTION", "CONSTRAINT", "CONTINUE", "CREATE",
-    "CROSS", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP",
-    "CURSOR", "DATABASE", "DATABASES", "DAY_HOUR", "DAY_MICROSECOND",
-    "DAY_MINUTE", "DAY_SECOND", "DEC", "DECIMAL", "DECLARE", "DEFAULT",
-    "DELAYED", "DELETE", "DESC", "DESCRIBE", "DISTINCT", "DISTINCTROW",
-    "DIV", "DOUBLE", "DROP", "ELSE", "ELSEIF", "ENCLOSED", "ESCAPED",
-    "EXISTS", "EXIT", "EXPLAIN", "FALSE", "FETCH", "FIELDS", "FLOAT",
-    "FOR", "FORCE", "FOREIGN", "FOUND", "FROM", "FULLTEXT", "GRANT",
-    "GROUP", "HAVING", "HIGH_PRIORITY", "HOUR_MICROSECOND", "HOUR_MINUTE",
-    "HOUR_SECOND", "IF", "IGNORE", "IN", "INDEX", "INFILE", "INNER",
-    "INNODB", "INOUT", "INSENSITIVE", "INSERT", "INT", "INTEGER",
-    "INTERVAL", "INTO", "IO_THREAD", "IS", "ITERATE", "JOIN", "KEY",
-    "KEYS", "KILL", "LEADING", "LEAVE", "LEFT", "LIKE", "LIMIT",
-    "LINES", "LOAD", "LOCALTIME", "LOCALTIMESTAMP", "LOCK", "LONG",
-    "LONGBLOB", "LONGTEXT", "LOOP", "LOW_PRIORITY", "MASTER_SERVER_ID",
-    "MATCH", "MEDIUMBLOB", "MEDIUMINT", "MEDIUMTEXT", "MIDDLEINT",
-    "MINUTE_MICROSECOND", "MINUTE_SECOND", "MOD", "NATURAL", "NOT",
-    "NO_WRITE_TO_BINLOG", "NULL", "NUMERIC", "ON", "OPTIMIZE", "OPTION",
-    "OPTIONALLY", "OR", "ORDER", "OUT", "OUTER", "OUTFILE", "PRECISION",
-    "PRIMARY", "PRIVILEGES", "PROCEDURE", "PURGE", "READ", "REAL",
-    "REFERENCES", "REGEXP", "RENAME", "REPEAT", "REPLACE", "REQUIRE",
-    "RESTRICT", "RETURN", "RETURNS", "REVOKE", "RIGHT", "RLIKE",
-    "SECOND_MICROSECOND", "SELECT", "SENSITIVE", "SEPARATOR", "SET",
-    "SHOW", "SMALLINT", "SOME", "SONAME", "SPATIAL", "SPECIFIC",
-    "SQL", "SQLEXCEPTION", "SQLSTATE", "SQLWARNING", "SQL_BIG_RESULT",
-    "SQL_CALC_FOUND_ROWS", "SQL_SMALL_RESULT", "SSL", "STARTING",
-    "STRAIGHT_JOIN", "STRIPED", "TABLE", "TABLES", "TERMINATED",
-    "THEN", "TINYBLOB", "TINYINT", "TINYTEXT", "TO", "TRAILING",
-    "TRUE", "TYPES", "UNDO", "UNION", "UNIQUE", "UNLOCK", "UNSIGNED",
-    "UPDATE", "USAGE", "USE", "USER_RESOURCES", "USING", "UTC_DATE",
-    "UTC_TIME", "UTC_TIMESTAMP", "VALUES", "VARBINARY", "VARCHAR",
-    "VARCHARACTER", "VARYING", "WHEN", "WHERE", "WHILE", "WITH",
-    "WRITE", "XOR", "YEAR_MONTH", "ZEROFILL"
-  )

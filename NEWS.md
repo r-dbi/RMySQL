@@ -26,4 +26,10 @@
  *  Implement methods for `dbIsValid()`; please use these instead of
     `isIdCurrent()`.
 
- * Assorted fixes accumulated since last release 3 years ago.
+ *  Assorted fixes accumulated since last release 3 years ago.
+
+ *  `fetch()` now returns a 0-row data frame (instead of an 0-col data frame)
+    if there are no results.
+
+ *  Methods no longer automatically close open result sets. This was implemented 
+    inconsistently in a handful of places.

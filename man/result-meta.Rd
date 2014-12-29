@@ -45,9 +45,8 @@ rs <- dbSendQuery(con, "SELECT * FROM t1 WHERE UrbanPop >= 80")
 dbGetStatement(rs)
 dbHasCompleted(rs)
 
-info <- dbGetInfo(rs)
-names(info)
-info$fields
+dbGetInfo(rs)
+dbColumnInfo(rs)
 
 dbClearResult(rs)
 dbRemoveTable(con, "t1")
