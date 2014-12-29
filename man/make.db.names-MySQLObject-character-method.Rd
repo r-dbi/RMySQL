@@ -16,6 +16,8 @@
   keywords = .MySQLKeywords, case = c("lower", "upper", "any")[3], ...)
 }
 \arguments{
+\item{dbObj}{any MySQL object (e.g., \code{MySQLDriver}).}
+
 \item{snames}{a character vector of R/S-Plus
 identifiers (symbols) from which we need to make SQL identifiers.}
 
@@ -31,14 +33,14 @@ letters are upper or lower case.}
 \item{allow.keywords}{logical describing whether SQL keywords should be
 allowed in the resulting set of SQL names.  Its default is \code{TRUE}}
 
+\item{...}{Unused, needed for compatibility with generic.}
+
 \item{name}{a character vector of SQL identifiers we want to check against
 keywords from the DBMS.}
 
 \item{case}{a character string specifying whether to make the
 comparison as lower case, upper case, or any of the two.  it defaults to
 \code{any}.}
-
-\item{any}{MySQL object (e.g., \code{MySQLDriver}).}
 }
 \description{
 These methods are straight-forward implementations of the corresponding

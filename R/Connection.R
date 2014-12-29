@@ -32,10 +32,11 @@ setClass("MySQLConnection", representation("DBIConnection", "MySQLObject"))
 #' @param port (optional) integer of the TCP/IP default port.
 #' @param client.flag (optional) integer setting various MySQL client flags. See
 #'   the MySQL manual for details.
-#' @param group string identifying a section in the \code{default.file} to use
+#' @param groups string identifying a section in the \code{default.file} to use
 #'   for setting authentication parameters (see \code{\link{MySQL}}).
 #' @param default.file string of the filename with MySQL client options.
 #'   Defaults to \code{\$HOME/.my.cnf}
+#' @param ... Unused, needed for compatibility with generic.
 #' @export
 #' @examples
 #' \dontrun{
@@ -131,7 +132,6 @@ setMethod("dbDisconnect", "MySQLConnection",
 #'
 #' @name db-meta
 #' @param conn,dbObj,object MySQLConnection object.
-#' @param what optional
 #' @param ... Other arguments for compatibility with generic.
 #' @examples
 #' \dontrun{
@@ -143,6 +143,7 @@ setMethod("dbDisconnect", "MySQLConnection",
 NULL
 
 #' @rdname db-meta
+#' @param what optional
 #' @export
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
   if(!isIdCurrent(dbObj))
@@ -167,6 +168,7 @@ setMethod("dbListResults", "MySQLConnection",
 )
 
 #' @rdname db-meta
+#' @param verbose If \code{TRUE}, add extra info.
 #' @export
 setMethod("summary", "MySQLConnection",
   function(object, verbose = FALSE, ...) {

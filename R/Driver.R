@@ -80,7 +80,7 @@ setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
 
 #' Get information about a MySQL driver.
 #'
-#' @param drv Object created by \code{\link{MySQL}}.
+#' @param dbObj,object,drv Object created by \code{\link{MySQL}}.
 #' @param what Optional
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @export
@@ -116,6 +116,7 @@ setMethod("dbListConnections", "MySQLDriver", function(drv, ...) {
 })
 
 #' @rdname dbGetInfo-MySQLDriver-method
+#' @param verbose If \code{TRUE}, print extra info.
 #' @export
 setMethod("summary", "MySQLDriver", function(object, verbose = FALSE, ...) {
   info <- dbGetInfo(object)

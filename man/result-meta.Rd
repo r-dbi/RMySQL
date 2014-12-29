@@ -24,9 +24,11 @@
 \S4method{summary}{MySQLResult}(object, verbose = FALSE, ...)
 }
 \arguments{
-\item{res}{An object of class \code{\linkS4class{MySQLResult}}}
+\item{res,conn,object}{An object of class \code{\linkS4class{MySQLResult}}}
 
 \item{...}{Ignored. Needed for compatibility with generic}
+
+\item{verbose}{If \code{TRUE}, print extra information.}
 }
 \description{
 See documentation of generics for more details.

@@ -22,6 +22,7 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #' fetches and clears for you.
 #'
 #' @param conn an \code{\linkS4class{MySQLConnection}} object.
+#' @param res,dbObj A  \code{\linkS4class{MySQLResult}} object.
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
@@ -120,6 +121,7 @@ setMethod("dbClearResult", "MySQLResult", function(res, ...) {
 
 
 #' @rdname query
+#' @param what optional
 #' @export
 setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
   if(!isIdCurrent(dbObj))
@@ -144,6 +146,7 @@ setMethod("dbGetStatement", "MySQLResult",
   valueClass = "character"
 )
 
+#' @param name Table name.
 #' @rdname query
 #' @export
 setMethod("dbListFields",
@@ -161,7 +164,7 @@ setMethod("dbListFields",
 #'
 #' See documentation of generics for more details.
 #'
-#' @param res An object of class \code{\linkS4class{MySQLResult}}
+#' @param res,conn,object An object of class \code{\linkS4class{MySQLResult}}
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' \dontrun{
@@ -225,6 +228,7 @@ setMethod("dbGetException", "MySQLResult", function(conn, ...) {
 })
 
 #' @export
+#' @param verbose If \code{TRUE}, print extra information.
 #' @rdname result-meta
 setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
   if(!isIdCurrent(object)){

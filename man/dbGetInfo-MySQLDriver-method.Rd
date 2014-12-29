@@ -14,11 +14,13 @@
 \S4method{summary}{MySQLDriver}(object, verbose = FALSE, ...)
 }
 \arguments{
+\item{dbObj,object,drv}{Object created by \code{\link{MySQL}}.}
+
 \item{what}{Optional}
 
 \item{...}{Ignored. Needed for compatibility with generic.}
 
-\item{drv}{Object created by \code{\link{MySQL}}.}
+\item{verbose}{If \code{TRUE}, print extra info.}
 }
 \description{
 Get information about a MySQL driver.

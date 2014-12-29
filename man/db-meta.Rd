@@ -23,6 +23,8 @@
 \item{...}{Other arguments for compatibility with generic.}
 
 \item{conn,dbObj,object}{MySQLConnection object.}
+
+\item{verbose}{If \code{TRUE}, add extra info.}
 }
 \description{
 Database interface meta-data

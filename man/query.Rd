@@ -29,6 +29,8 @@
 \S4method{dbListFields}{MySQLResult,missing}(conn, name, ...)
 }
 \arguments{
+\item{res,dbObj}{A  \code{\linkS4class{MySQLResult}} object.}
+
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
 number of rows as defined in \code{\link{MySQL}}}
@@ -40,6 +42,10 @@ number of rows as defined in \code{\link{MySQL}}}
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be
 provided.}
+
+\item{what}{optional}
+
+\item{name}{Table name.}
 }
 \description{
 To retrieve results a chunk at a time, use \code{dbSendQuery},

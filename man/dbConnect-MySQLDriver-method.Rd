@@ -40,13 +40,15 @@ host s assumed.}
 \item{client.flag}{(optional) integer setting various MySQL client flags. See
 the MySQL manual for details.}
 
+\item{groups}{string identifying a section in the \code{default.file} to use
+for setting authentication parameters (see \code{\link{MySQL}}).}
+
 \item{default.file}{string of the filename with MySQL client options.
 Defaults to \code{\$HOME/.my.cnf}}
 
-\item{conn}{an \code{MySQLConnection} object as produced by \code{dbConnect}.}
+\item{...}{Unused, needed for compatibility with generic.}
 
-\item{group}{string identifying a section in the \code{default.file} to use
-for setting authentication parameters (see \code{\link{MySQL}}).}
+\item{conn}{an \code{MySQLConnection} object as produced by \code{dbConnect}.}
 }
 \description{
 These methods are straight-forward implementations of the corresponding

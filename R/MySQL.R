@@ -189,7 +189,7 @@ setMethod("dbDataType", c("MySQLObject", "ANY"), function(dbObj, obj) {
 #' These methods are straight-forward implementations of the corresponding
 #' generic functions.
 #'
-#' @param any MySQL object (e.g., \code{MySQLDriver}).
+#' @param dbObj any MySQL object (e.g., \code{MySQLDriver}).
 #' @param snames a character vector of R/S-Plus
 #'   identifiers (symbols) from which we need to make SQL identifiers.
 #' @param name a character vector of SQL identifiers we want to check against
@@ -206,6 +206,7 @@ setMethod("dbDataType", c("MySQLObject", "ANY"), function(dbObj, obj) {
 #' @param case a character string specifying whether to make the
 #'   comparison as lower case, upper case, or any of the two.  it defaults to
 #'   \code{any}.
+#' @param ... Unused, needed for compatibility with generic.
 #' @export
 #' @examples
 #' \dontrun{

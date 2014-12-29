@@ -21,11 +21,9 @@ NULL
 #'   to use as \code{row.names} in the output data.frame. Defaults to using the
 #'   \code{row_names} column if present. Set to \code{NULL} to never use
 #'   row names.
-#' @name table
-NULL
-
+#' @param ... Unused, needed for compatiblity with generic.
 #' @export
-#' @rdname table
+#' @rdname dbReadTable
 setMethod("dbReadTable", signature(conn="MySQLConnection", name="character"),
   function(conn, name, row.names = "row_names", check.names = TRUE, ...) {
     out <- dbGetQuery(conn, paste("SELECT * from", name))
@@ -64,8 +62,46 @@ setMethod("dbReadTable", signature(conn="MySQLConnection", name="character"),
 ##       row.names=F)  I'm (very) reluctantly adding the code re: row.names,
 ##       because I'm not 100% comfortable using data.frames as the basic
 ##       data for relations.
+#' Write a local data frame or file to the database.
+#'
 #' @export
-#' @rdname table
+#' @rdname dbWriteTable
+#' @param conn a \code{\linkS4class{MySQLConnection}} object, produced by
+#'   \code{\link[DBI]{dbConnect}}
+#' @param name a character string specifying a table name.
+#' @param value a data.frame (or coercible to data.frame) object or a
+#'   file name (character).  In the first case, the data.frame is
+#'   written to a temporary file and then imported to SQLite; when \code{value}
+#'   is a character, it is interpreted as a file name and its contents imported
+#'   to SQLite.
+#' @param row.names A logical specifying whether the \code{row.names} should be
+#'   output to the output DBMS table; if \code{TRUE}, an extra field whose name
+#'   will be whatever the R identifier \code{"row.names"} maps to the DBMS (see
+#'   \code{\link[DBI]{make.db.names}}). If \code{NA} will add rows names if
+#'   they are characters, otherwise will ignore.
+#' @param overwrite a logical specifying whether to overwrite an existing table
+#'   or not. Its default is \code{FALSE}. (See the BUGS section below)
+#' @param append a logical specifying whether to append to an existing table
+#'   in the DBMS.  Its default is \code{FALSE}.
+#' @param field.types character vector of named  SQL field types where
+#'   the names are the names of new table's columns. If missing, types inferred
+#'   with \code{\link[DBI]{dbDataType}}).
+#' @param allow.keywords logical indicating whether column names that happen to
+#'  be MySQL keywords be used as column names in the resulting relation (table)
+#'  being written. Defaults to FALSE, forcing mysqlWriteTable to modify column
+#'  names to make them legal MySQL identifiers.
+#' @param header logical, does the input file have a header line? Default is the
+#'    same heuristic used by \code{read.table}, i.e., \code{TRUE} if the first
+#'    line has one fewer column that the second line.
+#' @param nrows number of lines to rows to import using \code{read.table} from
+#'   the input file to create the proper table definition. Default is 50.
+#' @param sep field separator character
+#' @param eol End-of-line separator
+#' @param skip number of lines to skip before reading data in the input file.
+#' @param quote the quote character used in the input file (defaults to
+#'    \code{\"}.)
+#' @param ... Unused, needs for compatibility with generic.
+#' @export
 setMethod("dbWriteTable",
   signature(conn="MySQLConnection", name="character", value="data.frame"),
   function(conn, name, value, field.types, row.names = TRUE,
@@ -151,7 +187,7 @@ setMethod("dbWriteTable",
 
 ## write table from filename (TODO: connections)
 #' @export
-#' @rdname table
+#' @rdname dbWriteTable
 setMethod("dbWriteTable",
   signature(conn="MySQLConnection", name="character", value="character"),
   function(conn, name, value, field.types = NULL, overwrite = FALSE,
@@ -239,7 +275,7 @@ setMethod("dbWriteTable",
 )
 
 #' @export
-#' @rdname table
+#' @rdname dbReadTable
 setMethod("dbListTables", "MySQLConnection",
   function(conn, ...) {
     tbls <- dbGetQuery(conn, "show tables")
@@ -252,7 +288,7 @@ setMethod("dbListTables", "MySQLConnection",
 )
 
 #' @export
-#' @rdname table
+#' @rdname dbReadTable
 setMethod("dbExistsTable",
   signature(conn="MySQLConnection", name="character"),
   def = function(conn, name, ...){
@@ -265,7 +301,7 @@ setMethod("dbExistsTable",
 )
 
 #' @export
-#' @rdname table
+#' @rdname dbReadTable
 setMethod("dbRemoveTable",
   signature(conn="MySQLConnection", name="character"),
   def = function(conn, name, ...){
@@ -279,7 +315,7 @@ setMethod("dbRemoveTable",
 )
 
 #' @export
-#' @rdname table
+#' @rdname dbReadTable
 setMethod("dbListFields",
   signature(conn="MySQLConnection", name="character"),
   def = function(conn, name, ...){
