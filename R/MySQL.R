@@ -107,6 +107,8 @@ setAs("dbObjectId", "integer",
   def = function(from) as(slot(from,"Id"), "integer")
 )
 
+setGeneric("summary")
+setGeneric("format")
 
 ## formating, showing, printing,...
 setMethod("format", "MySQLObject", function(x, ...) {
