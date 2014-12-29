@@ -20,3 +20,4 @@ src\/RCS
 .travis.yml
 ^windows$
 ^a\.out\.dSYM$
+^NEWS\.md$

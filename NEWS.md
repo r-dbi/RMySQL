@@ -1,9 +1,10 @@
-0.10
- - New maintainer.
- - Internal changes to support static linking on Windows.
- - Assorted fixes accumulated since last release 3 years ago.
+# Version 0.10
 
- -  The following internal functions are no longer exported: please
+ * New maintainer: Jereon Ooms
+
+ *  Internal changes to support static linking on Windows.
+
+ *  The following internal functions are no longer exported: please
     use the corresponding DBI generic instead:
 
     `isIdCurrent`, `mysqlInitDriver`, `mysqlCloseDriver`, `mysqlDescribeDriver`,
@@ -14,13 +15,15 @@
     `mysqlCloseResult`, `mysqlImportFile`, `mysqlReadTable`, `mysqlWriteTable`,
     `mysqlEscapeStrings`, `mysqlDataType`, `safe.write`.
 
- -  RMySQL gains transaction support with `dbBegin()`, `dbCommit()`,
+ *  RMySQL gains transaction support with `dbBegin()`, `dbCommit()`,
     and `dbRollback()`, but note that MySQL does not allow data definition
     language statements to be rolled back.
 
- -  The MySQLObject base class has been removed - there is no real shared
+ *  The MySQLObject base class has been removed - there is no real shared
     behaviour for MySQLDriver, MySQLConnection and MySQLResult so this
     simplifies the code
 
- -  Implement methods for `dbIsValid()`; please use these instead of
+ *  Implement methods for `dbIsValid()`; please use these instead of
     `isIdCurrent()`.
+
+ * Assorted fixes accumulated since last release 3 years ago.
