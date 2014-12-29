@@ -92,8 +92,7 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
     if(!is.null(default.file) && !file.exists(default.file[1]))
       stop(sprintf("mysql default file %s does not exist", default.file))
 
-    drvId <- as(drv, "integer")
-    conId <- .Call(RS_MySQL_newConnection, drvId,
+    conId <- .Call(RS_MySQL_newConnection, drv@Id,
       dbname, username, password, host, unix.socket,
       as.integer(port), as.integer(client.flag),
       groups, default.file[1])
@@ -108,8 +107,7 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
 setMethod("dbConnect", "MySQLConnection",
   function(drv, ...) {
     if (!isIdCurrent(drv)) stop(paste("expired", class(drv)))
-    conId <- as(drv, "integer")
-    newId <- .Call(RS_MySQL_cloneConnection, conId)
+    newId <- .Call(RS_MySQL_cloneConnection, drv@Id)
     new("MySQLConnection", Id = newId)
   }
 )
@@ -128,8 +126,7 @@ setMethod("dbDisconnect", "MySQLConnection",
       else
         stop("connection has pending rows (close open results set first)")
     }
-    conId <- as(conn, "integer")
-    .Call(RS_MySQL_closeConnection, conId)
+    .Call(RS_MySQL_closeConnection, conn@Id)
   }
 )
 
@@ -157,7 +154,7 @@ NULL
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
   if(!isIdCurrent(dbObj))
     stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
-  id <- as(dbObj, "integer")
+  id <- dbObj@Id
   info <- .Call(RS_MySQL_connectionInfo, id)
   rsId <- vector("list", length = length(info$rsId))
   for(i in seq(along = info$rsId))
@@ -213,6 +210,6 @@ setMethod("dbGetException", "MySQLConnection",
   def = function(conn, ...) {
     if(!isIdCurrent(conn))
       stop(paste("expired", class(conn)))
-    .Call(RS_MySQL_getException, as(conn, "integer"))
+    .Call(RS_MySQL_getException, conn@Id)
   }
 )

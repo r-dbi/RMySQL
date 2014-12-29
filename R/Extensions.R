@@ -9,9 +9,8 @@ mysqlEscapeStrings <-
     ## Escapes the given strings
     if(!isIdCurrent(con))
       stop(paste("expired", class(con)))
-    strings <- as(strings, "character")
-    conId <- as(con, "integer");
-    out <- .Call(RS_MySQL_escapeStrings, conId, strings)
+    strings <- as.character(strings)
+    out <- .Call(RS_MySQL_escapeStrings, con@Id, strings)
     names(out) <- names(strings)
     out
   }
@@ -172,7 +171,6 @@ setMethod("dbApply", "MySQLResult",
     group.end <- null.or.fun(FUN)     ## probably this is the most important
     end <- null.or.fun(end)
     new.record <- null.or.fun(new.record)
-    rsId <- as(res, "integer")
     con <- as(res, "MySQLConnection")
     on.exit({
       rc <- dbGetException(con)
@@ -189,7 +187,7 @@ setMethod("dbApply", "MySQLResult",
       group.begin = group.begin,
       group.end = group.end, new.record = new.record)
     out <- .Call(RS_MySQL_dbApply,
-      rs = rsId,
+      rs = res@Id,
       INDEX = as.integer(INDEX-1),
       funs, rho, as.integer(batchSize), as.integer(maxBatch))
     if(!is.null(end) && dbHasCompleted(res))
@@ -248,7 +246,7 @@ setMethod("dbNextResult",
     for(rs in dbListResults(con)){
       dbClearResult(rs)
     }
-    id = .Call(RS_MySQL_nextResultSet, as(con, "integer"))
+    id = .Call(RS_MySQL_nextResultSet, con@Id)
     new("MySQLResult", Id = id)
   }
 )
@@ -266,7 +264,7 @@ setGeneric("dbMoreResults",
 setMethod("dbMoreResults",
   signature(con = "MySQLConnection"),
   def = function(con, ...)
-    .Call(RS_MySQL_moreResultSets, as(con, "integer"))
+    .Call(RS_MySQL_moreResultSets, con@Id)
 )
 
 

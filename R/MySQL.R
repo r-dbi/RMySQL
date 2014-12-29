@@ -84,28 +84,18 @@ setClass("MySQLObject",
 )
 
 ## coercion methods
-setAs("MySQLObject", "integer",
-  def = function(from) as(slot(from,"Id"), "integer")
-)
-setAs("MySQLObject", "numeric",
-  def = function(from) as(slot(from, "Id"), "integer")
-)
-setAs("MySQLObject", "character",
-  def = function(from) as(slot(from, "Id"), "character")
-)
+setAs("MySQLObject", "integer", function(from) from@Id)
 
 #### Temporary compatibility fix for TSMySQL
 setClass("dbObjectId")
-setAs("dbObjectId", "integer",
-  def = function(from) as(slot(from,"Id"), "integer")
-)
+setAs("dbObjectId", "integer", function(from) from@Id)
 
 setGeneric("summary")
 setGeneric("format")
 
 ## formating, showing, printing,...
 setMethod("format", "MySQLObject", function(x, ...) {
-  paste("(", paste(as(x, "integer"), collapse=","), ")", sep="")
+  paste("(", paste(x@Id, collapse=","), ")", sep="")
 })
 
 setMethod("show", "MySQLObject", function(object) {
@@ -134,8 +124,7 @@ setMethod("show", "MySQLObject", function(object) {
 #' isIdCurrent(MySQL())
 #' @useDynLib RMySQL RS_DBI_validHandle
 isIdCurrent <- function(obj)  {
-  obj <- as(obj, "integer")
-  .Call(RS_DBI_validHandle, obj)
+  .Call(RS_DBI_validHandle, obj@Id)
 }
 
 #' Determine the SQL Data Type of an S object

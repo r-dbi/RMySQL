@@ -8,10 +8,10 @@
 setClass("MySQLResult", representation("DBIResult", "MySQLObject"))
 
 setAs("MySQLResult", "MySQLDriver", function(from) {
-  new("MySQLDriver", Id = as(from, "integer")[1:2])
+  new("MySQLDriver", Id = from@Id[1:2])
 })
 setAs("MySQLResult", "MySQLConnection", function(from) {
-  new("MySQLConnection", Id = as(from, "integer")[1:3])
+  new("MySQLConnection", Id = from@Id[1:3])
 })
 
 #' Execute a SQL statement on a database connection.
@@ -51,9 +51,8 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #' @useDynLib RMySQL RS_MySQL_fetch
 setMethod("fetch", signature(res="MySQLResult", n="numeric"),
   def = function(res, n, ...){
-    n <- as(n, "integer")
-    rsId <- as(res, "integer")
-    rel <- .Call(RS_MySQL_fetch, rsId, nrec = n)
+    n <- as.integer(n)
+    rel <- .Call(RS_MySQL_fetch, res@Id, nrec = n)
     if(length(rel)==0 || length(rel[[1]])==0)
       return(data.frame())
     ## create running row index as of previous fetch (if any)
@@ -82,9 +81,7 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
   function(conn, statement) {
     if(!isIdCurrent(conn))
       stop(paste("expired", class(conn)))
-    conId <- as(conn, "integer")
-    statement <- as(statement, "character")
-    rsId <- .Call(RS_MySQL_exec, conId, statement)
+    rsId <- .Call(RS_MySQL_exec, conn@Id, as.character(statement))
     new("MySQLResult", Id = rsId)
   }
 )
@@ -119,8 +116,7 @@ setMethod("dbGetQuery", c("MySQLConnection", "character"),
 setMethod("dbClearResult", "MySQLResult", function(res, ...) {
   if(!isIdCurrent(res))
     return(TRUE)
-  rsId <- as(res, "integer")
-  .Call(RS_MySQL_closeResultSet, rsId)
+  .Call(RS_MySQL_closeResultSet, res@Id)
 })
 
 
@@ -131,8 +127,7 @@ setMethod("dbClearResult", "MySQLResult", function(res, ...) {
 setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
   if(!isIdCurrent(dbObj))
     stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
-  id <- as(dbObj, "integer")
-  info <- .Call(RS_MySQL_resultSetInfo, id)
+  info <- .Call(RS_MySQL_resultSetInfo, dbObj@Id)
   if(!missing(what))
     info[what]
   else
@@ -229,8 +224,7 @@ setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
 #' @rdname result-meta
 #' @useDynLib RMySQL RS_MySQL_getException
 setMethod("dbGetException", "MySQLResult", function(conn, ...) {
-  id <- as(conn, "integer")[1:2]
-  .Call(RS_MySQL_getException, id)
+  .Call(RS_MySQL_getException, conn@Id[1:2])
 })
 
 #' @export

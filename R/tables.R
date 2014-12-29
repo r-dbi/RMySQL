@@ -123,8 +123,8 @@ setMethod("dbWriteTable",
     ## Do we need to coerce any field prior to write it out?
     ## TODO: MySQL 4.1 introduces the boolean data type.
     for(i in seq(along = value)){
-      if(is(value[[i]], "logical"))
-        value[[i]] <- as(value[[i]], "integer")
+      if(is.logical(value[[i]]))
+        value[[i]] <- as.integer(value[[i]])
     }
     i <- match("row.names", names(field.types), nomatch=0)
     if(i>0) ## did we add a row.names value?  If so, it's a text field.

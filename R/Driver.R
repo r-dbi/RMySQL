@@ -58,7 +58,7 @@ MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
 
 ## coerce (extract) any MySQLObject into a MySQLDriver
 setAs("MySQLObject", "MySQLDriver",
-  def = function(from) new("MySQLDriver", Id = as(from, "integer")[1:2])
+  def = function(from) new("MySQLDriver", Id = from@Id[1:2])
 )
 
 #' Unload MySQL driver.
@@ -71,8 +71,7 @@ setAs("MySQLObject", "MySQLDriver",
 setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
   if(!isIdCurrent(drv))
     return(TRUE)
-  drvId <- as(drv, "integer")
-  .Call(RS_MySQL_closeManager, drvId)
+  .Call(RS_MySQL_closeManager, drv@Id)
 })
 
 
@@ -93,7 +92,7 @@ setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
 setMethod("dbGetInfo", "MySQLDriver", function(dbObj, what="", ...) {
   if(!isIdCurrent(dbObj))
     stop(paste("expired", class(dbObj)))
-  drvId <- as(dbObj, "integer")
+  drvId <- dbObj@Id
   info <- .Call(RS_MySQL_managerInfo, drvId)
   ## replace drv/connection id w. actual drv/connection objects
   conObjs <- vector("list", length = info$"num_con")
