@@ -34,7 +34,7 @@
 See documentation of generics for more details.
 }
 \examples{
-\dontrun{
+if (mysqlHasDefault()) {
 con <- dbConnect(RMySQL::MySQL())
 dbWriteTable(con, "t1", datasets::USArrests)
 
@@ -47,6 +47,7 @@ names(info)
 info$fields
 
 dbClearResult(rs)
+dbRemoveTable(con, "t1")
 dbDisconnect(con)
 }
 }

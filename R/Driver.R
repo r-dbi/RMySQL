@@ -28,11 +28,10 @@ setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 #' @useDynLib RMySQL
 #' @rdname MySQLDriver-class
 #' @examples
-#' \dontrun{
+#' if (mysqlHasDefault()) {
 #' # connect to a database and load some data
 #' con <- dbConnect(RMySQL::MySQL())
-#' data(USArrests)
-#' dbWriteTable(con, "USArrests", USArrests)
+#' dbWriteTable(con, "USArrests", datasets::USArrests)
 #'
 #' # query
 #' rs <- dbSendQuery(con, "SELECT * FROM USArrests")
@@ -44,6 +43,7 @@ setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 #' dbListTables(con)
 #'
 #' # clean up
+#' dbRemoveTable(con, "USArrests")
 #' dbDisconnect(con)
 #' }
 MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
@@ -67,9 +67,6 @@ setAs("MySQLObject", "MySQLDriver",
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @return A logical indicating whether the operation succeeded or not.
 #' @export
-#' @examples
-#' db <- RMySQL::MySQL()
-#' dbUnloadDriver(db)
 setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
   if(!isIdCurrent(drv))
     return(TRUE)

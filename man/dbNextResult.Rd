@@ -36,24 +36,23 @@ fetches the next result from the sequence of pending results sets;
 additional results to process.
 }
 \examples{
-\dontrun{
-con <- dbConnect(MySQL(),
-          dbname = "rs-dbi",
-          client.flag=CLIENT_MULTI_STATEMENTS)
-sql.script <- paste(
-   "select * from abc",
-   "select * def",
-   collapse = ";")
+if (mysqlHasDefault()) {
+con <- dbConnect(RMySQL::MySQL(), client.flag = CLIENT_MULTI_STATEMENTS)
+dbWriteTable(con, "mtcars", datasets::mtcars, overwrite = TRUE)
 
-rs1 <- dbSendQuery(con, sql.script)
-data1 <- fetch(rs1, n = -1)
+sql <- "SELECT cyl FROM mtcars LIMIT 5; SELECT vs FROM mtcars LIMIT 5"
+rs1 <- dbSendQuery(con, sql)
+fetch(rs1, n = -1)
 
-if(dbMoreResults(con)){
+if (dbMoreResults(con)) {
    rs2 <- dbNextResult(con)
-   ## you could use dbHasCompleted(rs2) to determine whether
-   ## rs2 is a select-like that generates output or not.
-   data2 <- fetch(rs2, n = -1)
-   }
+   fetch(rs2, n = -1)
+}
+
+dbClearResult(rs1)
+dbClearResult(rs2)
+dbRemoveTable(con, "mtcars")
+dbDisconnect(con)
 }
 }
 

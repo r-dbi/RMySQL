@@ -30,11 +30,14 @@
 Database interface meta-data
 }
 \examples{
-\dontrun{
-con <- dbConnect(RMySQL::MySQL(), group = "wireless")
-dbGetInfo(con)
-dbListResults(con)
-dbListTables(con)
+if (mysqlHasDefault()) {
+  con <- dbConnect(RMySQL::MySQL())
+
+  dbGetInfo(con)
+  dbListResults(con)
+  dbListTables(con)
+
+  dbDisconnect(con)
 }
 }
 

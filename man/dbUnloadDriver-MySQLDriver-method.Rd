@@ -18,8 +18,4 @@ A logical indicating whether the operation succeeded or not.
 \description{
 Unload MySQL driver.
 }
-\examples{
-db <- RMySQL::MySQL()
-dbUnloadDriver(db)
-}
 

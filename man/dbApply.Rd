@@ -72,13 +72,16 @@ idea is that the data from individual groups can be handled by R, but not
 all the groups at the same time.
 }
 \examples{
-\dontrun{
-## compute quanitiles for each network agent
-con <- dbConnect(MySQL(), group="vitalAnalysis")
-res <- dbSendQuery(con,
-             "select Agent, ip_addr, DATA from pseudo_data order by Agent")
-out <- dbApply(res, INDEX = "Agent",
-        FUN = function(x, grp) quantile(x$DATA, names=FALSE))
+if (mysqlHasDefault()) {
+con <- dbConnect(RMySQL::MySQL())
+
+dbWriteTable(con, "mtcars", mtcars)
+res <- dbSendQuery(con, "SELECT * FROM mtcars ORDER BY cyl")
+dbApply(res, "cyl", function(x, grp) quantile(x$mpg, names=FALSE))
+
+dbClearResult(res)
+dbRemoveTable(con, "mtcars")
+dbDisconnect(con)
 }
 }
 

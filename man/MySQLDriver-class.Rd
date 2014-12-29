@@ -31,11 +31,10 @@ This class should always be initialized with the \code{MySQL()} function.
 It returns a singleton that allows you to connect to MySQL.
 }
 \examples{
-\dontrun{
+if (mysqlHasDefault()) {
 # connect to a database and load some data
 con <- dbConnect(RMySQL::MySQL())
-data(USArrests)
-dbWriteTable(con, "USArrests", USArrests)
+dbWriteTable(con, "USArrests", datasets::USArrests)
 
 # query
 rs <- dbSendQuery(con, "SELECT * FROM USArrests")
@@ -47,6 +46,7 @@ dbClearResult(rs)
 dbListTables(con)
 
 # clean up
+dbRemoveTable(con, "USArrests")
 dbDisconnect(con)
 }
 }

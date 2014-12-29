@@ -37,23 +37,41 @@ NULL
 ## The following client flags were copied from mysql_com.h (version 4.1.13)
 ## but it may not make sense to set some of this from RMySQL.
 
+#' @export
 CLIENT_LONG_PASSWORD <-   1    # new more secure passwords
+#' @export
 CLIENT_FOUND_ROWS    <-   2    # Found instead of affected rows
+#' @export
 CLIENT_LONG_FLAG     <-   4    # Get all column flags
+#' @export
 CLIENT_CONNECT_WITH_DB <- 8    # One can specify db on connect
+#' @export
 CLIENT_NO_SCHEMA     <-  16    # Don't allow database.table.column
+#' @export
 CLIENT_COMPRESS      <-  32    # Can use compression protocol
+#' @export
 CLIENT_ODBC          <-  64    # Odbc client
+#' @export
 CLIENT_LOCAL_FILES   <- 128    # Can use LOAD DATA LOCAL
+#' @export
 CLIENT_IGNORE_SPACE  <- 256    # Ignore spaces before '('
+#' @export
 CLIENT_PROTOCOL_41   <- 512    # New 4.1 protocol
+#' @export
 CLIENT_INTERACTIVE   <- 1024   # This is an interactive client
+#' @export
 CLIENT_SSL           <- 2048   # Switch to SSL after handshake
+#' @export
 CLIENT_IGNORE_SIGPIPE <- 4096  # IGNORE sigpipes
+#' @export
 CLIENT_TRANSACTIONS <- 8192    # Client knows about transactions
+#' @export
 CLIENT_RESERVED     <- 16384   # Old flag for 4.1 protocol
+#' @export
 CLIENT_SECURE_CONNECTION <- 32768 # New 4.1 authentication
+#' @export
 CLIENT_MULTI_STATEMENTS  <- 65536 # Enable/disable multi-stmt support
+#' @export
 CLIENT_MULTI_RESULTS     <- 131072 # Enable/disable multi-results
 
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
@@ -80,11 +98,6 @@ setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 #' the base directory of this package or
 #' \url{http://developer.r-project.org/db}.
 #' @keywords database interface classes
-#' @examples
-#' \dontrun{
-#' drv <- dbDriver("MySQL")
-#' con <- dbConnect(drv, dbname = "rsdbi.db")
-#' }
 setClass("MySQLObject",
   contains = c("DBIObject", "VIRTUAL"),
   slots = list(Id = "integer")
@@ -139,11 +152,9 @@ setMethod("show", "MySQLObject", function(object) {
 #' @seealso \code{\link[DBI]{dbDriver}} \code{\link[DBI]{dbConnect}}
 #' \code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
 #' @keywords interface database
+#' @export
 #' @examples
-#' \dontrun{
-#' cursor <- dbSendQuery(con, sql.statement)
-#' isIdCurrent(cursor)
-#' }
+#' isIdCurrent(MySQL())
 isIdCurrent <- function(obj)  {
   obj <- as(obj, "integer")
   .Call("RS_DBI_validHandle", obj, PACKAGE = .MySQLPkgName)
@@ -208,19 +219,6 @@ setMethod("dbDataType", c("MySQLObject", "ANY"), function(dbObj, obj) {
 #'   \code{any}.
 #' @param ... Unused, needed for compatibility with generic.
 #' @export
-#' @examples
-#' \dontrun{
-#' # This example shows how we could export a bunch of data.frames
-#' # into tables on a remote database.
-#'
-#' con <- dbConnect("MySQL", "user", "password")
-#'
-#' export <- c("trantime.email", "trantime.print", "round.trip.time.email")
-#' tabs <- make.db.names(export, unique = T, allow.keywords = T)
-#'
-#' for(i in seq(along = export) )
-#'    dbWriteTable(con, name = tabs[i],  get(export[i]))
-#' }
 setMethod("make.db.names",
    signature(dbObj="MySQLObject", snames = "character"),
    def = function(dbObj, snames, keywords = .MySQLKeywords,

@@ -54,9 +54,9 @@ results (and they'll fit in memory) use \code{dbGetQuery} which sends,
 fetches and clears for you.
 }
 \examples{
-\dontrun{
+if (mysqlHasDefault()) {
 con <- dbConnect(RMySQL::MySQL())
-dbWriteTable(con, "arrests", datasets::USArrests)
+dbWriteTable(con, "arrests", datasets::USArrests, overwrite = TRUE)
 
 # Run query to get results as dataframe
 dbGetQuery(con, "SELECT * FROM arrests limit 3")
@@ -69,7 +69,7 @@ dbHasCompleted(res)
 
 dbListResults(con)
 dbClearResult(res)
-
+dbRemoveTable(con, "arrests")
 dbDisconnect(con)
 }
 }

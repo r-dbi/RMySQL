@@ -12,12 +12,6 @@ Base class for all MySQL-specific DBI classes
  A virtual Class: No objects may be created
 from it.
 }
-\examples{
-\dontrun{
-drv <- dbDriver("MySQL")
-con <- dbConnect(drv, dbname = "rsdbi.db")
-}
-}
 \references{
 See the Database Interface definition document \code{DBI.pdf} in
 the base directory of this package or

@@ -25,10 +25,7 @@ minimal verification to ensure that the foreign object being referenced can
 be contacted.
 }
 \examples{
-\dontrun{
-cursor <- dbSendQuery(con, sql.statement)
-isIdCurrent(cursor)
-}
+isIdCurrent(MySQL())
 }
 \seealso{
 \code{\link[DBI]{dbDriver}} \code{\link[DBI]{dbConnect}}

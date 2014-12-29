@@ -29,9 +29,9 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #' @param ... Unused. Needed for compatibility with generic.
 #' @export
 #' @examples
-#' \dontrun{
+#' if (mysqlHasDefault()) {
 #' con <- dbConnect(RMySQL::MySQL())
-#' dbWriteTable(con, "arrests", datasets::USArrests)
+#' dbWriteTable(con, "arrests", datasets::USArrests, overwrite = TRUE)
 #'
 #' # Run query to get results as dataframe
 #' dbGetQuery(con, "SELECT * FROM arrests limit 3")
@@ -44,7 +44,7 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #'
 #' dbListResults(con)
 #' dbClearResult(res)
-#'
+#' dbRemoveTable(con, "arrests")
 #' dbDisconnect(con)
 #' }
 #' @rdname query
@@ -168,7 +168,7 @@ setMethod("dbListFields",
 #' @param res,conn,object An object of class \code{\linkS4class{MySQLResult}}
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
-#' \dontrun{
+#' if (mysqlHasDefault()) {
 #' con <- dbConnect(RMySQL::MySQL())
 #' dbWriteTable(con, "t1", datasets::USArrests)
 #'
@@ -181,6 +181,7 @@ setMethod("dbListFields",
 #' info$fields
 #'
 #' dbClearResult(rs)
+#' dbRemoveTable(con, "t1")
 #' dbDisconnect(con)
 #' }
 #' @name result-meta
