@@ -28,11 +28,10 @@ setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 #' @useDynLib RMySQL
 #' @rdname MySQLDriver-class
 #' @examples
-#' \dontrun{
+#' if (mysqlHasDefault()) {
 #' # connect to a database and load some data
 #' con <- dbConnect(RMySQL::MySQL())
-#' data(USArrests)
-#' dbWriteTable(con, "USArrests", USArrests)
+#' dbWriteTable(con, "USArrests", datasets::USArrests)
 #'
 #' # query
 #' rs <- dbSendQuery(con, "SELECT * FROM USArrests")
@@ -44,15 +43,16 @@ setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 #' dbListTables(con)
 #'
 #' # clean up
+#' dbRemoveTable(con, "USArrests")
 #' dbDisconnect(con)
 #' }
+#' @useDynLib RMySQL RS_MySQL_init
 MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
   if(fetch.default.rec<=0)
     stop("default num of records per fetch must be positive")
   config.params <- as(c(max.con, fetch.default.rec), "integer")
   force <- as.logical(force.reload)
-  drvId <- .Call("RS_MySQL_init", config.params, force,
-    PACKAGE = .MySQLPkgName)
+  drvId <- .Call(RS_MySQL_init, config.params, force)
   new("MySQLDriver", Id = drvId)
 }
 
@@ -67,14 +67,12 @@ setAs("MySQLObject", "MySQLDriver",
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @return A logical indicating whether the operation succeeded or not.
 #' @export
-#' @examples
-#' db <- RMySQL::MySQL()
-#' dbUnloadDriver(db)
+#' @useDynLib RMySQL RS_MySQL_closeManager
 setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
   if(!isIdCurrent(drv))
     return(TRUE)
   drvId <- as(drv, "integer")
-  .Call("RS_MySQL_closeManager", drvId, PACKAGE = .MySQLPkgName)
+  .Call(RS_MySQL_closeManager, drvId)
 })
 
 
@@ -91,11 +89,12 @@ setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
 #' dbGetInfo(db)
 #' dbListConnections(db)
 #' summary(db)
+#' @useDynLib RMySQL RS_MySQL_managerInfo
 setMethod("dbGetInfo", "MySQLDriver", function(dbObj, what="", ...) {
   if(!isIdCurrent(dbObj))
     stop(paste("expired", class(dbObj)))
   drvId <- as(dbObj, "integer")
-  info <- .Call("RS_MySQL_managerInfo", drvId, PACKAGE = .MySQLPkgName)
+  info <- .Call(RS_MySQL_managerInfo, drvId)
   ## replace drv/connection id w. actual drv/connection objects
   conObjs <- vector("list", length = info$"num_con")
   ids <- info$connectionIds

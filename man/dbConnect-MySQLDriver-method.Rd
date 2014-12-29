@@ -19,19 +19,16 @@
 \item{drv}{an object of class \code{MySQLDriver}, or the character string
 "MySQL" or an \code{MySQLConnection}.}
 
-\item{dbname}{string with the database name or NULL. If NOT NULL, the
-connection sets the default da abaseto this value.}
+\item{dbname}{string with the database name or NULL. If not NULL, the
+connection sets the default daabase to this value.}
 
-\item{username}{string of the MySQL login name or NULL. If NULL or the empty
-string \code{""}, the current user is assumed.}
-
-\item{password}{string with the MySQL password or NULL. If NULL, only entries
-in the user table for the users that have a blank (empty) password field
-are hecked for a match.}
+\item{username,password}{Username and password. If username omitted,
+defaults to the current user. If password is ommitted, only users
+without a password can log in.}
 
 \item{host}{string identifying the host machine running the MySQL server or
 NULL. If NULL or the string \code{"localhost"}, a connection to the local
-host s assumed.}
+host is assumed.}
 
 \item{unix.socket}{(optional) string of the unix socket or named pipe.}
 
@@ -56,21 +53,25 @@ generic functions.
 }
 \examples{
 \dontrun{
-# create an MySQL instance and create one connection.
-drv <- dbDriver(RMySQL::MySQL())
+# Connect to a MySQL database running locally
+con <- dbConnect(RMySQL::MySQL(), dbname = "mydb")
+# Connect to a remote database with username and password
+con <- dbConnect(RMySQL::MySQL(), host = "mydb.mycompany.com",
+  user = "abc", password = "def")
+# But instead of supplying the username and password in code, it's usually
+# better to set up a group in your .my.cnf (usually located in your home
+directory). Then it's less likely you'll inadvertently share them.
+con <- dbConnect(RMySQL::MySQL(), group = "test")
 
-# open the connection using user, passsword, etc., as
-con <- dbConnect(drv, group = "rs-dbi")
+# Always cleanup by disconnecting the database
+dbDisconnect(con)
+}
 
-# Run an SQL statement by creating first a resultSet object
-rs <- dbSendQuery(con, statement = paste(
-                      "SELECT w.laser_id, w.wavelength, p.cut_off",
-                      "FROM WL w, PURGE P",
-                      "WHERE w.laser_id = p.laser_id",
-                      "SORT BY w.laser_id")
-# we now fetch records from the resultSet into a data.frame
-data <- fetch(rs, n = -1)   # extract all rows
-dim(data)
+# All examples use the rs-dbi group by default.
+if (mysqlHasDefault()) {
+  con <- dbConnect(RMySQL::MySQL())
+  summary(con)
+  dbDisconnect(con)
 }
 }
 

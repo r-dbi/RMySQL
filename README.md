@@ -19,3 +19,22 @@ The development version from github:
 # install.packages("devtools")
 devtools::install_github("rstats-db/RMySQL")
 ```
+
+## MySQL configuration file
+
+Instead of specifying a username and password in calls to `dbConnect()`, it's better to set up a MySQL configuration file that names the databases that you connect to most commonly. This file should live in `~/.my.cnf` and look like:
+
+```
+[database_name]
+option1=value1
+option2=value2
+```
+
+If you want to be able to run the examples, you'll need to set up a database called `rs-dbi`. For a default single user install of MySQL, the following code should work:
+
+```
+[rs-dbi]
+database=test
+username=root
+password=
+```

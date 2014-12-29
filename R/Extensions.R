@@ -2,6 +2,7 @@
 NULL
 
 ## the following code was kindly provided ny J. T. Lindgren.
+#' @useDynLib RMySQL RS_MySQL_escapeStrings
 mysqlEscapeStrings <-
   function(con, strings)
   {
@@ -10,8 +11,7 @@ mysqlEscapeStrings <-
       stop(paste("expired", class(con)))
     strings <- as(strings, "character")
     conId <- as(con, "integer");
-    out <- .Call("RS_MySQL_escapeStrings", conId, strings,
-      PACKAGE = .MySQLPkgName)
+    out <- .Call(RS_MySQL_escapeStrings, conId, strings)
     names(out) <- names(strings)
     out
   }
@@ -24,10 +24,13 @@ mysqlEscapeStrings <-
 #' @return A character vector with SQL special characters properly escaped.
 #' @export
 #' @examples
-#' \dontrun{
-#' tmp <- sprintf("select * from emp where lname = %s", "O'Reilly")
-#' sql <- dbEscapeString(con, tmp)
-#' dbGetQuery(con, sql)
+#' if (mysqlHasDefault()) {
+#' con <- dbConnect(RMySQL::MySQL())
+#'
+#' tmp <- sprintf("SELECT * FROM emp WHERE lname = %s", "O'Reilly")
+#' dbEscapeStrings(con, tmp)
+#'
+#' dbDisconnect(con)
 #' }
 setGeneric("dbEscapeStrings", function(con, strings, ...) {
   standardGeneric("dbEscapeStrings")
@@ -103,14 +106,18 @@ setGeneric("dbApply", function(res, ...) {
 #' @export
 #' @rdname dbApply
 #' @examples
-#' \dontrun{
-#' ## compute quanitiles for each network agent
-#' con <- dbConnect(MySQL(), group="vitalAnalysis")
-#' res <- dbSendQuery(con,
-#'              "select Agent, ip_addr, DATA from pseudo_data order by Agent")
-#' out <- dbApply(res, INDEX = "Agent",
-#'         FUN = function(x, grp) quantile(x$DATA, names=FALSE))
+#' if (mysqlHasDefault()) {
+#' con <- dbConnect(RMySQL::MySQL())
+#'
+#' dbWriteTable(con, "mtcars", mtcars)
+#' res <- dbSendQuery(con, "SELECT * FROM mtcars ORDER BY cyl")
+#' dbApply(res, "cyl", function(x, grp) quantile(x$mpg, names=FALSE))
+#'
+#' dbClearResult(res)
+#' dbRemoveTable(con, "mtcars")
+#' dbDisconnect(con)
 #' }
+#' @useDynLib RMySQL RS_MySQL_dbApply
 setMethod("dbApply", "MySQLResult",
   function(res, INDEX, FUN = stop("must specify FUN"),
     begin = NULL,
@@ -181,11 +188,10 @@ setMethod("dbApply", "MySQLResult",
     funs <- list(begin = begin, end = end,
       group.begin = group.begin,
       group.end = group.end, new.record = new.record)
-    out <- .Call("RS_MySQL_dbApply",
+    out <- .Call(RS_MySQL_dbApply,
       rs = rsId,
       INDEX = as.integer(INDEX-1),
-      funs, rho, as.integer(batchSize), as.integer(maxBatch),
-      PACKAGE = .MySQLPkgName)
+      funs, rho, as.integer(batchSize), as.integer(maxBatch))
     if(!is.null(end) && dbHasCompleted(res))
       end()
     out
@@ -210,24 +216,23 @@ setMethod("dbApply", "MySQLResult",
 #'   additional result sets to process in the connection.
 #' @export
 #' @examples
-#' \dontrun{
-#' con <- dbConnect(MySQL(),
-#'           dbname = "rs-dbi",
-#'           client.flag=CLIENT_MULTI_STATEMENTS)
-#' sql.script <- paste(
-#'    "select * from abc",
-#'    "select * def",
-#'    collapse = ";")
+#' if (mysqlHasDefault()) {
+#' con <- dbConnect(RMySQL::MySQL(), client.flag = CLIENT_MULTI_STATEMENTS)
+#' dbWriteTable(con, "mtcars", datasets::mtcars, overwrite = TRUE)
 #'
-#' rs1 <- dbSendQuery(con, sql.script)
-#' data1 <- fetch(rs1, n = -1)
+#' sql <- "SELECT cyl FROM mtcars LIMIT 5; SELECT vs FROM mtcars LIMIT 5"
+#' rs1 <- dbSendQuery(con, sql)
+#' fetch(rs1, n = -1)
 #'
-#' if(dbMoreResults(con)){
+#' if (dbMoreResults(con)) {
 #'    rs2 <- dbNextResult(con)
-#'    ## you could use dbHasCompleted(rs2) to determine whether
-#'    ## rs2 is a select-like that generates output or not.
-#'    data2 <- fetch(rs2, n = -1)
-#'    }
+#'    fetch(rs2, n = -1)
+#' }
+#'
+#' dbClearResult(rs1)
+#' dbClearResult(rs2)
+#' dbRemoveTable(con, "mtcars")
+#' dbDisconnect(con)
 #' }
 setGeneric("dbNextResult",
   def = function(con, ...) standardGeneric("dbNextResult")
@@ -236,14 +241,14 @@ setGeneric("dbNextResult",
 
 #' @export
 #' @rdname dbNextResult
+#' @useDynLib RMySQL RS_MySQL_nextResultSet
 setMethod("dbNextResult",
   signature(con = "MySQLConnection"),
   def = function(con, ...){
     for(rs in dbListResults(con)){
       dbClearResult(rs)
     }
-    id = .Call("RS_MySQL_nextResultSet", as(con, "integer"),
-      PACKAGE=.MySQLPkgName)
+    id = .Call(RS_MySQL_nextResultSet, as(con, "integer"))
     new("MySQLResult", Id = id)
   }
 )
@@ -257,11 +262,11 @@ setGeneric("dbMoreResults",
 
 #' @export
 #' @rdname dbNextResult
+#' @useDynLib RMySQL RS_MySQL_moreResultSets
 setMethod("dbMoreResults",
   signature(con = "MySQLConnection"),
   def = function(con, ...)
-    .Call("RS_MySQL_moreResultSets", as(con, "integer"),
-      PACKAGE=.MySQLPkgName)
+    .Call(RS_MySQL_moreResultSets, as(con, "integer"))
 )
 
 
@@ -366,8 +371,9 @@ safe.write <- function(value, file, batch, ...) {
 #' @export
 #' @examples
 #' mysqlClientLibraryVersions()
+#' @useDynLib RMySQL RS_MySQL_clientLibraryVersions
 mysqlClientLibraryVersions <- function() {
-  .Call("RS_MySQL_clientLibraryVersions", PACKAGE=.MySQLPkgName)
+  .Call(RS_MySQL_clientLibraryVersions)
 }
 
 ## the following reserved words were taken from Section 6.1.7

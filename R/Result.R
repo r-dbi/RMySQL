@@ -29,9 +29,9 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #' @param ... Unused. Needed for compatibility with generic.
 #' @export
 #' @examples
-#' \dontrun{
+#' if (mysqlHasDefault()) {
 #' con <- dbConnect(RMySQL::MySQL())
-#' dbWriteTable(con, "arrests", datasets::USArrests)
+#' dbWriteTable(con, "arrests", datasets::USArrests, overwrite = TRUE)
 #'
 #' # Run query to get results as dataframe
 #' dbGetQuery(con, "SELECT * FROM arrests limit 3")
@@ -44,15 +44,16 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #'
 #' dbListResults(con)
 #' dbClearResult(res)
-#'
+#' dbRemoveTable(con, "arrests")
 #' dbDisconnect(con)
 #' }
 #' @rdname query
+#' @useDynLib RMySQL RS_MySQL_fetch
 setMethod("fetch", signature(res="MySQLResult", n="numeric"),
   def = function(res, n, ...){
     n <- as(n, "integer")
     rsId <- as(res, "integer")
-    rel <- .Call("RS_MySQL_fetch", rsId, nrec = n, PACKAGE = .MySQLPkgName)
+    rel <- .Call(RS_MySQL_fetch, rsId, nrec = n)
     if(length(rel)==0 || length(rel[[1]])==0)
       return(data.frame())
     ## create running row index as of previous fetch (if any)
@@ -61,6 +62,7 @@ setMethod("fetch", signature(res="MySQLResult", n="numeric"),
     indx <- seq(from = cnt - nrec + 1, length = nrec)
     attr(rel, "row.names") <- as.integer(indx)
     class(rel) <- "data.frame"
+    rel
   }
 )
 
@@ -75,13 +77,14 @@ setMethod("fetch", c("MySQLResult", "missing"), function(res, n, ...) {
 
 #' @rdname query
 #' @export
+#' @useDynLib RMySQL RS_MySQL_exec
 setMethod("dbSendQuery", c("MySQLConnection", "character"),
   function(conn, statement) {
     if(!isIdCurrent(conn))
       stop(paste("expired", class(conn)))
     conId <- as(conn, "integer")
     statement <- as(statement, "character")
-    rsId <- .Call("RS_MySQL_exec", conId, statement, PACKAGE = .MySQLPkgName)
+    rsId <- .Call(RS_MySQL_exec, conId, statement)
     new("MySQLResult", Id = rsId)
   }
 )
@@ -112,22 +115,24 @@ setMethod("dbGetQuery", c("MySQLConnection", "character"),
 
 #' @rdname query
 #' @export
+#' @useDynLib RMySQL RS_MySQL_closeResultSet
 setMethod("dbClearResult", "MySQLResult", function(res, ...) {
   if(!isIdCurrent(res))
     return(TRUE)
   rsId <- as(res, "integer")
-  .Call("RS_MySQL_closeResultSet", rsId, PACKAGE = .MySQLPkgName)
+  .Call(RS_MySQL_closeResultSet, rsId)
 })
 
 
 #' @rdname query
 #' @param what optional
 #' @export
+#' @useDynLib RMySQL RS_MySQL_resultSetInfo
 setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
   if(!isIdCurrent(dbObj))
     stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
   id <- as(dbObj, "integer")
-  info <- .Call("RS_MySQL_resultSetInfo", id, PACKAGE = .MySQLPkgName)
+  info <- .Call(RS_MySQL_resultSetInfo, id)
   if(!missing(what))
     info[what]
   else
@@ -167,7 +172,7 @@ setMethod("dbListFields",
 #' @param res,conn,object An object of class \code{\linkS4class{MySQLResult}}
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
-#' \dontrun{
+#' if (mysqlHasDefault()) {
 #' con <- dbConnect(RMySQL::MySQL())
 #' dbWriteTable(con, "t1", datasets::USArrests)
 #'
@@ -180,6 +185,7 @@ setMethod("dbListFields",
 #' info$fields
 #'
 #' dbClearResult(rs)
+#' dbRemoveTable(con, "t1")
 #' dbDisconnect(con)
 #' }
 #' @name result-meta
@@ -187,13 +193,12 @@ NULL
 
 #' @export
 #' @rdname result-meta
+#' @useDynLib RMySQL RS_DBI_SclassNames RS_MySQL_typeNames
 setMethod("dbColumnInfo", "MySQLResult", function(res, ...) {
   flds <- dbGetInfo(res, "fieldDescription")[[1]][[1]]
   if(!is.null(flds)){
-    flds$Sclass <- .Call("RS_DBI_SclassNames", flds$Sclass,
-      PACKAGE = .MySQLPkgName)
-    flds$type <- .Call("RS_MySQL_typeNames", as.integer(flds$type),
-      PACKAGE = .MySQLPkgName)
+    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
+    flds$type <- .Call(RS_MySQL_typeNames, as.integer(flds$type))
     ## no factors
     structure(flds, row.names = paste(seq(along=flds$type)),
       class = "data.frame")
@@ -222,9 +227,10 @@ setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
 
 #' @export
 #' @rdname result-meta
+#' @useDynLib RMySQL RS_MySQL_getException
 setMethod("dbGetException", "MySQLResult", function(conn, ...) {
   id <- as(conn, "integer")[1:2]
-  .Call("RS_MySQL_getException", id, PACKAGE = .MySQLPkgName)
+  .Call(RS_MySQL_getException, id)
 })
 
 #' @export
@@ -247,3 +253,13 @@ setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
   }
   invisible(NULL)
 })
+
+.clearResultSets <- function(con){
+  ## are there resultSets pending on con?
+  rsList <- dbListResults(con)
+  if(length(rsList)>0){
+    warning("There are pending result sets. Removing.",call.=FALSE)
+    lapply(rsList,dbClearResult) ## clear all pending results
+  }
+  NULL
+}

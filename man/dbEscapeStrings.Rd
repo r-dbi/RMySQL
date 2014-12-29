@@ -27,10 +27,13 @@ A character vector with SQL special characters properly escaped.
 Escape SQL-special characters in strings.
 }
 \examples{
-\dontrun{
-tmp <- sprintf("select * from emp where lname = \%s", "O'Reilly")
-sql <- dbEscapeString(con, tmp)
-dbGetQuery(con, sql)
+if (mysqlHasDefault()) {
+con <- dbConnect(RMySQL::MySQL())
+
+tmp <- sprintf("SELECT * FROM emp WHERE lname = \%s", "O'Reilly")
+dbEscapeStrings(con, tmp)
+
+dbDisconnect(con)
 }
 }
 

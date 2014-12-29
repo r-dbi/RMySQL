@@ -25,35 +25,50 @@
 #' @section Constants: \code{.MySQLPkgName} (currently \code{"RMySQL"}),
 #' \code{.MySQLPkgVersion} (the R package version), \code{.MySQLPkgRCS} (the
 #' RCS revision), \code{.MySQL.NA.string} (character that MySQL uses to denote
-#' \code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!) %\non_function{}
-#' @keywords datasets interface database
+#' \code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!)
 #' @name constants
 NULL
 
-.MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
-.MySQLVersion <- "0.5-12"      ##package.description(.MySQLPkgName, fields = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
 ## The following client flags were copied from mysql_com.h (version 4.1.13)
 ## but it may not make sense to set some of this from RMySQL.
 
+#' @export
 CLIENT_LONG_PASSWORD <-   1    # new more secure passwords
+#' @export
 CLIENT_FOUND_ROWS    <-   2    # Found instead of affected rows
+#' @export
 CLIENT_LONG_FLAG     <-   4    # Get all column flags
+#' @export
 CLIENT_CONNECT_WITH_DB <- 8    # One can specify db on connect
+#' @export
 CLIENT_NO_SCHEMA     <-  16    # Don't allow database.table.column
+#' @export
 CLIENT_COMPRESS      <-  32    # Can use compression protocol
+#' @export
 CLIENT_ODBC          <-  64    # Odbc client
+#' @export
 CLIENT_LOCAL_FILES   <- 128    # Can use LOAD DATA LOCAL
+#' @export
 CLIENT_IGNORE_SPACE  <- 256    # Ignore spaces before '('
+#' @export
 CLIENT_PROTOCOL_41   <- 512    # New 4.1 protocol
+#' @export
 CLIENT_INTERACTIVE   <- 1024   # This is an interactive client
+#' @export
 CLIENT_SSL           <- 2048   # Switch to SSL after handshake
+#' @export
 CLIENT_IGNORE_SIGPIPE <- 4096  # IGNORE sigpipes
+#' @export
 CLIENT_TRANSACTIONS <- 8192    # Client knows about transactions
+#' @export
 CLIENT_RESERVED     <- 16384   # Old flag for 4.1 protocol
+#' @export
 CLIENT_SECURE_CONNECTION <- 32768 # New 4.1 authentication
+#' @export
 CLIENT_MULTI_STATEMENTS  <- 65536 # Enable/disable multi-stmt support
+#' @export
 CLIENT_MULTI_RESULTS     <- 131072 # Enable/disable multi-results
 
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
@@ -62,29 +77,7 @@ setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 #'
 #' Base class for all MySQL-specific DBI classes
 #'
-#' @name MySQLObject-class
-#' @aliases MySQLObject-class dbObjectId-class
-#' @docType class
-#' @section Objects from the Class: A virtual Class: No objects may be created
-#' from it.
-#' @seealso DBI base classes:
-#'
-#' \code{\link[DBI]{DBIObject-class}} \code{\link[DBI]{DBIDriver-class}}
-#' \code{\link[DBI]{DBIConnection-class}} \code{\link[DBI]{DBIResult-class}}
-#'
-#' MySQL classes:
-#'
-#' \code{\link{MySQLObject-class}} \code{\link{MySQLDriver-class}}
-#' \code{\link{MySQLConnection-class}} \code{\link{MySQLResult-class}}
-#' @references See the Database Interface definition document \code{DBI.pdf} in
-#' the base directory of this package or
-#' \url{http://developer.r-project.org/db}.
-#' @keywords database interface classes
-#' @examples
-#' \dontrun{
-#' drv <- dbDriver("MySQL")
-#' con <- dbConnect(drv, dbname = "rsdbi.db")
-#' }
+#' @export
 setClass("MySQLObject",
   contains = c("DBIObject", "VIRTUAL"),
   slots = list(Id = "integer")
@@ -136,17 +129,13 @@ setMethod("show", "MySQLObject", function(object) {
 #' @param obj any \code{dbObject} (e.g., \code{dbDriver}, \code{dbConnection},
 #' \code{dbResult}).
 #' @return a logical scalar.
-#' @seealso \code{\link[DBI]{dbDriver}} \code{\link[DBI]{dbConnect}}
-#' \code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
-#' @keywords interface database
+#' @export
 #' @examples
-#' \dontrun{
-#' cursor <- dbSendQuery(con, sql.statement)
-#' isIdCurrent(cursor)
-#' }
+#' isIdCurrent(MySQL())
+#' @useDynLib RMySQL RS_DBI_validHandle
 isIdCurrent <- function(obj)  {
   obj <- as(obj, "integer")
-  .Call("RS_DBI_validHandle", obj, PACKAGE = .MySQLPkgName)
+  .Call(RS_DBI_validHandle, obj)
 }
 
 #' Determine the SQL Data Type of an S object
@@ -158,11 +147,6 @@ isIdCurrent <- function(obj)  {
 #' \code{MySQLConnection}, \code{MySQLResult}.
 #' @param obj R/S-Plus object whose SQL type we want to determine.
 #' @param \dots any other parameters that individual methods may need.
-#' @seealso \code{\link[DBI]{isSQLKeyword}} \code{\link[DBI]{make.db.names}}
-#' @references See the Database Interface definition document \code{DBI.pdf} in
-#' the base directory of this package or
-#' \url{http://stat.bell-labs.com/RS-DBI}.
-#' @keywords methods interface database
 #' @export
 #' @examples
 #' dbDataType(RMySQL::MySQL(), "a")
@@ -208,19 +192,6 @@ setMethod("dbDataType", c("MySQLObject", "ANY"), function(dbObj, obj) {
 #'   \code{any}.
 #' @param ... Unused, needed for compatibility with generic.
 #' @export
-#' @examples
-#' \dontrun{
-#' # This example shows how we could export a bunch of data.frames
-#' # into tables on a remote database.
-#'
-#' con <- dbConnect("MySQL", "user", "password")
-#'
-#' export <- c("trantime.email", "trantime.print", "round.trip.time.email")
-#' tabs <- make.db.names(export, unique = T, allow.keywords = T)
-#'
-#' for(i in seq(along = export) )
-#'    dbWriteTable(con, name = tabs[i],  get(export[i]))
-#' }
 setMethod("make.db.names",
    signature(dbObj="MySQLObject", snames = "character"),
    def = function(dbObj, snames, keywords = .MySQLKeywords,

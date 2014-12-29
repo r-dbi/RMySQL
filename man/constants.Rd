@@ -33,9 +33,6 @@ Constants
  \code{.MySQLPkgName} (currently \code{"RMySQL"}),
 \code{.MySQLPkgVersion} (the R package version), \code{.MySQLPkgRCS} (the
 RCS revision), \code{.MySQL.NA.string} (character that MySQL uses to denote
-\code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!) %\non_function{}
+\code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!)
 }
-\keyword{database}
-\keyword{datasets}
-\keyword{interface}
 

@@ -18,16 +18,14 @@ setClass("MySQLConnection", representation("DBIConnection", "MySQLObject"))
 #' @param drv an object of class \code{MySQLDriver}, or the character string
 #'   "MySQL" or an \code{MySQLConnection}.
 #' @param conn an \code{MySQLConnection} object as produced by \code{dbConnect}.
-#' @param username string of the MySQL login name or NULL. If NULL or the empty
-#'   string \code{""}, the current user is assumed.
-#' @param password string with the MySQL password or NULL. If NULL, only entries
-#'   in the user table for the users that have a blank (empty) password field
-#'   are hecked for a match.
-#' @param dbname string with the database name or NULL. If NOT NULL, the
-#'   connection sets the default da abaseto this value.
+#' @param username,password Username and password. If username omitted,
+#'   defaults to the current user. If password is ommitted, only users
+#'   without a password can log in.
+#' @param dbname string with the database name or NULL. If not NULL, the
+#'   connection sets the default daabase to this value.
 #' @param host string identifying the host machine running the MySQL server or
 #'   NULL. If NULL or the string \code{"localhost"}, a connection to the local
-#'   host s assumed.
+#'   host is assumed.
 #' @param unix.socket (optional) string of the unix socket or named pipe.
 #' @param port (optional) integer of the TCP/IP default port.
 #' @param client.flag (optional) integer setting various MySQL client flags. See
@@ -40,23 +38,28 @@ setClass("MySQLConnection", representation("DBIConnection", "MySQLObject"))
 #' @export
 #' @examples
 #' \dontrun{
-#' # create an MySQL instance and create one connection.
-#' drv <- dbDriver(RMySQL::MySQL())
+#' # Connect to a MySQL database running locally
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "mydb")
+#' # Connect to a remote database with username and password
+#' con <- dbConnect(RMySQL::MySQL(), host = "mydb.mycompany.com",
+#'   user = "abc", password = "def")
+#' # But instead of supplying the username and password in code, it's usually
+#' # better to set up a group in your .my.cnf (usually located in your home
+#' directory). Then it's less likely you'll inadvertently share them.
+#' con <- dbConnect(RMySQL::MySQL(), group = "test")
 #'
-#' # open the connection using user, passsword, etc., as
-#' con <- dbConnect(drv, group = "rs-dbi")
+#' # Always cleanup by disconnecting the database
+#' dbDisconnect(con)
+#' }
 #'
-#' # Run an SQL statement by creating first a resultSet object
-#' rs <- dbSendQuery(con, statement = paste(
-#'                       "SELECT w.laser_id, w.wavelength, p.cut_off",
-#'                       "FROM WL w, PURGE P",
-#'                       "WHERE w.laser_id = p.laser_id",
-#'                       "SORT BY w.laser_id")
-#' # we now fetch records from the resultSet into a data.frame
-#' data <- fetch(rs, n = -1)   # extract all rows
-#' dim(data)
+#' # All examples use the rs-dbi group by default.
+#' if (mysqlHasDefault()) {
+#'   con <- dbConnect(RMySQL::MySQL())
+#'   summary(con)
+#'   dbDisconnect(con)
 #' }
 #' @export
+#' @useDynLib RMySQL RS_MySQL_newConnection
 setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
           password=NULL, host=NULL,
           unix.socket=NULL, port = 0, client.flag = 0,
@@ -90,10 +93,10 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
       stop(sprintf("mysql default file %s does not exist", default.file))
 
     drvId <- as(drv, "integer")
-    conId <- .Call("RS_MySQL_newConnection", drvId,
+    conId <- .Call(RS_MySQL_newConnection, drvId,
       dbname, username, password, host, unix.socket,
       as.integer(port), as.integer(client.flag),
-      groups, default.file[1], PACKAGE = .MySQLPkgName)
+      groups, default.file[1])
 
     new("MySQLConnection", Id = conId)
   }
@@ -101,17 +104,19 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
 
 #' @export
 #' @rdname dbConnect-MySQLDriver-method
+#' @useDynLib RMySQL RS_MySQL_cloneConnection
 setMethod("dbConnect", "MySQLConnection",
   function(drv, ...) {
     if (!isIdCurrent(drv)) stop(paste("expired", class(drv)))
     conId <- as(drv, "integer")
-    newId <- .Call("RS_MySQL_cloneConnection", conId, PACKAGE = .MySQLPkgName)
+    newId <- .Call(RS_MySQL_cloneConnection, conId)
     new("MySQLConnection", Id = newId)
   }
 )
 
 #' @export
 #' @rdname dbConnect-MySQLDriver-method
+#' @useDynLib RMySQL RS_MySQL_closeConnection
 setMethod("dbDisconnect", "MySQLConnection",
   function(conn, ...) {
     if(!isIdCurrent(conn))
@@ -124,7 +129,7 @@ setMethod("dbDisconnect", "MySQLConnection",
         stop("connection has pending rows (close open results set first)")
     }
     conId <- as(conn, "integer")
-    .Call("RS_MySQL_closeConnection", conId, PACKAGE = .MySQLPkgName)
+    .Call(RS_MySQL_closeConnection, conId)
   }
 )
 
@@ -134,22 +139,26 @@ setMethod("dbDisconnect", "MySQLConnection",
 #' @param conn,dbObj,object MySQLConnection object.
 #' @param ... Other arguments for compatibility with generic.
 #' @examples
-#' \dontrun{
-#' con <- dbConnect(RMySQL::MySQL(), group = "wireless")
-#' dbGetInfo(con)
-#' dbListResults(con)
-#' dbListTables(con)
+#' if (mysqlHasDefault()) {
+#'   con <- dbConnect(RMySQL::MySQL())
+#'
+#'   dbGetInfo(con)
+#'   dbListResults(con)
+#'   dbListTables(con)
+#'
+#'   dbDisconnect(con)
 #' }
 NULL
 
 #' @rdname db-meta
 #' @param what optional
 #' @export
+#' @useDynLib RMySQL RS_MySQL_connectionInfo
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
   if(!isIdCurrent(dbObj))
     stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
   id <- as(dbObj, "integer")
-  info <- .Call("RS_MySQL_connectionInfo", id, PACKAGE = .MySQLPkgName)
+  info <- .Call(RS_MySQL_connectionInfo, id)
   rsId <- vector("list", length = length(info$rsId))
   for(i in seq(along = info$rsId))
     rsId[[i]] <- new("MySQLResult", Id = c(id, info$rsId[i]))
@@ -199,11 +208,11 @@ setMethod("summary", "MySQLConnection",
 
 #' @rdname db-meta
 #' @export
+#' @useDynLib RMySQL RS_MySQL_getException
 setMethod("dbGetException", "MySQLConnection",
   def = function(conn, ...) {
     if(!isIdCurrent(conn))
       stop(paste("expired", class(conn)))
-    .Call("RS_MySQL_getException", as(conn, "integer"),
-      PACKAGE = .MySQLPkgName)
+    .Call(RS_MySQL_getException, as(conn, "integer"))
   }
 )

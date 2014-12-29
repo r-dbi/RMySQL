@@ -46,18 +46,4 @@ comparison as lower case, upper case, or any of the two.  it defaults to
 These methods are straight-forward implementations of the corresponding
 generic functions.
 }
-\examples{
-\dontrun{
-# This example shows how we could export a bunch of data.frames
-# into tables on a remote database.
-
-con <- dbConnect("MySQL", "user", "password")
-
-export <- c("trantime.email", "trantime.print", "round.trip.time.email")
-tabs <- make.db.names(export, unique = T, allow.keywords = T)
-
-for(i in seq(along = export) )
-   dbWriteTable(con, name = tabs[i],  get(export[i]))
-}
-}
 
