@@ -19,3 +19,4 @@ src\/RCS
 ^\.Rproj\.user$
 .travis.yml
 ^windows$
+^a\.out\.dSYM$
