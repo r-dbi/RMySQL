@@ -46,7 +46,7 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #'
 #' dbDisconnect(con)
 #' }
-#' @name query
+#' @rdname query
 setMethod("fetch", signature(res="MySQLResult", n="numeric"),
   def = function(res, n, ...){
     n <- as(n, "integer")
@@ -179,11 +179,11 @@ setMethod("dbListFields",
 #' dbClearResult(rs)
 #' dbDisconnect(con)
 #' }
-#' @name sqlite-meta
+#' @name result-meta
 NULL
 
 #' @export
-#' @rdname sqlite-meta
+#' @rdname result-meta
 setMethod("dbColumnInfo", "MySQLResult", function(res, ...) {
   flds <- dbGetInfo(res, "fieldDescription")[[1]][[1]]
   if(!is.null(flds)){
@@ -200,31 +200,32 @@ setMethod("dbColumnInfo", "MySQLResult", function(res, ...) {
 )
 
 #' @export
-#' @rdname sqlite-meta
+#' @rdname result-meta
 setMethod("dbGetRowsAffected", "MySQLResult", function(res, ...) {
   dbGetInfo(res, "rowsAffected")[[1]]
 })
 
 #' @export
-#' @rdname sqlite-meta
+#' @rdname result-meta
 setMethod("dbGetRowCount", "MySQLResult", function(res, ...) {
   dbGetInfo(res, "rowCount")[[1]]
 })
 
 #' @export
-#' @rdname sqlite-meta
+#' @rdname result-meta
 setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
   dbGetInfo(res, "completed")[[1]] == 1
 })
 
 #' @export
-#' @rdname sqlite-meta
+#' @rdname result-meta
 setMethod("dbGetException", "MySQLResult", function(conn, ...) {
   id <- as(conn, "integer")[1:2]
   .Call("RS_MySQL_getException", id, PACKAGE = .MySQLPkgName)
 })
 
 #' @export
+#' @rdname result-meta
 setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
   if(!isIdCurrent(object)){
     print(object)

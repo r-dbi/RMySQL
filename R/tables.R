@@ -291,7 +291,10 @@ setMethod("dbListFields",
   valueClass = "character"
 )
 
-## NOTE: The following is experimental (as suggested by Greg Warnes)
+#' Experimental dbColumnInfo method for a connection
+#'
+#' @export
+#' @keywords internal
 setMethod("dbColumnInfo", "MySQLConnection",
   def = function(res, ...){
     dots <- list(...)
