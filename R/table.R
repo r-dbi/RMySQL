@@ -24,31 +24,33 @@ NULL
 #' @param ... Unused, needed for compatiblity with generic.
 #' @export
 #' @rdname dbReadTable
-setMethod("dbReadTable", signature(conn="MySQLConnection", name="character"),
-  function(conn, name, row.names = "row_names", check.names = TRUE, ...) {
-    out <- dbGetQuery(conn, paste("SELECT * from", name))
-    if(check.names)
+#' @examples
+#' if (mysqlHasDefault()) {
+#' con <- dbConnect(RMySQL::MySQL())
+#'
+#' # By default, row names are written in a column to row_names, and
+#' # automatically read back into the row.names()
+#' dbWriteTable(con, "mtcars", mtcars[1:5, ])
+#' dbReadTable(con, "mtcars")
+#' dbReadTable(con, "mtcars", row.names = NULL)
+#' }
+setMethod("dbReadTable", c("MySQLConnection", "character"),
+  function(conn, name, row.names, check.names = TRUE, ...) {
+    out <- dbGetQuery(conn, paste("SELECT * FROM", name))
+
+    if (check.names) {
       names(out) <- make.names(names(out), unique = TRUE)
-    ## should we set the row.names of the output data.frame?
-    nms <- names(out)
-    j <- switch(mode(row.names),
-      "character" = if(row.names=="") 0 else
-        match(tolower(row.names), tolower(nms),
-          nomatch = if(missing(row.names)) 0 else -1),
-      "numeric" = row.names,
-      "NULL" = 0,
-      0)
-    if(j==0)
-      return(out)
-    if(j<0 || j>ncol(out)){
-      warning("row.names not set on output data.frame (non-existing field)")
-      return(out)
     }
-    rnms <- as.character(out[,j])
-    if(all(!duplicated(rnms))){
-      out <- out[,-j, drop = FALSE]
+    row.names <- rownames_column(out, row.names)
+    if (is.null(row.names)) return(out)
+
+    rnms <- as.character(out[[row.names]])
+    if (anyDuplicated(rnms)) {
+      warning("row.names not set (duplicate elements in field)", call. = FALSE)
+    } else {
+      out <- out[, -row.names, drop = F]
       row.names(out) <- rnms
-    } else warning("row.names not set on output (duplicate elements in field)")
+    }
     out
   }
 )
@@ -102,172 +104,89 @@ setMethod("dbReadTable", signature(conn="MySQLConnection", name="character"),
 #'    \code{\"}.)
 #' @param ... Unused, needs for compatibility with generic.
 #' @export
-setMethod("dbWriteTable",
-  signature(conn="MySQLConnection", name="character", value="data.frame"),
-  function(conn, name, value, field.types, row.names = TRUE,
+setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
+  function(conn, name, value, field.types = NULL, row.names = TRUE,
     overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE)     {
-    if(overwrite && append)
-      stop("overwrite and append cannot both be TRUE")
-    if(!is.data.frame(value))
-      value <- as.data.frame(value)
-    if(row.names){
-      value <- cbind(row.names(value), value)  ## can't use row.names= here
-      names(value)[1] <- "row.names"
+
+    if (overwrite && append)
+      stop("overwrite and append cannot both be TRUE", call. = FALSE)
+
+    found <- dbExistsTable(conn, name)
+    if (found && !overwrite && !append) {
+      stop("Table ", name, " exists in database, and both overwrite and",
+        " append are FALSE", call. = FALSE)
     }
-    if(missing(field.types) || is.null(field.types)){
-      ## the following mapping should be coming from some kind of table
-      ## also, need to use converter functions (for dates, etc.)
-      field.types <- lapply(value, dbDataType, dbObj = conn)
+    if (found && overwrite) {
+      dbRemoveTable(conn, name)
     }
 
-    ## Do we need to coerce any field prior to write it out?
-    ## TODO: MySQL 4.1 introduces the boolean data type.
-    for(i in seq(along = value)){
-      if(is.logical(value[[i]]))
-        value[[i]] <- as.integer(value[[i]])
-    }
-    i <- match("row.names", names(field.types), nomatch=0)
-    if(i>0) ## did we add a row.names value?  If so, it's a text field.
-      field.types[i] <- dbDataType(dbObj=conn, field.types$row.names)
-    names(field.types) <- make.db.names(conn, names(field.types),
-      allow.keywords = allow.keywords)
+    value <- explict_rownames(value, row.names)
 
-    if(dbExistsTable(conn,name)){
-      if(overwrite){
-        if(!dbRemoveTable(conn, name)){
-          warning(paste("table", name, "couldn't be overwritten"))
-          return(FALSE)
-        }
-      }
-      else if(!append){
-        warning(paste("table",name,"exists in database: aborting mysqlWriteTable"))
-        return(FALSE)
-      }
-    }
-    if(!dbExistsTable(conn,name)){      ## need to re-test table for existence
-      ## need to create a new (empty) table
-      sql1 <- paste("create table ", name, "\n(\n\t", sep="")
-      sql2 <- paste(paste(names(field.types), field.types), collapse=",\n\t",
-        sep="")
-      sql3 <- "\n)\n"
-      sql <- paste(sql1, sql2, sql3, sep="")
-      rs <- try(dbSendQuery(conn, sql))
-      if(inherits(rs, "try-error")){
-        warning("could not create table: aborting mysqlWriteTable")
-        return(FALSE)
-      }
-      else
-        dbClearResult(rs)
+    if (!found || overwrite) {
+      sql <- mysqlBuildTableDefinition(conn, name, value,
+        field.types = field.types, row.names = FALSE)
+      dbGetQuery(conn, sql)
     }
 
-    ## TODO: here, we should query the MySQL to find out if it supports
-    ## LOAD DATA thru pipes; if so, should open the pipe instead of a file.
+    if (nrow(value) == 0) return(TRUE)
 
-    fn <- tempfile("rsdbi")
-    fn <- gsub("\\\\", "/", fn)  # Since MySQL on Windows wants \ double (BDR)
+    ## Save file to disk, then use LOAD DATA command
+    fn <- normalizePath(tempfile("rsdbi"), mustWork = FALSE)
     safe.write(value, file = fn)
     on.exit(unlink(fn), add = TRUE)
-    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
-      " INTO TABLE ", name,
-      " LINES TERMINATED BY '\n' ",
-      "( ", paste(names(field.types), collapse=", "), ");",
-      sep="")
-    rs <- try(dbSendQuery(conn, sql4))
-    if(inherits(rs, "try-error")){
-      warning("could not load data into table")
-      return(FALSE)
-    }
-    else
-      dbClearResult(rs)
+
+    sql <- paste0(
+      "LOAD DATA LOCAL INFILE ", dbQuoteString(conn, fn),
+      "  INTO TABLE ", dbQuoteIdentifier(conn, name),
+      "  LINES TERMINATED BY '\n' ",
+      "  (", paste(dbQuoteIdentifier(conn, names(value)), collapse=", "), ");"
+    )
+    dbGetQuery(conn, sql)
+
     TRUE
   }
 )
 
-## write table from filename (TODO: connections)
 #' @export
 #' @rdname dbWriteTable
-setMethod("dbWriteTable",
-  signature(conn="MySQLConnection", name="character", value="character"),
+setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
   function(conn, name, value, field.types = NULL, overwrite = FALSE,
-    append = FALSE, header, row.names, nrows = 50, sep = ",",
+    append = FALSE, header = TRUE, row.names = FALSE, nrows = 50, sep = ",",
     eol="\n", skip = 0, quote = '"', ...)   {
-    if(overwrite && append)
-      stop("overwrite and append cannot both be TRUE")
 
-    if(dbExistsTable(conn,name)){
-      if(overwrite){
-        if(!dbRemoveTable(conn, name)){
-          warning(paste("table", name, "couldn't be overwritten"))
-          return(FALSE)
-        }
-      }
-      else if(!append){
-        warning(paste("table", name, "exists in database: aborting dbWriteTable"))
-        return(FALSE)
-      }
+    if (overwrite && append)
+      stop("overwrite and append cannot both be TRUE", call. = FALSE)
+
+    found <- dbExistsTable(conn, name)
+    if (found && !overwrite && !append) {
+      stop("Table ", name, " exists in database, and both overwrite and",
+        " append are FALSE", call. = FALSE)
+    }
+    if (found && overwrite) {
+      dbRemoveTable(conn, name)
     }
 
-    ## compute full path name (have R expand ~, etc)
-    fn <- file.path(dirname(value), basename(value))
-    if(missing(header) || missing(row.names)){
-      f <- file(fn, open="r")
-      if(skip>0)
-        readLines(f, n=skip)
-      txtcon <- textConnection(readLines(f, n=2))
-      flds <- count.fields(txtcon, sep)
-      close(txtcon)
-      close(f)
-      nf <- length(unique(flds))
-    }
-    if(missing(header)){
-      header <- nf==2
-    }
-    if(missing(row.names)){
-      if(header)
-        row.names <- if(nf==2) TRUE else FALSE
-      else
-        row.names <- FALSE
+    if (!found || overwrite) {
+      # Initialise table with first `nrows` lines
+      d <- read.table(value, sep = sep, header = header, skip = skip, nrows = nrows,
+        na.strings = "\\N", comment.char = "", stringsAsFactors = FALSE)
+      sql <- mysqlBuildTableDefinition(conn, name, d, field.types = field.types,
+        row.names = row.names)
+      dbGetQuery(conn, sql)
     }
 
-    new.table <- !dbExistsTable(conn, name)
-    if(new.table){
-      ## need to init table, say, with the first nrows lines
-      d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows, ...)
-      sql <-
-        dbBuildTableDefinition(conn, name, obj=d, field.types = field.types,
-          row.names = row.names)
-      rs <- try(dbSendQuery(conn, sql))
-      if(inherits(rs, "try-error")){
-        warning("could not create table: aborting mysqlImportFile")
-        return(FALSE)
-      }
-      else
-        dbClearResult(rs)
-    }
-    else if(!append){
-      warning(sprintf("table %s already exists -- use append=TRUE?", name))
-    }
+    path <- normalizePath(value, mustWork = TRUE)
+    sql <- paste0(
+      "LOAD DATA LOCAL INFILE ", dbQuoteString(conn, path), "\n",
+      "INTO TABLE ", dbQuoteIdentifier(conn, name), "\n",
+      "FIELDS TERMINATED BY ", dbQuoteString(conn, encodeString(sep)), "\n",
+      "OPTIONALLY ENCLOSED BY ", dbQuoteString(conn, quote), "\n",
+      "LINES TERMINATED BY ", dbQuoteString(conn, encodeString(eol)), "\n",
+      "IGNORE ", skip + as.integer(header), " LINES")
+    dbSendQuery(conn, sql)
 
-    fmt <-
-      paste("LOAD DATA LOCAL INFILE '%s' INTO TABLE  %s ",
-        "FIELDS TERMINATED BY '%s' ",
-        if(!is.null(quote)) "OPTIONALLY ENCLOSED BY '%s' " else "",
-        "LINES TERMINATED BY '%s' ",
-        "IGNORE %d LINES ", sep="")
-    if(is.null(quote))
-      sql <- sprintf(fmt, fn, name, sep, eol, skip + as.integer(header))
-    else
-      sql <- sprintf(fmt, fn, name, sep, quote, eol, skip + as.integer(header))
-
-    rs <- try(dbSendQuery(conn, sql))
-    if(inherits(rs, "try-error")){
-      warning("could not load data into table")
-      return(FALSE)
-    }
-    dbClearResult(rs)
     TRUE
   }
-
 )
 
 #' @export
@@ -310,3 +229,44 @@ setMethod("dbListFields", c("MySQLConnection", "character"),
 setMethod("dbColumnInfo", "MySQLConnection", function(res, name, ...) {
   dbGetQuery(res, paste("DESCRIBE", name))
 })
+
+
+# Row name handling ------------------------------------------------------------
+
+explict_rownames <- function(df, row.names = NA) {
+  if (is.na(row.names)) {
+    row.names <- is.character(attr(df, "row.names"))
+  }
+  if (!row.names) return(df)
+
+  rn <- data.frame(row_names = row.names(df))
+  cbind(rn, df)
+}
+
+# Figure out which column to
+rownames_column <- function(df, row.names) {
+  if (missing(row.names)) {
+    if (!"row_names" %in% names(df)) {
+      return(NULL)
+    }
+
+    row.names <- "row_names"
+  }
+
+  if (is.null(row.names) || identical(row.names, FALSE)) {
+    NULL
+  } else if (is.character(row.names)) {
+    if (!(row.names %in% names(df))) {
+      stop("Column ", row.names, " not present in output", call. = FALSE)
+    }
+    match(row.names, names(df))
+  } else if (is.numeric(row.names)) {
+    if (row.names == 0) return(NULL)
+    if (row.names < 0 || row.names > ncol(df)) {
+      stop("Column ", row.names, " not present in output", call. = FALSE)
+    }
+    row.names
+  } else {
+    stop("Unknown specification for row.names")
+  }
+}

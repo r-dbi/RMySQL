@@ -117,7 +117,7 @@ setMethod("dbConnect", "MySQLConnection", function(drv, ...) {
 #' @rdname dbConnect-MySQLDriver-method
 #' @useDynLib RMySQL RS_MySQL_closeConnection
 setMethod("dbDisconnect", "MySQLConnection", function(conn, ...) {
-  if(!dbIsValid(conn)) return(TRUE)
+  if (!dbIsValid(conn)) return(TRUE)
 
   rs <- dbListResults(conn)
   if (length(rs) > 0) {

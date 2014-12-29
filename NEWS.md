@@ -1,6 +1,6 @@
 # Version 0.10
 
- * New maintainer: Jereon Ooms
+ *  New maintainer: Jereon Ooms
 
  *  Internal changes to support static linking on Windows.
 
@@ -33,3 +33,21 @@
 
  *  Methods no longer automatically close open result sets. This was implemented 
     inconsistently in a handful of places.
+
+ *  `dbBuildTableDefinition()` has been renamed to `mysqlBuildTableDefinition()`.
+ 
+ *  `dbWriteTable()` has been rewritten:
+
+    * It quotes field names using `dbQuoteIdentifier()`, rather
+      than use a flawed black-list based approach with name munging.
+
+    * It now throws errors on failure, rather than returning FALSE. 
+    
+    * It will automatically add row names only if they are character, not integer.
+    
+    * When loading a file from disk, `dbWriteTable()` will no longer
+      attempt to guess the correct values for `row.names` and `header` - instead
+      supply them explicitly if the defaults are incorrect. 
+    
+    * When given a zero-row data frame it will just creates the table 
+      definition. 

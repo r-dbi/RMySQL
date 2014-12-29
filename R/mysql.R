@@ -16,7 +16,7 @@
 
 #' Constants
 #'
-#' @aliases .MySQLPkgName .MySQLPkgVersion .MySQLPkgRCS .MySQL.NA.string
+#' @aliases .MySQLPkgName .MySQLPkgVersion .MySQLPkgRCS
 #' .MySQLSQLKeywords CLIENT_LONG_PASSWORD CLIENT_FOUND_ROWS CLIENT_LONG_FLAG
 #' CLIENT_CONNECT_WITH_DB CLIENT_NO_SCHEMA CLIENT_COMPRESS CLIENT_ODBC
 #' CLIENT_LOCAL_FILES CLIENT_IGNORE_SPACE CLIENT_PROTOCOL_41 CLIENT_INTERACTIVE
@@ -24,12 +24,9 @@
 #' CLIENT_SECURE_CONNECTION CLIENT_MULTI_STATEMENTS CLIENT_MULTI_RESULTS
 #' @section Constants: \code{.MySQLPkgName} (currently \code{"RMySQL"}),
 #' \code{.MySQLPkgVersion} (the R package version), \code{.MySQLPkgRCS} (the
-#' RCS revision), \code{.MySQL.NA.string} (character that MySQL uses to denote
-#' \code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!)
+#' RCS revision), \code{.MySQLSQLKeywords} (a lot!)
 #' @name constants
 NULL
-
-.MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
 ## The following client flags were copied from mysql_com.h (version 4.1.13)
 ## but it may not make sense to set some of this from RMySQL.

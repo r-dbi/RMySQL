@@ -9,8 +9,8 @@
 \alias{dbRemoveTable,MySQLConnection,character-method}
 \title{Convenience functions for importing/exporting DBMS tables}
 \usage{
-\S4method{dbReadTable}{MySQLConnection,character}(conn, name,
-  row.names = "row_names", check.names = TRUE, ...)
+\S4method{dbReadTable}{MySQLConnection,character}(conn, name, row.names,
+  check.names = TRUE, ...)
 
 \S4method{dbListTables}{MySQLConnection}(conn, ...)
 
@@ -48,5 +48,16 @@ code that gets remotely executed in a database engine.
 \note{
 Note that the data.frame returned by \code{dbReadTable} only has
 primitive data, e.g., it does not coerce character data to factors.
+}
+\examples{
+if (mysqlHasDefault()) {
+con <- dbConnect(RMySQL::MySQL())
+
+# By default, row names are written in a column to row_names, and
+# automatically read back into the row.names()
+dbWriteTable(con, "mtcars", mtcars[1:5, ])
+dbReadTable(con, "mtcars")
+dbReadTable(con, "mtcars", row.names = NULL)
+}
 }
 

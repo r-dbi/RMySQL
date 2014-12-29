@@ -276,28 +276,22 @@ setMethod("dbMoreResults", "MySQLConnection", function(con, ...) {
 #' @return An SQL string
 #' @export
 #' @keywords internal
-dbBuildTableDefinition <- function(dbObj, name, obj, field.types = NULL,
+mysqlBuildTableDefinition <- function(dbObj, name, obj, field.types = NULL,
                                    row.names = TRUE, ...) {
-  if(!is.data.frame(obj))
+  if (!is.data.frame(obj)) {
     obj <- as.data.frame(obj)
-  if(!is.null(row.names) && row.names){
-    obj  <- cbind(row.names(obj), obj)  ## can't use row.names= here
-    names(obj)[1] <- "row.names"
   }
-  if(is.null(field.types)){
-    ## the following mapping should be coming from some kind of table
-    ## also, need to use converter functions (for dates, etc.)
-    field.types <- lapply(obj, dbDataType, dbObj = dbObj)
-  }
-  i <- match("row.names", names(field.types), nomatch=0)
-  if(i>0) ## did we add a row.names value?  If so, it's a text field.
-    field.types[i] <- dbDataType(dbObj, field.types$row.names)
-  names(field.types) <-
-    make.db.names(dbObj, names(field.types), allow.keywords = FALSE)
+  value <- explict_rownames(obj, row.names)
 
-  ## need to create a new (empty) table
+  if (is.null(field.types)) {
+    field.types <- vapply(value, dbDataType, dbObj = dbObj,
+      FUN.VALUE = character(1))
+  }
+  # Escape field names
+  names(field.types) <- dbQuoteIdentifier(dbObj, names(field.types))
+
   flds <- paste(names(field.types), field.types)
-  paste("CREATE TABLE", name, "\n(", paste(flds, collapse=",\n\t"), "\n)")
+  paste("CREATE TABLE", name, "\n(", paste(flds, collapse = ",\n\t"), "\n)")
 }
 
 ## Escape problematic characters in the data frame.
@@ -338,7 +332,7 @@ safe.write <- function(value, file, batch, ...) {
   conb <- file(file,open="wb")
   while(from<=N){
     write.table(escape(value[from:to,, drop=FALSE]), file = conb,
-      append = TRUE, quote = FALSE, sep="\t", na = .MySQL.NA.string,
+      append = TRUE, quote = FALSE, sep="\t", na = "\\N",
       row.names=FALSE, col.names=FALSE, eol = '\n', ...)
     from <- to+1
     to <- min(to+batch, N)
@@ -361,3 +355,16 @@ safe.write <- function(value, file, batch, ...) {
 mysqlClientLibraryVersions <- function() {
   .Call(RS_MySQL_clientLibraryVersions)
 }
+
+#' Quote method for MySQL identifiers
+#'
+#' In MySQL, identifiers are enclosed in backticks, e.g. \code{`x`}.
+#'
+#' @export
+#' @keywords internal
+setMethod("dbQuoteIdentifier", c("MySQLConnection", "character"),
+  function(conn, x, ...) {
+    x <- gsub('`', '``', x, fixed = TRUE)
+    SQL(paste('`', x, '`', sep = ""))
+  }
+)

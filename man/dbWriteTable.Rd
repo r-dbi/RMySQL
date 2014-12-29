@@ -7,12 +7,12 @@
 \title{Write a local data frame or file to the database.}
 \usage{
 \S4method{dbWriteTable}{MySQLConnection,character,data.frame}(conn, name, value,
-  field.types, row.names = TRUE, overwrite = FALSE, append = FALSE, ...,
-  allow.keywords = FALSE)
+  field.types = NULL, row.names = TRUE, overwrite = FALSE,
+  append = FALSE, ..., allow.keywords = FALSE)
 
 \S4method{dbWriteTable}{MySQLConnection,character,character}(conn, name, value,
-  field.types = NULL, overwrite = FALSE, append = FALSE, header,
-  row.names, nrows = 50, sep = ",", eol = "\\n", skip = 0,
+  field.types = NULL, overwrite = FALSE, append = FALSE, header = TRUE,
+  row.names = FALSE, nrows = 50, sep = ",", eol = "\\n", skip = 0,
   quote = "\\"", ...)
 }
 \arguments{
