@@ -17,8 +17,8 @@ isIdCurrent(obj)
 \S4method{dbIsValid}{MySQLResult}(dbObj)
 }
 \arguments{
-\item{obj}{any \code{dbObject} (e.g., \code{dbDriver}, \code{dbConnection},
-\code{dbResult}).}
+\item{dbObj,obj}{A \code{MysqlDriver}, \code{MysqlConnection},
+\code{MysqlResult}.}
 }
 \value{
 a logical scalar.
