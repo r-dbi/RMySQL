@@ -28,7 +28,7 @@ isIdCurrent <- function(obj)  {
 checkValid <- function(obj) {
   if (dbIsValid(obj)) return(TRUE)
 
-  stop("Expired ", class(obj), call = FALSE)
+  stop("Expired ", class(obj), call. = FALSE)
 }
 
 #' @export
