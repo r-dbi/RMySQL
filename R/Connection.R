@@ -59,6 +59,7 @@ setClass("MySQLConnection", representation("DBIConnection", "MySQLObject"))
 #'   dbDisconnect(con)
 #' }
 #' @export
+#' @useDynLib RMySQL RS_MySQL_newConnection
 setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
           password=NULL, host=NULL,
           unix.socket=NULL, port = 0, client.flag = 0,
@@ -92,10 +93,10 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
       stop(sprintf("mysql default file %s does not exist", default.file))
 
     drvId <- as(drv, "integer")
-    conId <- .Call("RS_MySQL_newConnection", drvId,
+    conId <- .Call(RS_MySQL_newConnection, drvId,
       dbname, username, password, host, unix.socket,
       as.integer(port), as.integer(client.flag),
-      groups, default.file[1], PACKAGE = .MySQLPkgName)
+      groups, default.file[1])
 
     new("MySQLConnection", Id = conId)
   }
@@ -103,17 +104,19 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
 
 #' @export
 #' @rdname dbConnect-MySQLDriver-method
+#' @useDynLib RMySQL RS_MySQL_cloneConnection
 setMethod("dbConnect", "MySQLConnection",
   function(drv, ...) {
     if (!isIdCurrent(drv)) stop(paste("expired", class(drv)))
     conId <- as(drv, "integer")
-    newId <- .Call("RS_MySQL_cloneConnection", conId, PACKAGE = .MySQLPkgName)
+    newId <- .Call(RS_MySQL_cloneConnection, conId)
     new("MySQLConnection", Id = newId)
   }
 )
 
 #' @export
 #' @rdname dbConnect-MySQLDriver-method
+#' @useDynLib RMySQL RS_MySQL_closeConnection
 setMethod("dbDisconnect", "MySQLConnection",
   function(conn, ...) {
     if(!isIdCurrent(conn))
@@ -126,7 +129,7 @@ setMethod("dbDisconnect", "MySQLConnection",
         stop("connection has pending rows (close open results set first)")
     }
     conId <- as(conn, "integer")
-    .Call("RS_MySQL_closeConnection", conId, PACKAGE = .MySQLPkgName)
+    .Call(RS_MySQL_closeConnection, conId)
   }
 )
 
@@ -150,11 +153,12 @@ NULL
 #' @rdname db-meta
 #' @param what optional
 #' @export
+#' @useDynLib RMySQL RS_MySQL_connectionInfo
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
   if(!isIdCurrent(dbObj))
     stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
   id <- as(dbObj, "integer")
-  info <- .Call("RS_MySQL_connectionInfo", id, PACKAGE = .MySQLPkgName)
+  info <- .Call(RS_MySQL_connectionInfo, id)
   rsId <- vector("list", length = length(info$rsId))
   for(i in seq(along = info$rsId))
     rsId[[i]] <- new("MySQLResult", Id = c(id, info$rsId[i]))
@@ -204,11 +208,11 @@ setMethod("summary", "MySQLConnection",
 
 #' @rdname db-meta
 #' @export
+#' @useDynLib RMySQL RS_MySQL_getException
 setMethod("dbGetException", "MySQLConnection",
   def = function(conn, ...) {
     if(!isIdCurrent(conn))
       stop(paste("expired", class(conn)))
-    .Call("RS_MySQL_getException", as(conn, "integer"),
-      PACKAGE = .MySQLPkgName)
+    .Call(RS_MySQL_getException, as(conn, "integer"))
   }
 )

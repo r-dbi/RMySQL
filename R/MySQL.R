@@ -29,8 +29,6 @@
 #' @name constants
 NULL
 
-.MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
-.MySQLVersion <- "0.5-12"      ##package.description(.MySQLPkgName, fields = "Version")
 .MySQL.NA.string <- "\\N"      ## on input, MySQL interprets \N as NULL (NA)
 
 ## The following client flags were copied from mysql_com.h (version 4.1.13)
@@ -134,9 +132,10 @@ setMethod("show", "MySQLObject", function(object) {
 #' @export
 #' @examples
 #' isIdCurrent(MySQL())
+#' @useDynLib RMySQL RS_DBI_validHandle
 isIdCurrent <- function(obj)  {
   obj <- as(obj, "integer")
-  .Call("RS_DBI_validHandle", obj, PACKAGE = .MySQLPkgName)
+  .Call(RS_DBI_validHandle, obj)
 }
 
 #' Determine the SQL Data Type of an S object
