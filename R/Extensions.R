@@ -1,3 +1,6 @@
+#' @include MySQL.R Result.R
+NULL
+
 ## the following code was kindly provided ny J. T. Lindgren.
 mysqlEscapeStrings <-
   function(con, strings)

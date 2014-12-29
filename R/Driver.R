@@ -1,3 +1,6 @@
+#' @include MySQL.R
+NULL
+
 #' Class MySQLDriver with constructor MySQL.
 #'
 #' An MySQL driver implementing the R database (DBI) API.
