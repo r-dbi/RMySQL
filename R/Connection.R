@@ -1,4 +1,4 @@
-#' @include MySQL.R
+#' @include Driver.R MySQL.R
 NULL
 
 #' Class MySQLConnection.

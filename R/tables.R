@@ -1,3 +1,6 @@
+#' @include Connection.R
+NULL
+
 #' Convenience functions for importing/exporting DBMS tables
 #'
 #' These functions mimic their R/S-Plus counterpart \code{get}, \code{assign},

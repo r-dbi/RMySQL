@@ -23,8 +23,8 @@ SystemRequirements: libmysqlclient-dev (deb), mariadb-devel (rpm), or
 NeedsCompilation: yes
 Collate:
     'MySQL.R'
-    'Connection.R'
     'Driver.R'
+    'Connection.R'
     'Result.R'
     'Extensions.R'
     'tables.R'

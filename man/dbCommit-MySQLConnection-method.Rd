@@ -3,12 +3,15 @@
 \docType{methods}
 \name{dbCommit,MySQLConnection-method}
 \alias{dbCommit,MySQLConnection-method}
+\alias{dbRollback,MySQLConnection-method}
 \title{DBMS Transaction Management}
 \usage{
 \S4method{dbCommit}{MySQLConnection}(conn, ...)
+
+\S4method{dbRollback}{MySQLConnection}(conn, ...)
 }
 \description{
-Commits or roll backs the current transaction in an MySQL connection
+Commits or roll backs the current transaction in an MySQL connection.
 }
 \section{Methods}{
  \describe{ \item{conn}{a \code{MySQLConnection} object, as

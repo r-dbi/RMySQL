@@ -1,7 +1,9 @@
+#' @include Connection.R
+NULL
 
 #' DBMS Transaction Management
 #'
-#' Commits or roll backs the current transaction in an MySQL connection
+#' Commits or roll backs the current transaction in an MySQL connection.
 #'
 #' @section Methods: \describe{ \item{conn}{a \code{MySQLConnection} object, as
 #' produced by the function \code{dbConnect}.} \item{list()}{currently
@@ -30,13 +32,7 @@ setMethod("dbCommit", "MySQLConnection",
 )
 
 #' @export
-#' @rdname dbCommit
+#' @rdname dbCommit-MySQLConnection-method
 setMethod("dbRollback", "MySQLConnection",
   def = function(conn, ...) .NotYetImplemented()
 )
-
-#' @export
-setMethod("dbCallProc", "MySQLConnection",
-  def = function(conn, ...) .NotYetImplemented()
-)
-
