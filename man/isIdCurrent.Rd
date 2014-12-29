@@ -37,6 +37,6 @@ minimal verification to ensure that the foreign object being referenced can
 be contacted.
 }
 \examples{
-isIdCurrent(MySQL())
+dbIsValid(MySQL())
 }
 

@@ -67,8 +67,7 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
           password=NULL, host=NULL,
           unix.socket=NULL, port = 0, client.flag = 0,
           groups = 'rs-dbi', default.file = NULL, ...) {
-    if(!isIdCurrent(drv))
-      stop("expired manager")
+    checkValid(drv)
 
     if (!is.null(dbname) && !is.character(dbname))
       stop("Argument dbname must be a string or NULL")
@@ -109,7 +108,8 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
 #' @useDynLib RMySQL RS_MySQL_cloneConnection
 setMethod("dbConnect", "MySQLConnection",
   function(drv, ...) {
-    if (!isIdCurrent(drv)) stop(paste("expired", class(drv)))
+    checkValid(drv)
+
     newId <- .Call(RS_MySQL_cloneConnection, drv@Id)
     new("MySQLConnection", Id = newId)
   }
@@ -120,8 +120,8 @@ setMethod("dbConnect", "MySQLConnection",
 #' @useDynLib RMySQL RS_MySQL_closeConnection
 setMethod("dbDisconnect", "MySQLConnection",
   function(conn, ...) {
-    if(!isIdCurrent(conn))
-      return(TRUE)
+    if(!dbIsValid(conn)) return(TRUE)
+
     rs <- dbListResults(conn)
     if(length(rs)>0){
       if(dbHasCompleted(rs[[1]]))
@@ -155,8 +155,8 @@ NULL
 #' @export
 #' @useDynLib RMySQL RS_MySQL_connectionInfo
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
-  if(!isIdCurrent(dbObj))
-    stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
+  checkValid(dbObj)
+
   id <- dbObj@Id
   info <- .Call(RS_MySQL_connectionInfo, id)
   rsId <- vector("list", length = length(info$rsId))
@@ -211,8 +211,8 @@ setMethod("summary", "MySQLConnection",
 #' @useDynLib RMySQL RS_MySQL_getException
 setMethod("dbGetException", "MySQLConnection",
   def = function(conn, ...) {
-    if(!isIdCurrent(conn))
-      stop(paste("expired", class(conn)))
+    checkValid(conn)
+
     .Call(RS_MySQL_getException, conn@Id)
   }
 )
@@ -220,7 +220,7 @@ setMethod("dbGetException", "MySQLConnection",
 #' @rdname db-meta
 #' @export
 setMethod("show", "MySQLConnection", function(object) {
-  expired <- if(isIdCurrent(object)) "" else "Expired "
+  expired <- if(dbIsValid(object)) "" else "Expired "
   cat("<", expired, "MySQLConnection:", paste(object@Id, collapse = ","), ">\n",
     sep = "")
   invisible(NULL)

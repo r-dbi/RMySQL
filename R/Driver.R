@@ -70,7 +70,7 @@ MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
 #' @export
 #' @useDynLib RMySQL RS_MySQL_closeManager
 setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
-  if(!isIdCurrent(drv)) return(TRUE)
+  if(!dbIsValid(drv)) return(TRUE)
 
   .Call(RS_MySQL_closeManager, drv@Id)
 })
@@ -139,7 +139,7 @@ setMethod("summary", "MySQLDriver", function(object, verbose = FALSE, ...) {
 #' @rdname dbGetInfo-MySQLDriver-method
 #' @export
 setMethod("show", "MySQLDriver", function(object) {
-  expired <- if(isIdCurrent(object)) "" else "Expired "
+  expired <- if(dbIsValid(object)) "" else "Expired "
   cat("<", expired, "MySQLDriver:", object@Id, ">\n",
     sep = "")
   invisible(NULL)

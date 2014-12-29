@@ -19,7 +19,7 @@ NULL
 #' @return a logical scalar.
 #' @export
 #' @examples
-#' isIdCurrent(MySQL())
+#' dbIsValid(MySQL())
 #' @useDynLib RMySQL RS_DBI_validHandle
 isIdCurrent <- function(obj)  {
   .Call(RS_DBI_validHandle, obj@Id)

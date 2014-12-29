@@ -79,8 +79,8 @@ setMethod("fetch", c("MySQLResult", "missing"), function(res, n, ...) {
 #' @useDynLib RMySQL RS_MySQL_exec
 setMethod("dbSendQuery", c("MySQLConnection", "character"),
   function(conn, statement) {
-    if(!isIdCurrent(conn))
-      stop(paste("expired", class(conn)))
+    checkValid(conn)
+
     rsId <- .Call(RS_MySQL_exec, conn@Id, as.character(statement))
     new("MySQLResult", Id = rsId)
   }
@@ -90,8 +90,8 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
 #' @export
 #' @useDynLib RMySQL RS_MySQL_closeResultSet
 setMethod("dbClearResult", "MySQLResult", function(res, ...) {
-  if(!isIdCurrent(res))
-    return(TRUE)
+  if (!dbIsValid(res)) return(TRUE)
+
   .Call(RS_MySQL_closeResultSet, res@Id)
 })
 
@@ -101,8 +101,8 @@ setMethod("dbClearResult", "MySQLResult", function(res, ...) {
 #' @export
 #' @useDynLib RMySQL RS_MySQL_resultSetInfo
 setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
-  if(!isIdCurrent(dbObj))
-    stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
+  checkValid(dbObj)
+
   info <- .Call(RS_MySQL_resultSetInfo, dbObj@Id)
   if(!missing(what))
     info[what]
@@ -207,10 +207,8 @@ setMethod("dbGetException", "MySQLResult", function(conn, ...) {
 #' @param verbose If \code{TRUE}, print extra information.
 #' @rdname result-meta
 setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
-  if(!isIdCurrent(object)){
-    print(object)
-    invisible(return(NULL))
-  }
+  checkValid(object)
+
   print(object)
   cat("  Statement:", dbGetStatement(object), "\n")
   cat("  Has completed?", if(dbHasCompleted(object)) "yes" else "no", "\n")
@@ -227,7 +225,7 @@ setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
 #' @export
 #' @rdname result-meta
 setMethod("show", "MySQLResult", function(object) {
-  expired <- if(isIdCurrent(object)) "" else "Expired "
+  expired <- if(dbIsValid(object)) "" else "Expired "
   cat("<", expired, "MySQLResult:", paste(object@Id, collapse = ","), ">\n",
     sep = "")
   invisible(NULL)

@@ -3,17 +3,14 @@ NULL
 
 ## the following code was kindly provided ny J. T. Lindgren.
 #' @useDynLib RMySQL RS_MySQL_escapeStrings
-mysqlEscapeStrings <-
-  function(con, strings)
-  {
-    ## Escapes the given strings
-    if(!isIdCurrent(con))
-      stop(paste("expired", class(con)))
-    strings <- as.character(strings)
-    out <- .Call(RS_MySQL_escapeStrings, con@Id, strings)
-    names(out) <- names(strings)
-    out
-  }
+mysqlEscapeStrings <- function(con, strings) {
+  checkValid(con)
+
+  strings <- as.character(strings)
+  out <- .Call(RS_MySQL_escapeStrings, con@Id, strings)
+  names(out) <- names(strings)
+  out
+}
 
 #' Escape SQL-special characters in strings.
 #'
