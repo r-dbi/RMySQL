@@ -4,7 +4,6 @@
 \name{fetch,MySQLResult,numeric-method}
 \alias{dbClearResult,MySQLResult-method}
 \alias{dbGetInfo,MySQLResult-method}
-\alias{dbGetQuery,MySQLConnection,character-method}
 \alias{dbGetStatement,MySQLResult-method}
 \alias{dbListFields,MySQLResult,missing-method}
 \alias{dbSendQuery,MySQLConnection,character-method}
@@ -17,8 +16,6 @@
 \S4method{fetch}{MySQLResult,missing}(res, n = -1, ...)
 
 \S4method{dbSendQuery}{MySQLConnection,character}(conn, statement)
-
-\S4method{dbGetQuery}{MySQLConnection,character}(conn, statement)
 
 \S4method{dbClearResult}{MySQLResult}(res, ...)
 

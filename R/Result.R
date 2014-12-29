@@ -88,30 +88,6 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
 
 #' @rdname query
 #' @export
-setMethod("dbGetQuery", c("MySQLConnection", "character"),
-  function(conn, statement) {
-    if(!isIdCurrent(conn)) stop(paste("expired", class(conn)))
-
-    ## are there resultSets pending on con?
-    .clearResultSets(conn)
-
-    rs <- dbSendQuery(conn, statement)
-    if(dbHasCompleted(rs)){
-      dbClearResult(rs)            ## no records to fetch, we're done
-      invisible()
-      return(NULL)
-    }
-    res <- fetch(rs, n = -1)
-    if(dbHasCompleted(rs))
-      dbClearResult(rs)
-    else
-      warning("pending rows")
-    res
-  }
-)
-
-#' @rdname query
-#' @export
 #' @useDynLib RMySQL RS_MySQL_closeResultSet
 setMethod("dbClearResult", "MySQLResult", function(res, ...) {
   if(!isIdCurrent(res))
