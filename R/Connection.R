@@ -8,7 +8,10 @@ NULL
 #'
 #' @export
 #' @keywords internal
-setClass("MySQLConnection", representation("DBIConnection", "MySQLObject"))
+setClass("MySQLConnection",
+  contains = "DBIConnection",
+  slots = list(Id = "integer")
+)
 
 #' Connect/disconnect to a MySQL DBMS
 #'
@@ -213,3 +216,12 @@ setMethod("dbGetException", "MySQLConnection",
     .Call(RS_MySQL_getException, conn@Id)
   }
 )
+
+#' @rdname db-meta
+#' @export
+setMethod("show", "MySQLConnection", function(object) {
+  expired <- if(isIdCurrent(object)) "" else "Expired "
+  cat("<", expired, "MySQLConnection:", paste(object@Id, collapse = ","), ">\n",
+    sep = "")
+  invisible(NULL)
+})

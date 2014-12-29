@@ -4,6 +4,7 @@
 \name{dbGetInfo,MySQLDriver-method}
 \alias{dbGetInfo,MySQLDriver-method}
 \alias{dbListConnections,MySQLDriver-method}
+\alias{show,MySQLDriver-method}
 \alias{summary,MySQLDriver-method}
 \title{Get information about a MySQL driver.}
 \usage{
@@ -12,6 +13,8 @@
 \S4method{dbListConnections}{MySQLDriver}(drv, ...)
 
 \S4method{summary}{MySQLDriver}(object, verbose = FALSE, ...)
+
+\S4method{show}{MySQLDriver}(object)
 }
 \arguments{
 \item{dbObj,object,drv}{Object created by \code{\link{MySQL}}.}

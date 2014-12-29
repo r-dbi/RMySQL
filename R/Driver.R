@@ -9,7 +9,10 @@ NULL
 #'
 #' @export
 #' @aliases RMySQL-package
-setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
+setClass("MySQLDriver",
+  contains = "DBIDriver",
+  slots = list(Id = "integer")
+)
 
 #' @param max.con maximum number of connections that can be open
 #'   at one time. There's no intrinic limit, since strictly speaking this limit
@@ -58,12 +61,6 @@ MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
   drvId <- .Call(RS_MySQL_init, config.params, force)
   new("MySQLDriver", Id = drvId)
 }
-
-## coerce (extract) any MySQLObject into a MySQLDriver
-## HW: I'm pretty sure this is incorrect, since a Driver only needs a singe ID
-setAs("MySQLObject", "MySQLDriver", function(from) {
-  new("MySQLDriver", Id = from@Id[1:2])
-})
 
 #' Unload MySQL driver.
 #'
@@ -136,5 +133,14 @@ setMethod("summary", "MySQLDriver", function(object, verbose = FALSE, ...) {
     lapply(info$connectionIds, function(x) print(summary(x)))
   }
 
+  invisible(NULL)
+})
+
+#' @rdname dbGetInfo-MySQLDriver-method
+#' @export
+setMethod("show", "MySQLDriver", function(object) {
+  expired <- if(isIdCurrent(object)) "" else "Expired "
+  cat("<", expired, "MySQLDriver:", object@Id, ">\n",
+    sep = "")
   invisible(NULL)
 })

@@ -6,6 +6,7 @@
 \alias{dbGetException,MySQLConnection-method}
 \alias{dbGetInfo,MySQLConnection-method}
 \alias{dbListResults,MySQLConnection-method}
+\alias{show,MySQLConnection-method}
 \alias{summary,MySQLConnection-method}
 \title{Database interface meta-data}
 \usage{
@@ -16,6 +17,8 @@
 \S4method{summary}{MySQLConnection}(object, verbose = FALSE, ...)
 
 \S4method{dbGetException}{MySQLConnection}(conn, ...)
+
+\S4method{show}{MySQLConnection}(object)
 }
 \arguments{
 \item{what}{optional}

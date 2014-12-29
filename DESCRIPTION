@@ -27,7 +27,9 @@ Collate:
     'Connection.R'
     'Result.R'
     'Extensions.R'
+    'data-type.R'
     'default.R'
+    'escaping.R'
     'tables.R'
     'transactions.R'
 Suggests:

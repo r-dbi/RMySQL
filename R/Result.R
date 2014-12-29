@@ -5,13 +5,13 @@
 #'
 #' @export
 #' @keywords internal
-setClass("MySQLResult", representation("DBIResult", "MySQLObject"))
+setClass("MySQLResult",
+  contains = "DBIResult",
+  slots = list(Id = "integer")
+)
 
-setAs("MySQLResult", "MySQLDriver", function(from) {
-  new("MySQLDriver", Id = from@Id[1:2])
-})
 setAs("MySQLResult", "MySQLConnection", function(from) {
-  new("MySQLConnection", Id = from@Id[1:3])
+  new("MySQLConnection", Id = from@Id[1:2])
 })
 
 #' Execute a SQL statement on a database connection.
@@ -223,6 +223,16 @@ setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
   }
   invisible(NULL)
 })
+
+#' @export
+#' @rdname result-meta
+setMethod("show", "MySQLResult", function(object) {
+  expired <- if(isIdCurrent(object)) "" else "Expired "
+  cat("<", expired, "MySQLResult:", paste(object@Id, collapse = ","), ">\n",
+    sep = "")
+  invisible(NULL)
+})
+
 
 .clearResultSets <- function(con){
   ## are there resultSets pending on con?

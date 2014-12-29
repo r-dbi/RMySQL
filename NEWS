@@ -17,3 +17,7 @@
  -  RMySQL gains transaction support with `dbBegin()`, `dbCommit()`,
     and `dbRollback()`, but note that MySQL does not allow data definition
     language statements to be rolled back.
+
+ -  The MySQLObject base class has been removed - there is no real shared
+    behaviour for MySQLDriver, MySQLConnection and MySQLResult so this
+    simplifies the code
