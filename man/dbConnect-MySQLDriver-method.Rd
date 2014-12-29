@@ -2,43 +2,60 @@
 % Please edit documentation in R/Connection.R
 \docType{methods}
 \name{dbConnect,MySQLDriver-method}
+\alias{dbConnect,MySQLConnection-method}
 \alias{dbConnect,MySQLDriver-method}
-\title{Create a connection object to an MySQL DBMS}
+\alias{dbDisconnect,MySQLConnection-method}
+\title{Connect/disconnect to a MySQL DBMS}
 \usage{
 \S4method{dbConnect}{MySQLDriver}(drv, dbname = NULL, username = NULL,
   password = NULL, host = NULL, unix.socket = NULL, port = 0,
   client.flag = 0, groups = "rs-dbi", default.file = NULL, ...)
+
+\S4method{dbConnect}{MySQLConnection}(drv, ...)
+
+\S4method{dbDisconnect}{MySQLConnection}(conn, ...)
+}
+\arguments{
+\item{drv}{an object of class \code{MySQLDriver}, or the character string
+"MySQL" or an \code{MySQLConnection}.}
+
+\item{dbname}{string with the database name or NULL. If NOT NULL, the
+connection sets the default da abaseto this value.}
+
+\item{username}{string of the MySQL login name or NULL. If NULL or the empty
+string \code{""}, the current user is assumed.}
+
+\item{password}{string with the MySQL password or NULL. If NULL, only entries
+in the user table for the users that have a blank (empty) password field
+are hecked for a match.}
+
+\item{host}{string identifying the host machine running the MySQL server or
+NULL. If NULL or the string \code{"localhost"}, a connection to the local
+host s assumed.}
+
+\item{unix.socket}{(optional) string of the unix socket or named pipe.}
+
+\item{port}{(optional) integer of the TCP/IP default port.}
+
+\item{client.flag}{(optional) integer setting various MySQL client flags. See
+the MySQL manual for details.}
+
+\item{default.file}{string of the filename with MySQL client options.
+Defaults to \code{\$HOME/.my.cnf}}
+
+\item{conn}{an \code{MySQLConnection} object as produced by \code{dbConnect}.}
+
+\item{group}{string identifying a section in the \code{default.file} to use
+for setting authentication parameters (see \code{\link{MySQL}}).}
 }
 \description{
 These methods are straight-forward implementations of the corresponding
 generic functions.
 }
-\section{Methods}{
- \describe{ \item{drv}{ an object of class
-\code{MySQLDriver}, or the character string "MySQL" or an
-\code{MySQLConnection}.  } \item{conn}{ an \code{MySQLConnection} object as
-produced by \code{dbConnect}.  } \item{username}{string of the MySQL login
-name or NULL. If NULL or the empty string \code{""}, the current user is
-assumed.} \item{password}{string with the MySQL password or NULL. If NULL,
-only entries in the user table for the users that have a blank (empty)
-password field are checked for a match.} \item{dbname}{string with the
-database name or NULL. If NOT NULL, the connection sets the default database
-to this value.} \item{host}{string identifying the host machine running the
-MySQL server or NULL. If NULL or the string \code{"localhost"}, a connection
-to the local host is assumed.} \item{unix.socket}{(optional) string of the
-unix socket or named pipe.} \item{port}{(optional) integer of the TCP/IP
-default port.} \item{client.flag}{(optional) integer setting various MySQL
-client flags. See the MySQL manual for details.} \item{group}{string
-identifying a section in the \code{default.file} to use for setting
-authentication parameters (see \code{\link{MySQL}}.)}
-\item{default.file}{string of the filename with MySQL client options.
-Defaults to \code{\$HOME/.my.cnf}} \item{list()}{Currently unused.}\item{
-}{Currently unused.} }
-}
 \examples{
 \dontrun{
 # create an MySQL instance and create one connection.
-drv <- dbDriver("MySQL")
+drv <- dbDriver(RMySQL::MySQL())
 
 # open the connection using user, passsword, etc., as
 con <- dbConnect(drv, group = "rs-dbi")
@@ -54,18 +71,4 @@ data <- fetch(rs, n = -1)   # extract all rows
 dim(data)
 }
 }
-\references{
-See the Database Interface definition document \code{DBI.pdf} in
-the base directory of this package or
-\url{http://stat.bell-labs.com/RS-DBI}.
-}
-\seealso{
-\code{\link{MySQL}}, \code{\link[DBI]{dbConnect}},
-\code{\link[DBI]{dbSendQuery}}, \code{\link[DBI]{dbGetQuery}},
-\code{\link[DBI]{fetch}}, \code{\link[DBI]{dbCommit}},
-\code{\link[DBI]{dbGetInfo}}, \code{\link[DBI]{dbReadTable}}.
-}
-\keyword{database}
-\keyword{interface}
-\keyword{methods}
 

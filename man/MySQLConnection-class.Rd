@@ -3,37 +3,10 @@
 \docType{class}
 \name{MySQLConnection-class}
 \alias{MySQLConnection-class}
-\title{Class MySQLConnection}
+\title{Class MySQLConnection.}
 \description{
-MySQLConnection class.
+\code{MySQLConnection.} objects are usually created by
+\code{\link[DBI]{dbConnect}}
 }
-\section{Generators}{
- The method \code{\link[DBI]{dbConnect}} is the main
-generator.
-}
-\examples{
-\dontrun{
-drv <- dbDriver("MySQL)
-con <- dbConnect(drv, dbname = "rsdbi.db")
-}
-}
-\references{
-See the Database Interface definition document \code{DBI.pdf} in
-the base directory of this package or
-\url{http://developer.r-project.org/db}.
-}
-\seealso{
-DBI base classes:
-
-\code{\link[DBI]{DBIObject-class}} \code{\link[DBI]{DBIDriver-class}}
-\code{\link[DBI]{DBIConnection-class}} \code{\link[DBI]{DBIResult-class}}
-
-MySQL classes:
-
-\code{\link{MySQLObject-class}} \code{\link{MySQLDriver-class}}
-\code{\link{MySQLConnection-class}} \code{\link{MySQLResult-class}}
-}
-\keyword{classes}
-\keyword{database}
-\keyword{interface}
+\keyword{internal}
 

@@ -27,3 +27,5 @@ Collate:
     'Driver.R'
     'Result.R'
     'Extensions.R'
+    'tables.R'
+    'transactions.R'
