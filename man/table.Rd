@@ -33,12 +33,10 @@
 \S4method{dbListFields}{MySQLConnection,character}(conn, name, ...)
 }
 \arguments{
-\item{conn}{a \code{\linkS4class{SQLiteConnection}} object, produced by
+\item{conn}{a \code{\linkS4class{MySQLConnection}} object, produced by
 \code{\link[DBI]{dbConnect}}}
 
-\item{name}{a character string specifying a table name. SQLite table names
-are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
-are considered equal.}
+\item{name}{a character string specifying a table name.}
 
 \item{row.names}{A string or an index specifying the column in the DBMS table
 to use as \code{row.names} in the output data.frame. Defaults to using the

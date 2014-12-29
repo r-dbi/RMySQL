@@ -21,7 +21,7 @@
 \S4method{dbGetException}{MySQLResult}(conn, ...)
 }
 \arguments{
-\item{res}{An object of class \code{\linkS4class{SQLiteResult}}}
+\item{res}{An object of class \code{\linkS4class{MySQLResult}}}
 
 \item{...}{Ignored. Needed for compatibility with generic}
 }

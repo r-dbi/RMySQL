@@ -31,11 +31,11 @@
 \arguments{
 \item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
 retrieve all pending records; use \code{0} for to fetch the default
-number of rows as defined in \code{\link{SQLite}}}
+number of rows as defined in \code{\link{MySQL}}}
 
 \item{...}{Unused. Needed for compatibility with generic.}
 
-\item{conn}{an \code{\linkS4class{SQLiteConnection}} object.}
+\item{conn}{an \code{\linkS4class{MySQLConnection}} object.}
 
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be

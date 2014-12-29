@@ -12,11 +12,9 @@ NULL
 #' @note Note that the data.frame returned by \code{dbReadTable} only has
 #' primitive data, e.g., it does not coerce character data to factors.
 #'
-#' @param conn a \code{\linkS4class{SQLiteConnection}} object, produced by
+#' @param conn a \code{\linkS4class{MySQLConnection}} object, produced by
 #'   \code{\link[DBI]{dbConnect}}
-#' @param name a character string specifying a table name. SQLite table names
-#'   are \emph{not} case sensitive, e.g., table names \code{ABC} and \code{abc}
-#'   are considered equal.
+#' @param name a character string specifying a table name.
 #' @param check.names If \code{TRUE}, the default, column names will be
 #'   converted to valid R identifiers.
 #' @param row.names A string or an index specifying the column in the DBMS table
