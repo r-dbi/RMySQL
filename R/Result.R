@@ -29,6 +29,7 @@ setMethod("fetch", signature(res="MySQLResult", n="numeric"),
     indx <- seq(from = cnt - nrec + 1, length = nrec)
     attr(rel, "row.names") <- as.integer(indx)
     class(rel) <- "data.frame"
+    rel
   }
 )
 
