@@ -27,5 +27,8 @@ Collate:
     'Connection.R'
     'Result.R'
     'Extensions.R'
+    'default.R'
     'tables.R'
     'transactions.R'
+Suggests:
+    testthat
