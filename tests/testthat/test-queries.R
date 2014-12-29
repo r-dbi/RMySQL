@@ -3,7 +3,7 @@ context("queries")
 test_that("query returns expected number of rows", {
   if (!mysqlHasDefault()) skip("Test database not available")
 
-  conn <- mysqlDefault()
+  conn <- dbConnect(RMySQL::MySQL())
   dbRemoveTable(conn, "iris")
   dbWriteTable(conn, 'iris', datasets::iris, row.names = FALSE)
   rs <- dbSendQuery(conn, "SELECT * FROM iris WHERE Species='versicolor'")
@@ -20,7 +20,7 @@ test_that("query returns expected number of rows", {
 test_that("correctly computes affected rows", {
   if (!mysqlHasDefault()) skip("Test database not available")
 
-  conn <- mysqlDefault()
+  conn <- dbConnect(RMySQL::MySQL())
   dbRemoveTable(conn, "iris")
   dbWriteTable(conn, 'iris', datasets::iris, row.names = FALSE)
   rs <- dbSendQuery(conn, "DELETE FROM iris WHERE Species = 'versicolor'")

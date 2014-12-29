@@ -1,35 +1,26 @@
-#' Connect to a default database.
+#' Check if default database is available.
 #'
-#' Connect to a database configured by environment variables. The default
-#' database name is "test", override with env var \code{MYSQL_DATABASE}.
-#' Specify default username and password in \code{MYSQL_USER} and
-#' \code{MYSQL_PASSWORD} envvars; or alternatively configured in
-#' \code{my.ini} or \code{my.cnf}.
+#' RMySQL examples and tests connect to a database defined by the
+#' \code{rs-dbi} group in \code{~/.my.cnf}. This function checks if that
+#' database is available, and if not, displays an informative message.
+#'
 #' @export
 #' @examples
 #' if (mysqlHasDefault()) {
-#'   db <- mysqlDefault()
+#'   db <- dbConnect(RMySQL::MySQL())
 #'   dbListTables(db)
 #'   dbDisconnect(db)
 #' }
-mysqlDefault <- function() {
-  dbname <- Sys.getenv("MYSQL_DATABASE", unset = "test")
-  user <- Sys.getenv("MYSQL_USER", unset = NA)
-  password <- Sys.getenv("MYSQL_PASSWORD", unset = '')
-
-  if (is.na(user)) {
-    # in this leg user and password should be set in my.ini or my.cnf files
-    dbConnect(MySQL(), dbname = dbname)
-  } else {
-    dbConnect(MySQL(), user = user, password = password, dbname = dbname)
-  }
-}
-
-#' @export
-#' @rdname mysqlDefault
 mysqlHasDefault <- function() {
   tryCatch({
-    mysqlDefault()
+    dbConnect(MySQL())
     TRUE
-  }, error = function(...) FALSE)
+  }, error = function(...) {
+    message(
+      "Could not initialise default MySQL database. If MySQL is running\n",
+      "check that you have a ~/.my.cnf file that contains a [rs-dbi] section\n",
+      "describing how to connect to a test database."
+    )
+    FALSE
+  })
 }

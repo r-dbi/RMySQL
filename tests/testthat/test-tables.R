@@ -9,7 +9,7 @@ test_that("basic roundtrip is succesful", {
     row.names = letters[1:5],
     stringsAsFactors = FALSE)
 
-  conn <- mysqlDefault()
+  conn <- dbConnect(RMySQL::MySQL())
   dbRemoveTable(conn, "myDF")
   dbWriteTable(conn, name = "myDF", value = myDF)
 
