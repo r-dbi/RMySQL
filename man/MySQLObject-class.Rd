@@ -3,32 +3,8 @@
 \docType{class}
 \name{MySQLObject-class}
 \alias{MySQLObject-class}
-\alias{dbObjectId-class}
 \title{Class MySQLObject}
 \description{
 Base class for all MySQL-specific DBI classes
 }
-\section{Objects from the Class}{
- A virtual Class: No objects may be created
-from it.
-}
-\references{
-See the Database Interface definition document \code{DBI.pdf} in
-the base directory of this package or
-\url{http://developer.r-project.org/db}.
-}
-\seealso{
-DBI base classes:
-
-\code{\link[DBI]{DBIObject-class}} \code{\link[DBI]{DBIDriver-class}}
-\code{\link[DBI]{DBIConnection-class}} \code{\link[DBI]{DBIResult-class}}
-
-MySQL classes:
-
-\code{\link{MySQLObject-class}} \code{\link{MySQLDriver-class}}
-\code{\link{MySQLConnection-class}} \code{\link{MySQLResult-class}}
-}
-\keyword{classes}
-\keyword{database}
-\keyword{interface}
 

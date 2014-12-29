@@ -24,15 +24,4 @@ dbDataType(RMySQL::MySQL(), "a")
 dbDataType(RMySQL::MySQL(), 1:3)
 dbDataType(RMySQL::MySQL(), 2.5)
 }
-\references{
-See the Database Interface definition document \code{DBI.pdf} in
-the base directory of this package or
-\url{http://stat.bell-labs.com/RS-DBI}.
-}
-\seealso{
-\code{\link[DBI]{isSQLKeyword}} \code{\link[DBI]{make.db.names}}
-}
-\keyword{database}
-\keyword{interface}
-\keyword{methods}
 

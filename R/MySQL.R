@@ -25,8 +25,7 @@
 #' @section Constants: \code{.MySQLPkgName} (currently \code{"RMySQL"}),
 #' \code{.MySQLPkgVersion} (the R package version), \code{.MySQLPkgRCS} (the
 #' RCS revision), \code{.MySQL.NA.string} (character that MySQL uses to denote
-#' \code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!) %\non_function{}
-#' @keywords datasets interface database
+#' \code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!)
 #' @name constants
 NULL
 
@@ -80,24 +79,7 @@ setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 #'
 #' Base class for all MySQL-specific DBI classes
 #'
-#' @name MySQLObject-class
-#' @aliases MySQLObject-class dbObjectId-class
-#' @docType class
-#' @section Objects from the Class: A virtual Class: No objects may be created
-#' from it.
-#' @seealso DBI base classes:
-#'
-#' \code{\link[DBI]{DBIObject-class}} \code{\link[DBI]{DBIDriver-class}}
-#' \code{\link[DBI]{DBIConnection-class}} \code{\link[DBI]{DBIResult-class}}
-#'
-#' MySQL classes:
-#'
-#' \code{\link{MySQLObject-class}} \code{\link{MySQLDriver-class}}
-#' \code{\link{MySQLConnection-class}} \code{\link{MySQLResult-class}}
-#' @references See the Database Interface definition document \code{DBI.pdf} in
-#' the base directory of this package or
-#' \url{http://developer.r-project.org/db}.
-#' @keywords database interface classes
+#' @export
 setClass("MySQLObject",
   contains = c("DBIObject", "VIRTUAL"),
   slots = list(Id = "integer")
@@ -149,9 +131,6 @@ setMethod("show", "MySQLObject", function(object) {
 #' @param obj any \code{dbObject} (e.g., \code{dbDriver}, \code{dbConnection},
 #' \code{dbResult}).
 #' @return a logical scalar.
-#' @seealso \code{\link[DBI]{dbDriver}} \code{\link[DBI]{dbConnect}}
-#' \code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
-#' @keywords interface database
 #' @export
 #' @examples
 #' isIdCurrent(MySQL())
@@ -169,11 +148,6 @@ isIdCurrent <- function(obj)  {
 #' \code{MySQLConnection}, \code{MySQLResult}.
 #' @param obj R/S-Plus object whose SQL type we want to determine.
 #' @param \dots any other parameters that individual methods may need.
-#' @seealso \code{\link[DBI]{isSQLKeyword}} \code{\link[DBI]{make.db.names}}
-#' @references See the Database Interface definition document \code{DBI.pdf} in
-#' the base directory of this package or
-#' \url{http://stat.bell-labs.com/RS-DBI}.
-#' @keywords methods interface database
 #' @export
 #' @examples
 #' dbDataType(RMySQL::MySQL(), "a")

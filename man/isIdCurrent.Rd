@@ -27,10 +27,4 @@ be contacted.
 \examples{
 isIdCurrent(MySQL())
 }
-\seealso{
-\code{\link[DBI]{dbDriver}} \code{\link[DBI]{dbConnect}}
-\code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
-}
-\keyword{database}
-\keyword{interface}
 
