@@ -130,3 +130,13 @@ setMethod("summary", "MySQLResult",
     invisible(NULL)
   }
 )
+
+.clearResultSets <- function(con){
+  ## are there resultSets pending on con?
+  rsList <- dbListResults(con)
+  if(length(rsList)>0){
+    warning("There are pending result sets. Removing.",call.=FALSE)
+    lapply(rsList,dbClearResult) ## clear all pending results
+  }
+  NULL
+}
