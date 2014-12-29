@@ -5,7 +5,7 @@
 \alias{dbDataType,MySQLObject-method}
 \title{Determine the SQL Data Type of an S object}
 \usage{
-\S4method{dbDataType}{MySQLObject}(dbObj, obj, ...)
+\S4method{dbDataType}{MySQLObject}(dbObj, obj)
 }
 \arguments{
 \item{dbObj}{any \code{MySQLObject} object, e.g., \code{MySQLDriver},
@@ -20,11 +20,9 @@ This method is a straight-forward implementation of the corresponding
 generic function.
 }
 \examples{
-\dontrun{
-data(quakes)
-drv <- dbDriver("MySQL")
-sql.type <- dbDataType(drv, quakes)
-}
+dbDataType(RMySQL::MySQL(), "a")
+dbDataType(RMySQL::MySQL(), 1:3)
+dbDataType(RMySQL::MySQL(), 2.5)
 }
 \references{
 See the Database Interface definition document \code{DBI.pdf} in

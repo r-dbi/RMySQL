@@ -14,94 +14,6 @@
 ## License along with this library; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-
-
-#' R interface to the MySQL database
-#'
-#' The functions in this package allow you interact with one or more MySQL
-#' databases from R.
-#'
-#'
-#' @name RMySQL-package
-#' @aliases RMySQL-package RMySQL
-#' @docType package
-#' @section Overview: A typical usage of the R-MySQL interface is: \enumerate{
-#' \item Connect and authenticate to one or more MySQL databases:
-#' \preformatted{ con <- dbConnect(MySQL(), group = "lasers") con2 <-
-#' dbConnect(MySQL(), user="opto", password="pure-light", dbname="lasers",
-#' host="merced") } \item List tables and fields in a table: \preformatted{
-#' dbListTables(con) dbListFields(con, "table\_name") } \item Import and export
-#' data.frames: \preformatted{ d <- dbReadTable(con, "WL") dbWriteTable(con,
-#' "WL2", a.data.frame) ## table from a data.frame dbWriteTable(con, "test2",
-#' "~/data/test2.csv") ## table from a file } \item Run an arbitrary SQL
-#' statement and extract all its output (returns a data.frame): \preformatted{
-#' dbGetQuery(con, "select count(*) from a\_table") dbGetQuery(con, "select *
-#' from a\_table") } \item Run an SQL statement and extract its output in
-#' pieces (returns a result set): \preformatted{ rs <- dbSendQuery(con, "select
-#' * from WL where width\_nm between 0.5 and 1") d1 <- fetch(rs, n = 10000) d2
-#' <- fetch(rs, n = -1 } \item Run multiple SQL statements and process the
-#' various result sets (note the \code{client.flag} value in the
-#' \code{dbConnect} call): \preformatted{ con <- dbConnection(MySQL(), dbname =
-#' "rs-dbi", client.flag = CLIENT\_MULTI\_STATEMENTS) script <- paste("select *
-#' from WL where width\_nm between 0.5 and 1" "select * from lasers\_id where
-#' id LIKE 'AL100%' sep = ";") rs1 <- dbSendQuery(con, script) d1 <- fetch(rs1,
-#' n = -1) if(dbMoreResults(con)){ rs2 <- dbNextResult(con) d2 <- fetch(rs2,
-#' n=-1) } } \item Get meta-information on a connection (thread-id, etc.):
-#' \preformatted{ summary(MySQL(), verbose = TRUE) summary(con, verbose = TRUE)
-#' summary(rs, verbose = TRUE) dbListConnections(MySQL()) dbListResultSets(con)
-#' dbHasCompleted(rs) } \item Close connections: \preformatted{
-#' dbDisconnect(con) dbDisconnect(con2) } }
-#' @author David A. James <dj@@bell-labs.com> Saikat DebRoy
-#' <saikat@@stat.wisc.edu>
-#' @seealso On database managers:
-#'
-#' \code{\link[DBI]{dbDriver}} \code{\link[DBI]{dbUnloadDriver}}
-#'
-#' On connections, SQL statements and resultSets:
-#'
-#' \code{\link[DBI]{dbConnect}} \code{\link[DBI]{dbDisconnect}}
-#' \code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{dbGetQuery}}
-#' \code{\link[DBI]{fetch}} \code{\link[DBI]{dbClearResult}}
-#'
-#' On transaction management:
-#'
-#' \code{\link[DBI]{dbCommit}} \code{\link[DBI]{dbRollback}}
-#'
-#' On meta-data:
-#'
-#' \code{\link{summary}} \code{\link[DBI]{dbGetInfo}}
-#' \code{\link[DBI]{dbGetDBIVersion}} \code{\link[DBI]{dbListTables}}
-#' \code{\link[DBI]{dbListConnections}} \code{\link[DBI]{dbListResults}}
-#' \code{\link[DBI]{dbColumnInfo}} \code{\link[DBI]{dbGetException}}
-#' \code{\link[DBI]{dbGetStatement}} \code{\link[DBI]{dbHasCompleted}}
-#' \code{\link[DBI]{dbGetRowCount}}
-#' @keywords package interface database
-#' @examples
-#' \dontrun{
-#' # create a MySQL instance and create one connection.
-#' > m <- dbDriver("MySQL")  ## or MySQL()
-#' <MySQLDriver:(4378)>
-#'
-#' # open the connection using user, passsword, etc., as
-#' # specified in the "[iptraffic]" section of the
-#' # configuration file \file{\$HOME/.my.cnf}
-#' > con <- dbConnect(m, group = "iptraffic")
-#' > rs <- dbSendQuery(con, "select * from HTTP_ACCESS where IP_ADDRESS = '127.0.0.1'")
-#' > df <- fetch(rs, n = 50)
-#' > dbHasCompleted(rs)
-#' [1] FALSE
-#' > df2 <- fetch(rs, n = -1)
-#' > dbHasCompleted(rs)
-#' [1] TRUE
-#' > dbClearResult(rs)
-#' > dim(dbGetQuery(con, "show tables"))
-#' [1] 74   1
-#' > dbListTables(con)
-#' }
-#'
-NULL
-
-
 #' Constants
 #'
 #' @aliases .MySQLPkgName .MySQLPkgVersion .MySQLPkgRCS .MySQL.NA.string
@@ -150,7 +62,6 @@ setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 #'
 #' Base class for all MySQL-specific DBI classes
 #'
-#'
 #' @name MySQLObject-class
 #' @aliases MySQLObject-class dbObjectId-class
 #' @docType class
@@ -190,23 +101,24 @@ setAs("MySQLObject", "character",
   def = function(from) as(slot(from, "Id"), "character")
 )
 
-## formating, showing, printing,...
-setMethod("format", "MySQLObject",
-  def = function(x, ...) {
-    paste("(", paste(as(x, "integer"), collapse=","), ")", sep="")
-  },
-  valueClass = "character"
+#### Temporary compatibility fix for TSMySQL
+setClass("dbObjectId")
+setAs("dbObjectId", "integer",
+  def = function(from) as(slot(from,"Id"), "integer")
 )
 
-setMethod("show", "MySQLObject", def = function(object) {
+
+## formating, showing, printing,...
+setMethod("format", "MySQLObject", function(x, ...) {
+  paste("(", paste(as(x, "integer"), collapse=","), ")", sep="")
+})
+
+setMethod("show", "MySQLObject", function(object) {
   expired <- if(isIdCurrent(object)) "" else "Expired "
   str <- paste("<", expired, class(object), ":", format(object), ">", sep="")
   cat(str, "\n")
   invisible(NULL)
 })
-
-## verify that obj refers to a currently open/loaded database
-
 
 #' Check whether a database handle object is valid or not
 #'
@@ -230,7 +142,6 @@ setMethod("show", "MySQLObject", def = function(object) {
 #' cursor <- dbSendQuery(con, sql.statement)
 #' isIdCurrent(cursor)
 #' }
-#'
 isIdCurrent <- function(obj)  {
   obj <- as(obj, "integer")
   .Call("RS_DBI_validHandle", obj, PACKAGE = .MySQLPkgName)
@@ -252,57 +163,48 @@ isIdCurrent <- function(obj)  {
 #' @keywords methods interface database
 #' @export
 #' @examples
-#' \dontrun{
-#' data(quakes)
-#' drv <- dbDriver("MySQL")
-#' sql.type <- dbDataType(drv, quakes)
-#' }
-setMethod("dbDataType",
-   signature(dbObj = "MySQLObject", obj = "ANY"),
-   def = function(dbObj, obj, ...) mysqlDataType(obj, ...),
-   valueClass = "character"
-)
+#' dbDataType(RMySQL::MySQL(), "a")
+#' dbDataType(RMySQL::MySQL(), 1:3)
+#' dbDataType(RMySQL::MySQL(), 2.5)
+setMethod("dbDataType", c("MySQLObject", "ANY"), function(dbObj, obj) {
+  rs.class <- data.class(obj)    ## this differs in R 1.4 from older vers
+  rs.mode <- storage.mode(obj)
+  if(rs.class == "numeric" || rs.class == "integer") {
+    sql.type <- if(rs.mode=="integer") "bigint" else  "double"
+  } else {
+    sql.type <- switch(rs.class,
+      character = "text",
+      logical = "tinyint",  ## but we need to coerce to int!!
+      factor = "text",      ## up to 65535 characters
+      ordered = "text",
+      "text")
+  }
+  sql.type
+})
 
 #' Make R/S-Plus identifiers into legal SQL identifiers
 #'
 #' These methods are straight-forward implementations of the corresponding
 #' generic functions.
 #'
-#'
-#' @name make.db.names-methods
-#' @aliases SQLKeywords-methods isSQLKeyword-methods
-#' make.db.names,MySQLObject,character-method SQLKeywords,MySQLObject-method
-#' SQLKeywords,missing-method isSQLKeyword,MySQLObject,character-method
-#' @docType methods
-#' @section Methods: \describe{ \item{dbObj}{ any MySQL object (e.g.,
-#' \code{MySQLDriver}).  } \item{snames}{ a character vector of R/S-Plus
-#' identifiers (symbols) from which we need to make SQL identifiers.  }
-#' \item{name}{ a character vector of SQL identifiers we want to check against
-#' keywords from the DBMS. } \item{unique}{ logical describing whether the
-#' resulting set of SQL names should be unique.  Its default is \code{TRUE}.
-#' Following the SQL 92 standard, uniqueness of SQL identifiers is determined
-#' regardless of whether letters are upper or lower case.  }
-#' \item{allow.keywords }{ logical describing whether SQL keywords should be
-#' allowed in the resulting set of SQL names.  Its default is \code{TRUE} }
-#' \item{keywords}{ a character vector with SQL keywords, by default it is
-#' \code{.MySQLKeywords} define in \code{RMySQL}. This may be overriden by
-#' users.  } \item{case}{ a character string specifying whether to make the
-#' comparison as lower case, upper case, or any of the two.  it defaults to
-#' \code{any}.  } \item{list()}{currently not used.} }
-#' @seealso \code{\link{MySQL}}, \code{\link[DBI]{dbReadTable}},
-#' \code{\link[DBI]{dbWriteTable}}, \code{\link[DBI]{dbExistsTable}},
-#' \code{\link[DBI]{dbRemoveTable}}, \code{\link[DBI]{dbListTables}}.
-#' @references The set of SQL keywords is stored in the character vector
-#' \code{.SQL92Keywords} and reflects the SQL ANSI/ISO standard as documented
-#' in "X/Open SQL and RDA", 1994, ISBN 1-872630-68-8.  Users can easily
-#' override or update this vector.
-#'
-#' MySQL does add some keywords to the SQL 92 standard, they are listed in the
-#' \code{.MySQLKeywords} object.
-#'
-#' See the Database Interface definition document \code{DBI.pdf} in the base
-#' directory of this package or \url{http://stat.bell-labs.com/RS-DBI}.
-#' @keywords methods interface database
+#' @param any MySQL object (e.g., \code{MySQLDriver}).
+#' @param snames a character vector of R/S-Plus
+#'   identifiers (symbols) from which we need to make SQL identifiers.
+#' @param name a character vector of SQL identifiers we want to check against
+#'   keywords from the DBMS.
+#' @param unique logical describing whether the resulting set of SQL names
+#'   should be unique.  Its default is \code{TRUE}. Following the SQL 92
+#'   standard, uniqueness of SQL identifiers is determined regardless of whether
+#'   letters are upper or lower case.
+#' @param allow.keywords logical describing whether SQL keywords should be
+#'   allowed in the resulting set of SQL names.  Its default is \code{TRUE}
+#' @param keywords a character vector with SQL keywords, by default it is
+#'   \code{.MySQLKeywords} define in \code{RMySQL}. This may be overriden by
+#'   users.
+#' @param case a character string specifying whether to make the
+#'   comparison as lower case, upper case, or any of the two.  it defaults to
+#'   \code{any}.
+#' @export
 #' @examples
 #' \dontrun{
 #' # This example shows how we could export a bunch of data.frames
@@ -316,7 +218,6 @@ setMethod("dbDataType",
 #' for(i in seq(along = export) )
 #'    dbWriteTable(con, name = tabs[i],  get(export[i]))
 #' }
-#'
 setMethod("make.db.names",
    signature(dbObj="MySQLObject", snames = "character"),
    def = function(dbObj, snames, keywords = .MySQLKeywords,
@@ -354,11 +255,15 @@ setMethod("make.db.names",
    valueClass = "character"
 )
 
+#' @export
+#' @rdname make.db.names-MySQLObject-character-method
 setMethod("SQLKeywords", "MySQLObject",
    def = function(dbObj, ...) .MySQLKeywords,
    valueClass = "character"
 )
 
+#' @export
+#' @rdname make.db.names-MySQLObject-character-method
 setMethod("isSQLKeyword",
    signature(dbObj="MySQLObject", name="character"),
    def = function(dbObj, name, keywords = .MySQLKeywords, case, ...){
@@ -366,43 +271,4 @@ setMethod("isSQLKeyword",
    },
    valueClass = "character"
 )
-
-## extension to the DBI 0.1-4
-
-
-#### Temporary compatibility fix for TSMySQL
-setClass("dbObjectId")
-setAs("dbObjectId", "integer",
-  def = function(from) as(slot(from,"Id"), "integer")
-)
-####
-
-#' Summarize an MySQL object
-#'
-#' These methods are straight-forward implementations of the corresponding
-#' generic functions.
-#'
-#'
-#' @name summary-methods
-#' @aliases coerce-methods summary-methods format-methods show-methods
-#' coerce,dbObjectId,integer-method coerce,MySQLObject,integer-method
-#' coerce,MySQLObject,numeric-method coerce,MySQLObject,character-method
-#' coerce,MySQLObject,MySQLDriver-method
-#' coerce,MySQLConnection,MySQLResult-method
-#' coerce,MySQLConnection,MySQLDriver-method
-#' coerce,MySQLResult,MySQLConnection-method
-#' coerce,MySQLResult,MySQLDriver-method format,MySQLObject-method
-#' print,MySQLObject-method show,MySQLObject-method summary,MySQLObject-method
-#' summary,MySQLDriver-method summary,MySQLConnection-method
-#' summary,MySQLResult-method
-#' @docType methods
-#' @section Methods: \describe{
-#'
-#' \item{object = "DBIObject"}{ Provides relevant metadata information on
-#' \code{object}, for instance, the MySQL server file, the SQL statement
-#' associated with a result set, etc.  } \item{from}{object to be coerced}
-#' \item{to}{coercion class} \item{x}{object to \code{format} or \code{print}
-#' or \code{show}} }
-#' @keywords methods database interface
-NULL
 

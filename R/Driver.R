@@ -5,6 +5,7 @@
 #' It returns a singleton that allows you to connect to MySQL.
 #'
 #' @export
+#' @aliases RMySQL-package
 setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 
 #' @param max.con maximum number of connections that can be open
