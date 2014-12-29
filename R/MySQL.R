@@ -14,9 +14,21 @@
 ## License along with this library; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-##
-## Constants
-##
+#' Constants
+#'
+#' @aliases .MySQLPkgName .MySQLPkgVersion .MySQLPkgRCS .MySQL.NA.string
+#' .MySQLSQLKeywords CLIENT_LONG_PASSWORD CLIENT_FOUND_ROWS CLIENT_LONG_FLAG
+#' CLIENT_CONNECT_WITH_DB CLIENT_NO_SCHEMA CLIENT_COMPRESS CLIENT_ODBC
+#' CLIENT_LOCAL_FILES CLIENT_IGNORE_SPACE CLIENT_PROTOCOL_41 CLIENT_INTERACTIVE
+#' CLIENT_SSL CLIENT_IGNORE_SIGPIPE CLIENT_TRANSACTIONS CLIENT_RESERVED
+#' CLIENT_SECURE_CONNECTION CLIENT_MULTI_STATEMENTS CLIENT_MULTI_RESULTS
+#' @section Constants: \code{.MySQLPkgName} (currently \code{"RMySQL"}),
+#' \code{.MySQLPkgVersion} (the R package version), \code{.MySQLPkgRCS} (the
+#' RCS revision), \code{.MySQL.NA.string} (character that MySQL uses to denote
+#' \code{NULL} on input), \code{.MySQLSQLKeywords} (a lot!) %\non_function{}
+#' @keywords datasets interface database
+#' @name constants
+NULL
 
 .MySQLPkgName <- "RMySQL"      ## should we set thru package.description()?
 .MySQLVersion <- "0.5-12"      ##package.description(.MySQLPkgName, fields = "Version")
@@ -46,9 +58,33 @@ CLIENT_MULTI_RESULTS     <- 131072 # Enable/disable multi-results
 
 setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 
-##
-## Class: DBIObject
-##
+#' Class MySQLObject
+#'
+#' Base class for all MySQL-specific DBI classes
+#'
+#' @name MySQLObject-class
+#' @aliases MySQLObject-class dbObjectId-class
+#' @docType class
+#' @section Objects from the Class: A virtual Class: No objects may be created
+#' from it.
+#' @seealso DBI base classes:
+#'
+#' \code{\link[DBI]{DBIObject-class}} \code{\link[DBI]{DBIDriver-class}}
+#' \code{\link[DBI]{DBIConnection-class}} \code{\link[DBI]{DBIResult-class}}
+#'
+#' MySQL classes:
+#'
+#' \code{\link{MySQLObject-class}} \code{\link{MySQLDriver-class}}
+#' \code{\link{MySQLConnection-class}} \code{\link{MySQLResult-class}}
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://developer.r-project.org/db}.
+#' @keywords database interface classes
+#' @examples
+#' \dontrun{
+#' drv <- dbDriver("MySQL")
+#' con <- dbConnect(drv, dbname = "rsdbi.db")
+#' }
 setClass("MySQLObject",
   contains = c("DBIObject", "VIRTUAL"),
   slots = list(Id = "integer")
@@ -65,33 +101,126 @@ setAs("MySQLObject", "character",
   def = function(from) as(slot(from, "Id"), "character")
 )
 
-## formating, showing, printing,...
-setMethod("format", "MySQLObject",
-  def = function(x, ...) {
-    paste("(", paste(as(x, "integer"), collapse=","), ")", sep="")
-  },
-  valueClass = "character"
+#### Temporary compatibility fix for TSMySQL
+setClass("dbObjectId")
+setAs("dbObjectId", "integer",
+  def = function(from) as(slot(from,"Id"), "integer")
 )
 
-setMethod("show", "MySQLObject", def = function(object) {
+setGeneric("summary")
+setGeneric("format")
+
+## formating, showing, printing,...
+setMethod("format", "MySQLObject", function(x, ...) {
+  paste("(", paste(as(x, "integer"), collapse=","), ")", sep="")
+})
+
+setMethod("show", "MySQLObject", function(object) {
   expired <- if(isIdCurrent(object)) "" else "Expired "
   str <- paste("<", expired, class(object), ":", format(object), ">", sep="")
   cat(str, "\n")
   invisible(NULL)
 })
 
-## verify that obj refers to a currently open/loaded database
+#' Check whether a database handle object is valid or not
+#'
+#' Support function that verifies that an object holding a reference to a
+#' foreign object is still valid for communicating with the RDBMS
+#'
+#' \code{dbObjects} are R/S-Plus remote references to foreign objects. This
+#' introduces differences to the object's semantics such as persistence (e.g.,
+#' connections may be closed unexpectedly), thus this function provides a
+#' minimal verification to ensure that the foreign object being referenced can
+#' be contacted.
+#'
+#' @param obj any \code{dbObject} (e.g., \code{dbDriver}, \code{dbConnection},
+#' \code{dbResult}).
+#' @return a logical scalar.
+#' @seealso \code{\link[DBI]{dbDriver}} \code{\link[DBI]{dbConnect}}
+#' \code{\link[DBI]{dbSendQuery}} \code{\link[DBI]{fetch}}
+#' @keywords interface database
+#' @examples
+#' \dontrun{
+#' cursor <- dbSendQuery(con, sql.statement)
+#' isIdCurrent(cursor)
+#' }
 isIdCurrent <- function(obj)  {
   obj <- as(obj, "integer")
   .Call("RS_DBI_validHandle", obj, PACKAGE = .MySQLPkgName)
 }
 
-setMethod("dbDataType",
-   signature(dbObj = "MySQLObject", obj = "ANY"),
-   def = function(dbObj, obj, ...) mysqlDataType(obj, ...),
-   valueClass = "character"
-)
+#' Determine the SQL Data Type of an S object
+#'
+#' This method is a straight-forward implementation of the corresponding
+#' generic function.
+#'
+#' @param dbObj any \code{MySQLObject} object, e.g., \code{MySQLDriver},
+#' \code{MySQLConnection}, \code{MySQLResult}.
+#' @param obj R/S-Plus object whose SQL type we want to determine.
+#' @param \dots any other parameters that individual methods may need.
+#' @seealso \code{\link[DBI]{isSQLKeyword}} \code{\link[DBI]{make.db.names}}
+#' @references See the Database Interface definition document \code{DBI.pdf} in
+#' the base directory of this package or
+#' \url{http://stat.bell-labs.com/RS-DBI}.
+#' @keywords methods interface database
+#' @export
+#' @examples
+#' dbDataType(RMySQL::MySQL(), "a")
+#' dbDataType(RMySQL::MySQL(), 1:3)
+#' dbDataType(RMySQL::MySQL(), 2.5)
+setMethod("dbDataType", c("MySQLObject", "ANY"), function(dbObj, obj) {
+  rs.class <- data.class(obj)    ## this differs in R 1.4 from older vers
+  rs.mode <- storage.mode(obj)
+  if(rs.class == "numeric" || rs.class == "integer") {
+    sql.type <- if(rs.mode=="integer") "bigint" else  "double"
+  } else {
+    sql.type <- switch(rs.class,
+      character = "text",
+      logical = "tinyint",  ## but we need to coerce to int!!
+      factor = "text",      ## up to 65535 characters
+      ordered = "text",
+      "text")
+  }
+  sql.type
+})
 
+#' Make R/S-Plus identifiers into legal SQL identifiers
+#'
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#'
+#' @param dbObj any MySQL object (e.g., \code{MySQLDriver}).
+#' @param snames a character vector of R/S-Plus
+#'   identifiers (symbols) from which we need to make SQL identifiers.
+#' @param name a character vector of SQL identifiers we want to check against
+#'   keywords from the DBMS.
+#' @param unique logical describing whether the resulting set of SQL names
+#'   should be unique.  Its default is \code{TRUE}. Following the SQL 92
+#'   standard, uniqueness of SQL identifiers is determined regardless of whether
+#'   letters are upper or lower case.
+#' @param allow.keywords logical describing whether SQL keywords should be
+#'   allowed in the resulting set of SQL names.  Its default is \code{TRUE}
+#' @param keywords a character vector with SQL keywords, by default it is
+#'   \code{.MySQLKeywords} define in \code{RMySQL}. This may be overriden by
+#'   users.
+#' @param case a character string specifying whether to make the
+#'   comparison as lower case, upper case, or any of the two.  it defaults to
+#'   \code{any}.
+#' @param ... Unused, needed for compatibility with generic.
+#' @export
+#' @examples
+#' \dontrun{
+#' # This example shows how we could export a bunch of data.frames
+#' # into tables on a remote database.
+#'
+#' con <- dbConnect("MySQL", "user", "password")
+#'
+#' export <- c("trantime.email", "trantime.print", "round.trip.time.email")
+#' tabs <- make.db.names(export, unique = T, allow.keywords = T)
+#'
+#' for(i in seq(along = export) )
+#'    dbWriteTable(con, name = tabs[i],  get(export[i]))
+#' }
 setMethod("make.db.names",
    signature(dbObj="MySQLObject", snames = "character"),
    def = function(dbObj, snames, keywords = .MySQLKeywords,
@@ -129,11 +258,15 @@ setMethod("make.db.names",
    valueClass = "character"
 )
 
+#' @export
+#' @rdname make.db.names-MySQLObject-character-method
 setMethod("SQLKeywords", "MySQLObject",
    def = function(dbObj, ...) .MySQLKeywords,
    valueClass = "character"
 )
 
+#' @export
+#' @rdname make.db.names-MySQLObject-character-method
 setMethod("isSQLKeyword",
    signature(dbObj="MySQLObject", name="character"),
    def = function(dbObj, name, keywords = .MySQLKeywords, case, ...){
@@ -142,12 +275,3 @@ setMethod("isSQLKeyword",
    valueClass = "character"
 )
 
-## extension to the DBI 0.1-4
-
-
-#### Temporary compatibility fix for TSMySQL
-setClass("dbObjectId")
-setAs("dbObjectId", "integer",
-  def = function(from) as(slot(from,"Id"), "integer")
-)
-####

@@ -1,15 +1,66 @@
+#' @include Driver.R MySQL.R
+NULL
 
-##
-## Class: DBIConnection
-##
+#' Class MySQLConnection.
+#'
+#' \code{MySQLConnection.} objects are usually created by
+#' \code{\link[DBI]{dbConnect}}
+#'
+#' @export
+#' @keywords internal
 setClass("MySQLConnection", representation("DBIConnection", "MySQLObject"))
 
-setMethod("dbConnect", "MySQLDriver",
-  function(drv, dbname=NULL, username=NULL,
-    password=NULL, host=NULL,
-    unix.socket=NULL, port = 0, client.flag = 0,
-    groups = 'rs-dbi', default.file = NULL, ...)
-  {
+#' Connect/disconnect to a MySQL DBMS
+#'
+#' These methods are straight-forward implementations of the corresponding
+#' generic functions.
+#'
+#' @param drv an object of class \code{MySQLDriver}, or the character string
+#'   "MySQL" or an \code{MySQLConnection}.
+#' @param conn an \code{MySQLConnection} object as produced by \code{dbConnect}.
+#' @param username string of the MySQL login name or NULL. If NULL or the empty
+#'   string \code{""}, the current user is assumed.
+#' @param password string with the MySQL password or NULL. If NULL, only entries
+#'   in the user table for the users that have a blank (empty) password field
+#'   are hecked for a match.
+#' @param dbname string with the database name or NULL. If NOT NULL, the
+#'   connection sets the default da abaseto this value.
+#' @param host string identifying the host machine running the MySQL server or
+#'   NULL. If NULL or the string \code{"localhost"}, a connection to the local
+#'   host s assumed.
+#' @param unix.socket (optional) string of the unix socket or named pipe.
+#' @param port (optional) integer of the TCP/IP default port.
+#' @param client.flag (optional) integer setting various MySQL client flags. See
+#'   the MySQL manual for details.
+#' @param groups string identifying a section in the \code{default.file} to use
+#'   for setting authentication parameters (see \code{\link{MySQL}}).
+#' @param default.file string of the filename with MySQL client options.
+#'   Defaults to \code{\$HOME/.my.cnf}
+#' @param ... Unused, needed for compatibility with generic.
+#' @export
+#' @examples
+#' \dontrun{
+#' # create an MySQL instance and create one connection.
+#' drv <- dbDriver(RMySQL::MySQL())
+#'
+#' # open the connection using user, passsword, etc., as
+#' con <- dbConnect(drv, group = "rs-dbi")
+#'
+#' # Run an SQL statement by creating first a resultSet object
+#' rs <- dbSendQuery(con, statement = paste(
+#'                       "SELECT w.laser_id, w.wavelength, p.cut_off",
+#'                       "FROM WL w, PURGE P",
+#'                       "WHERE w.laser_id = p.laser_id",
+#'                       "SORT BY w.laser_id")
+#' # we now fetch records from the resultSet into a data.frame
+#' data <- fetch(rs, n = -1)   # extract all rows
+#' dim(data)
+#' }
+#' @export
+setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
+          password=NULL, host=NULL,
+          unix.socket=NULL, port = 0, client.flag = 0,
+          groups = 'rs-dbi', default.file = NULL, ...) {
     if(!isIdCurrent(drv))
       stop("expired manager")
 
@@ -48,16 +99,19 @@ setMethod("dbConnect", "MySQLDriver",
   }
 )
 
-## clone a connection
+#' @export
+#' @rdname dbConnect-MySQLDriver-method
 setMethod("dbConnect", "MySQLConnection",
   function(drv, ...) {
-    if(!isIdCurrent(drv)) stop(paste("expired", class(drv)))
+    if (!isIdCurrent(drv)) stop(paste("expired", class(drv)))
     conId <- as(drv, "integer")
     newId <- .Call("RS_MySQL_cloneConnection", conId, PACKAGE = .MySQLPkgName)
     new("MySQLConnection", Id = newId)
   }
 )
 
+#' @export
+#' @rdname dbConnect-MySQLDriver-method
 setMethod("dbDisconnect", "MySQLConnection",
   function(conn, ...) {
     if(!isIdCurrent(conn))
@@ -74,74 +128,48 @@ setMethod("dbDisconnect", "MySQLConnection",
   }
 )
 
-## submits the sql statement to MySQL and creates a
-## dbResult object if the SQL operation does not produce
-## output, otherwise it produces a resultSet that can
-## be used for fetching rows.
-setMethod("dbSendQuery", c("MySQLConnection", "character"),
-  function(conn, statement) {
-    if(!isIdCurrent(conn))
-      stop(paste("expired", class(conn)))
-    conId <- as(conn, "integer")
-    statement <- as(statement, "character")
-    rsId <- .Call("RS_MySQL_exec", conId, statement, PACKAGE = .MySQLPkgName)
-    new("MySQLResult", Id = rsId)
-  }
-)
+#' Database interface meta-data
+#'
+#' @name db-meta
+#' @param conn,dbObj,object MySQLConnection object.
+#' @param ... Other arguments for compatibility with generic.
+#' @examples
+#' \dontrun{
+#' con <- dbConnect(RMySQL::MySQL(), group = "wireless")
+#' dbGetInfo(con)
+#' dbListResults(con)
+#' dbListTables(con)
+#' }
+NULL
 
-setMethod("dbGetQuery", c("MySQLConnection", "character"),
-  function(conn, statement) {
-    if(!isIdCurrent(conn)) stop(paste("expired", class(conn)))
+#' @rdname db-meta
+#' @param what optional
+#' @export
+setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
+  if(!isIdCurrent(dbObj))
+    stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
+  id <- as(dbObj, "integer")
+  info <- .Call("RS_MySQL_connectionInfo", id, PACKAGE = .MySQLPkgName)
+  rsId <- vector("list", length = length(info$rsId))
+  for(i in seq(along = info$rsId))
+    rsId[[i]] <- new("MySQLResult", Id = c(id, info$rsId[i]))
+  info$rsId <- rsId
 
-    ## are there resultSets pending on con?
-    .clearResultSets(conn)
+  if(!missing(what))
+    info[what]
+  else
+    info
+})
 
-    rs <- dbSendQuery(conn, statement)
-    if(dbHasCompleted(rs)){
-      dbClearResult(rs)            ## no records to fetch, we're done
-      invisible()
-      return(NULL)
-    }
-    res <- fetch(rs, n = -1)
-    if(dbHasCompleted(rs))
-      dbClearResult(rs)
-    else
-      warning("pending rows")
-    res
-  }
-)
-
-setMethod("dbGetException", "MySQLConnection",
-  def = function(conn, ...) {
-    if(!isIdCurrent(conn))
-      stop(paste("expired", class(conn)))
-    .Call("RS_MySQL_getException", as(conn, "integer"),
-      PACKAGE = .MySQLPkgName)
-  }
-)
-
-setMethod("dbGetInfo", "MySQLConnection",
-  function(dbObj, what="", ...)    {
-    if(!isIdCurrent(dbObj))
-      stop(paste("expired", class(dbObj), deparse(substitute(dbObj))))
-    id <- as(dbObj, "integer")
-    info <- .Call("RS_MySQL_connectionInfo", id, PACKAGE = .MySQLPkgName)
-    rsId <- vector("list", length = length(info$rsId))
-    for(i in seq(along = info$rsId))
-      rsId[[i]] <- new("MySQLResult", Id = c(id, info$rsId[i]))
-    info$rsId <- rsId
-
-    if(!missing(what))
-      info[what]
-    else
-      info
-  }
-)
-
+#' @rdname db-meta
+#' @export
 setMethod("dbListResults", "MySQLConnection",
   def = function(conn, ...) dbGetInfo(conn, "rsId")[[1]]
 )
 
+#' @rdname db-meta
+#' @param verbose If \code{TRUE}, add extra info.
+#' @export
 setMethod("summary", "MySQLConnection",
   function(object, verbose = FALSE, ...) {
     info <- dbGetInfo(object)
@@ -168,282 +196,14 @@ setMethod("summary", "MySQLConnection",
   }
 )
 
-## convenience methods
-setMethod("dbListTables", "MySQLConnection",
-  function(conn, ...) {
-    tbls <- dbGetQuery(conn, "show tables")
-    if(length(tbls)>0)
-      tbls <- tbls[,1]
-    else
-      tbls <- character()
-    tbls
-  }
-)
 
-## Use NULL, "", or 0 as row.names to prevent using any field as row.names.
-setMethod("dbReadTable", signature(conn="MySQLConnection", name="character"),
-  function(conn, name, row.names = "row_names", check.names = TRUE, ...) {
-    out <- dbGetQuery(conn, paste("SELECT * from", name))
-    if(check.names)
-      names(out) <- make.names(names(out), unique = TRUE)
-    ## should we set the row.names of the output data.frame?
-    nms <- names(out)
-    j <- switch(mode(row.names),
-      "character" = if(row.names=="") 0 else
-        match(tolower(row.names), tolower(nms),
-          nomatch = if(missing(row.names)) 0 else -1),
-      "numeric" = row.names,
-      "NULL" = 0,
-      0)
-    if(j==0)
-      return(out)
-    if(j<0 || j>ncol(out)){
-      warning("row.names not set on output data.frame (non-existing field)")
-      return(out)
-    }
-    rnms <- as.character(out[,j])
-    if(all(!duplicated(rnms))){
-      out <- out[,-j, drop = FALSE]
-      row.names(out) <- rnms
-    } else warning("row.names not set on output (duplicate elements in field)")
-    out
-  }
-)
-
-## Create table "name" (must be an SQL identifier) and populate
-## it with the values of the data.frame "value"
-## TODO: This function should execute its sql as a single transaction,
-##       and allow converter functions.
-## TODO: In the unlikely event that value has a field called "row_names"
-##       we could inadvertently overwrite it (here the user should set
-##       row.names=F)  I'm (very) reluctantly adding the code re: row.names,
-##       because I'm not 100% comfortable using data.frames as the basic
-##       data for relations.
-setMethod("dbWriteTable",
-  signature(conn="MySQLConnection", name="character", value="data.frame"),
-  function(conn, name, value, field.types, row.names = TRUE,
-           overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE)     {
-    if(overwrite && append)
-      stop("overwrite and append cannot both be TRUE")
-    if(!is.data.frame(value))
-      value <- as.data.frame(value)
-    if(row.names){
-      value <- cbind(row.names(value), value)  ## can't use row.names= here
-      names(value)[1] <- "row.names"
-    }
-    if(missing(field.types) || is.null(field.types)){
-      ## the following mapping should be coming from some kind of table
-      ## also, need to use converter functions (for dates, etc.)
-      field.types <- lapply(value, dbDataType, dbObj = conn)
-    }
-
-    ## Do we need to coerce any field prior to write it out?
-    ## TODO: MySQL 4.1 introduces the boolean data type.
-    for(i in seq(along = value)){
-      if(is(value[[i]], "logical"))
-        value[[i]] <- as(value[[i]], "integer")
-    }
-    i <- match("row.names", names(field.types), nomatch=0)
-    if(i>0) ## did we add a row.names value?  If so, it's a text field.
-      field.types[i] <- dbDataType(dbObj=conn, field.types$row.names)
-    names(field.types) <- make.db.names(conn, names(field.types),
-      allow.keywords = allow.keywords)
-
-    .clearResultSets(conn)
-
-    if(dbExistsTable(conn,name)){
-      if(overwrite){
-        if(!dbRemoveTable(conn, name)){
-          warning(paste("table", name, "couldn't be overwritten"))
-          return(FALSE)
-        }
-      }
-      else if(!append){
-        warning(paste("table",name,"exists in database: aborting mysqlWriteTable"))
-        return(FALSE)
-      }
-    }
-    if(!dbExistsTable(conn,name)){      ## need to re-test table for existence
-      ## need to create a new (empty) table
-      sql1 <- paste("create table ", name, "\n(\n\t", sep="")
-      sql2 <- paste(paste(names(field.types), field.types), collapse=",\n\t",
-        sep="")
-      sql3 <- "\n)\n"
-      sql <- paste(sql1, sql2, sql3, sep="")
-      rs <- try(dbSendQuery(conn, sql))
-      if(inherits(rs, "try-error")){
-        warning("could not create table: aborting mysqlWriteTable")
-        return(FALSE)
-      }
-      else
-        dbClearResult(rs)
-    }
-
-    ## TODO: here, we should query the MySQL to find out if it supports
-    ## LOAD DATA thru pipes; if so, should open the pipe instead of a file.
-
-    fn <- tempfile("rsdbi")
-    fn <- gsub("\\\\", "/", fn)  # Since MySQL on Windows wants \ double (BDR)
-    safe.write(value, file = fn)
-    on.exit(unlink(fn), add = TRUE)
-    sql4 <- paste("LOAD DATA LOCAL INFILE '", fn, "'",
-      " INTO TABLE ", name,
-      " LINES TERMINATED BY '\n' ",
-      "( ", paste(names(field.types), collapse=", "), ");",
-      sep="")
-    rs <- try(dbSendQuery(conn, sql4))
-    if(inherits(rs, "try-error")){
-      warning("could not load data into table")
-      return(FALSE)
-    }
-    else
-      dbClearResult(rs)
-    TRUE
-  }
-)
-
-## write table from filename (TODO: connections)
-setMethod("dbWriteTable",
-  signature(conn="MySQLConnection", name="character", value="character"),
-  function(conn, name, value, field.types = NULL, overwrite = FALSE,
-           append = FALSE, header, row.names, nrows = 50, sep = ",",
-           eol="\n", skip = 0, quote = '"', ...)   {
-    if(overwrite && append)
-      stop("overwrite and append cannot both be TRUE")
-
-    .clearResultSets(conn)
-
-    if(dbExistsTable(conn,name)){
-      if(overwrite){
-        if(!dbRemoveTable(conn, name)){
-          warning(paste("table", name, "couldn't be overwritten"))
-          return(FALSE)
-        }
-      }
-      else if(!append){
-        warning(paste("table", name, "exists in database: aborting dbWriteTable"))
-        return(FALSE)
-      }
-    }
-
-    ## compute full path name (have R expand ~, etc)
-    fn <- file.path(dirname(value), basename(value))
-    if(missing(header) || missing(row.names)){
-      f <- file(fn, open="r")
-      if(skip>0)
-        readLines(f, n=skip)
-      txtcon <- textConnection(readLines(f, n=2))
-      flds <- count.fields(txtcon, sep)
-      close(txtcon)
-      close(f)
-      nf <- length(unique(flds))
-    }
-    if(missing(header)){
-      header <- nf==2
-    }
-    if(missing(row.names)){
-      if(header)
-        row.names <- if(nf==2) TRUE else FALSE
-      else
-        row.names <- FALSE
-    }
-
-    new.table <- !dbExistsTable(conn, name)
-    if(new.table){
-      ## need to init table, say, with the first nrows lines
-      d <- read.table(fn, sep=sep, header=header, skip=skip, nrows=nrows, ...)
-      sql <-
-        dbBuildTableDefinition(conn, name, obj=d, field.types = field.types,
-          row.names = row.names)
-      rs <- try(dbSendQuery(conn, sql))
-      if(inherits(rs, "try-error")){
-        warning("could not create table: aborting mysqlImportFile")
-        return(FALSE)
-      }
-      else
-        dbClearResult(rs)
-    }
-    else if(!append){
-      warning(sprintf("table %s already exists -- use append=TRUE?", name))
-    }
-
-    fmt <-
-      paste("LOAD DATA LOCAL INFILE '%s' INTO TABLE  %s ",
-        "FIELDS TERMINATED BY '%s' ",
-        if(!is.null(quote)) "OPTIONALLY ENCLOSED BY '%s' " else "",
-        "LINES TERMINATED BY '%s' ",
-        "IGNORE %d LINES ", sep="")
-    if(is.null(quote))
-      sql <- sprintf(fmt, fn, name, sep, eol, skip + as.integer(header))
-    else
-      sql <- sprintf(fmt, fn, name, sep, quote, eol, skip + as.integer(header))
-
-    rs <- try(dbSendQuery(conn, sql))
-    if(inherits(rs, "try-error")){
-      warning("could not load data into table")
-      return(FALSE)
-    }
-    dbClearResult(rs)
-    TRUE
-  }
-
-)
-
-setMethod("dbExistsTable",
-  signature(conn="MySQLConnection", name="character"),
-  def = function(conn, name, ...){
-    ## TODO: find out the appropriate query to the MySQL metadata
-    avail <- dbListTables(conn)
-    if(length(avail)==0) avail <- ""
-    match(tolower(name), tolower(avail), nomatch=0)>0
-  },
-  valueClass = "logical"
-)
-
-setMethod("dbRemoveTable",
-  signature(conn="MySQLConnection", name="character"),
-  def = function(conn, name, ...){
-    if(dbExistsTable(conn, name)){
-      rc <- try(dbGetQuery(conn, paste("DROP TABLE", name)))
-      !inherits(rc, "try-error")
-    }
-    else FALSE
-  },
-  valueClass = "logical"
-)
-
-## return field names (no metadata)
-setMethod("dbListFields",
-  signature(conn="MySQLConnection", name="character"),
-  def = function(conn, name, ...){
-    flds <- dbGetQuery(conn, paste("describe", name))[,1]
-    if(length(flds)==0)
-      flds <- character()
-    flds
-  },
-  valueClass = "character"
-)
-
-setMethod("dbCommit", "MySQLConnection",
-  def = function(conn, ...) .NotYetImplemented()
-)
-
-setMethod("dbRollback", "MySQLConnection",
-  def = function(conn, ...) .NotYetImplemented()
-)
-
-setMethod("dbCallProc", "MySQLConnection",
-  def = function(conn, ...) .NotYetImplemented()
-)
-
-## NOTE: The following is experimental (as suggested by Greg Warnes)
-setMethod("dbColumnInfo", "MySQLConnection",
-  def = function(res, ...){
-    dots <- list(...)
-    if(length(dots) == 0)
-      stop("must specify one MySQL object (table) name")
-    if(length(dots) > 1)
-      warning("dbColumnInfo: only one MySQL object name (table) may be specified", call.=FALSE)
-    dbGetQuery(res, paste("describe", dots[[1]]))
+#' @rdname db-meta
+#' @export
+setMethod("dbGetException", "MySQLConnection",
+  def = function(conn, ...) {
+    if(!isIdCurrent(conn))
+      stop(paste("expired", class(conn)))
+    .Call("RS_MySQL_getException", as(conn, "integer"),
+      PACKAGE = .MySQLPkgName)
   }
 )
