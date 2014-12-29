@@ -30,6 +30,7 @@ Collate:
     'data-type.R'
     'default.R'
     'escaping.R'
+    'is-valid.R'
     'tables.R'
     'transactions.R'
 Suggests:

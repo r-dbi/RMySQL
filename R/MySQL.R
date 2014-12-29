@@ -75,32 +75,3 @@ setOldClass("data.frame")      ## to appease setMethod's signature warnings...
 
 setGeneric("summary")
 setGeneric("format")
-
-#' Check whether a database handle object is valid or not
-#'
-#' Support function that verifies that an object holding a reference to a
-#' foreign object is still valid for communicating with the RDBMS
-#'
-#' \code{dbObjects} are R/S-Plus remote references to foreign objects. This
-#' introduces differences to the object's semantics such as persistence (e.g.,
-#' connections may be closed unexpectedly), thus this function provides a
-#' minimal verification to ensure that the foreign object being referenced can
-#' be contacted.
-#'
-#' @param obj any \code{dbObject} (e.g., \code{dbDriver}, \code{dbConnection},
-#' \code{dbResult}).
-#' @return a logical scalar.
-#' @export
-#' @examples
-#' isIdCurrent(MySQL())
-#' @useDynLib RMySQL RS_DBI_validHandle
-isIdCurrent <- function(obj)  {
-  .Call(RS_DBI_validHandle, obj@Id)
-}
-
-checkValid <- function(obj) {
-  if (isIdCurrent(obj)) return(TRUE)
-
-  stop("Expired ", class(obj), call = FALSE)
-}
-

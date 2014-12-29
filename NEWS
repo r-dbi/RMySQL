@@ -21,3 +21,6 @@
  -  The MySQLObject base class has been removed - there is no real shared
     behaviour for MySQLDriver, MySQLConnection and MySQLResult so this
     simplifies the code
+
+ -  Implement methods for `dbIsValid()`; please use these instead of
+    `isIdCurrent()`.
