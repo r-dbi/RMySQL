@@ -48,18 +48,22 @@ setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 #' }
 #' @useDynLib RMySQL RS_MySQL_init
 MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
-  if(fetch.default.rec<=0)
+  if (fetch.default.rec <= 0) {
     stop("default num of records per fetch must be positive")
-  config.params <- as(c(max.con, fetch.default.rec), "integer")
+  }
+
+  config.params <- as.integer(c(max.con, fetch.default.rec))
   force <- as.logical(force.reload)
+
   drvId <- .Call(RS_MySQL_init, config.params, force)
   new("MySQLDriver", Id = drvId)
 }
 
 ## coerce (extract) any MySQLObject into a MySQLDriver
-setAs("MySQLObject", "MySQLDriver",
-  def = function(from) new("MySQLDriver", Id = from@Id[1:2])
-)
+## HW: I'm pretty sure this is incorrect, since a Driver only needs a singe ID
+setAs("MySQLObject", "MySQLDriver", function(from) {
+  new("MySQLDriver", Id = from@Id[1:2])
+})
 
 #' Unload MySQL driver.
 #'
@@ -69,8 +73,8 @@ setAs("MySQLObject", "MySQLDriver",
 #' @export
 #' @useDynLib RMySQL RS_MySQL_closeManager
 setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
-  if(!isIdCurrent(drv))
-    return(TRUE)
+  if(!isIdCurrent(drv)) return(TRUE)
+
   .Call(RS_MySQL_closeManager, drv@Id)
 })
 
@@ -90,21 +94,21 @@ setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
 #' summary(db)
 #' @useDynLib RMySQL RS_MySQL_managerInfo
 setMethod("dbGetInfo", "MySQLDriver", function(dbObj, what="", ...) {
-  if(!isIdCurrent(dbObj))
-    stop(paste("expired", class(dbObj)))
-  drvId <- dbObj@Id
-  info <- .Call(RS_MySQL_managerInfo, drvId)
-  ## replace drv/connection id w. actual drv/connection objects
-  conObjs <- vector("list", length = info$"num_con")
-  ids <- info$connectionIds
-  for(i in seq(along = ids))
-    conObjs[[i]] <- new("MySQLConnection", Id = c(drvId, ids[i]))
-  info$connectionIds <- conObjs
-  info$managerId <- new("MySQLDriver", Id = drvId)
-  if(!missing(what))
+  checkValid(dbObj)
+
+  info <- .Call(RS_MySQL_managerInfo, dbObj@Id)
+  info$connectionIds <- lapply(info$connectionIds, function(conId) {
+    new("MySQLConnection", Id = c(dbObj@Id, conId))
+  })
+
+  # Don't need to insert self into info
+  info$managerId <- NULL
+
+  if (!missing(what)) {
     info[what]
-  else
+  } else {
     info
+  }
 })
 
 #' @rdname dbGetInfo-MySQLDriver-method
@@ -118,21 +122,19 @@ setMethod("dbListConnections", "MySQLDriver", function(drv, ...) {
 #' @export
 setMethod("summary", "MySQLDriver", function(object, verbose = FALSE, ...) {
   info <- dbGetInfo(object)
+
   print(object)
-  cat("  Driver name: ", info$drvName, "\n")
-  cat("  Max  connections:", info$length, "\n")
-  cat("  Conn. processed:", info$counter, "\n")
-  cat("  Default records per fetch:", info$"fetch_default_rec", "\n")
-  if(verbose){
-    cat("  DBI API version: ", dbGetDBIVersion(), "\n")
+  cat("  Max connections:  ", info$length, "\n")
+  cat("  Cur connections:  ", info$`num_con`, "\n")
+  cat("  Total connections:", info$counter, "\n")
+  cat("  Default records per fetch:", info$`fetch_default_rec`, "\n")
+  if (verbose) {
+    cat("  DBI API version:      ", as.character(packageVersion("DBI")), "\n")
     cat("  MySQL client version: ", info$clientVersion, "\n")
+
+    cat("\nConnections:\n")
+    lapply(info$connectionIds, function(x) print(summary(x)))
   }
-  cat("  Open connections:", info$"num_con", "\n")
-  if(verbose && !is.null(info$connectionIds)){
-    for(i in seq(along = info$connectionIds)){
-      cat("   ", i, " ")
-      print(info$connectionIds[[i]])
-    }
-  }
+
   invisible(NULL)
 })

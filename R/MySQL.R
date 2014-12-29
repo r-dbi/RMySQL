@@ -127,6 +127,12 @@ isIdCurrent <- function(obj)  {
   .Call(RS_DBI_validHandle, obj@Id)
 }
 
+checkValid <- function(obj) {
+  if (isIdCurrent(obj)) return(TRUE)
+
+  stop("Expired ", class(obj), call = FALSE)
+}
+
 #' Determine the SQL Data Type of an S object
 #'
 #' This method is a straight-forward implementation of the corresponding
