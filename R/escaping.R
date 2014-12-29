@@ -1,4 +1,4 @@
-#' @include Connection.R
+#' @include connection.R
 NULL
 
 #' Make R/S-Plus identifiers into legal SQL identifiers

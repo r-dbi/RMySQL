@@ -1,4 +1,4 @@
-#' @include Connection.R
+#' @include connection.R
 NULL
 
 #' DBMS Transaction Management

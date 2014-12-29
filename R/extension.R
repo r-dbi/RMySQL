@@ -1,4 +1,4 @@
-#' @include MySQL.R Result.R
+#' @include mysql.R result.R
 NULL
 
 ## the following code was kindly provided ny J. T. Lindgren.

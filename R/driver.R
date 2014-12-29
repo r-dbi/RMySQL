@@ -1,4 +1,4 @@
-#' @include MySQL.R
+#' @include mysql.R
 NULL
 
 #' Class MySQLDriver with constructor MySQL.

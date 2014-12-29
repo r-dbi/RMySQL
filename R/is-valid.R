@@ -1,4 +1,4 @@
-#' @include Driver.R Connection.R Result.R
+#' @include driver.R connection.R result.R
 NULL
 
 #' Check if a database object is valid.

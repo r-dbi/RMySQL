@@ -22,16 +22,16 @@ SystemRequirements: libmysqlclient-dev (deb), mariadb-devel (rpm), or
     mysql-connector-c (brew)
 NeedsCompilation: yes
 Collate:
-    'MySQL.R'
-    'Driver.R'
-    'Connection.R'
-    'Result.R'
-    'Extensions.R'
+    'mysql.R'
+    'driver.R'
+    'connection.R'
     'data-type.R'
     'default.R'
     'escaping.R'
+    'result.R'
+    'extension.R'
     'is-valid.R'
-    'tables.R'
-    'transactions.R'
+    'table.R'
+    'transaction.R'
 Suggests:
     testthat
