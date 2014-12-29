@@ -13,3 +13,7 @@
     `mysqlResultInfo`, `mysqlDescribeResult`, `mysqlDescribeFields`,
     `mysqlCloseResult`, `mysqlImportFile`, `mysqlReadTable`, `mysqlWriteTable`,
     `mysqlEscapeStrings`, `mysqlDataType`, `safe.write`.
+
+ -  RMySQL gains transaction support with `dbBegin()`, `dbCommit()`,
+    and `dbRollback()`, but note that MySQL does not allow data definition
+    language statements to be rolled back.
