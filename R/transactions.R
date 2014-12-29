@@ -32,20 +32,20 @@ NULL
 #' @export
 #' @rdname transactions
 setMethod("dbCommit", "MySQLConnection", function(conn, ...) {
-  dbGetQuery(con, "COMMIT")
+  dbGetQuery(conn, "COMMIT")
   TRUE
 })
 
 #' @export
 #' @rdname transactions
 setMethod("dbBegin", "MySQLConnection", function(conn, ...) {
-  dbGetQuery(con, "START TRANSACTION")
+  dbGetQuery(conn, "START TRANSACTION")
   TRUE
 })
 
 #' @export
 #' @rdname transactions
 setMethod("dbRollback", "MySQLConnection", function(conn, ...) {
-  dbGetQuery(con, "ROLLBACK")
+  dbGetQuery(conn, "ROLLBACK")
   TRUE
 })
