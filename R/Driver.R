@@ -24,6 +24,7 @@ setClass("MySQLDriver", representation("DBIDriver", "MySQLObject"))
 #'   Setting this to \code{TRUE} allows you to change default settings.
 #'   All connections should be closed before re-loading.
 #' @export
+#' @import methods DBI
 #' @useDynLib RMySQL
 #' @rdname MySQLDriver-class
 #' @examples

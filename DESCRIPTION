@@ -12,9 +12,9 @@ Authors@R: as.person(c(
     ))
 Depends:
     R (>= 2.8.0),
-    methods,
-    DBI (>= 0.2-2),
-    utils
+    DBI (>= 0.2-2)
+Imports:
+    methods
 License: GPL-2
 URL: https://github.com/rstats-db/rmysql
 BugReports: https://github.com/rstats-db/rmysql/issues
