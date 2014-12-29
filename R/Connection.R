@@ -106,32 +106,27 @@ setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
 #' @export
 #' @rdname dbConnect-MySQLDriver-method
 #' @useDynLib RMySQL RS_MySQL_cloneConnection
-setMethod("dbConnect", "MySQLConnection",
-  function(drv, ...) {
-    checkValid(drv)
+setMethod("dbConnect", "MySQLConnection", function(drv, ...) {
+  checkValid(drv)
 
-    newId <- .Call(RS_MySQL_cloneConnection, drv@Id)
-    new("MySQLConnection", Id = newId)
-  }
-)
+  newId <- .Call(RS_MySQL_cloneConnection, drv@Id)
+  new("MySQLConnection", Id = newId)
+})
 
 #' @export
 #' @rdname dbConnect-MySQLDriver-method
 #' @useDynLib RMySQL RS_MySQL_closeConnection
-setMethod("dbDisconnect", "MySQLConnection",
-  function(conn, ...) {
-    if(!dbIsValid(conn)) return(TRUE)
+setMethod("dbDisconnect", "MySQLConnection", function(conn, ...) {
+  if(!dbIsValid(conn)) return(TRUE)
 
-    rs <- dbListResults(conn)
-    if(length(rs)>0){
-      if(dbHasCompleted(rs[[1]]))
-        dbClearResult(rs[[1]])
-      else
-        stop("connection has pending rows (close open results set first)")
-    }
-    .Call(RS_MySQL_closeConnection, conn@Id)
+  rs <- dbListResults(conn)
+  if (length(rs) > 0) {
+    warning("Closing open result sets", call. = FALSE)
+    lapply(rs, dbClearResult)
   }
-)
+
+  .Call(RS_MySQL_closeConnection, conn@Id)
+})
 
 #' Database interface meta-data
 #'
@@ -141,6 +136,8 @@ setMethod("dbDisconnect", "MySQLConnection",
 #' @examples
 #' if (mysqlHasDefault()) {
 #'   con <- dbConnect(RMySQL::MySQL())
+#'
+#'   summary(con)
 #'
 #'   dbGetInfo(con)
 #'   dbListResults(con)
@@ -157,23 +154,22 @@ NULL
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
   checkValid(dbObj)
 
-  id <- dbObj@Id
-  info <- .Call(RS_MySQL_connectionInfo, id)
-  rsId <- vector("list", length = length(info$rsId))
-  for(i in seq(along = info$rsId))
-    rsId[[i]] <- new("MySQLResult", Id = c(id, info$rsId[i]))
-  info$rsId <- rsId
+  info <- .Call(RS_MySQL_connectionInfo, dbObj@Id)
+  info$rsId <- lapply(info$rsId, function(id) {
+    new("MySQLResult", Id = c(dbObj@Id, id))
+  })
 
-  if(!missing(what))
+  if (!missing(what)) {
     info[what]
-  else
+  } else {
     info
+  }
 })
 
 #' @rdname db-meta
 #' @export
 setMethod("dbListResults", "MySQLConnection",
-  def = function(conn, ...) dbGetInfo(conn, "rsId")[[1]]
+  def = function(conn, ...) dbGetInfo(conn)$rsId
 )
 
 #' @rdname db-meta
@@ -181,26 +177,23 @@ setMethod("dbListResults", "MySQLConnection",
 #' @export
 setMethod("summary", "MySQLConnection",
   function(object, verbose = FALSE, ...) {
-    info <- dbGetInfo(object)
     print(object)
-    cat("  User:", info$user, "\n")
-    cat("  Host:", info$host, "\n")
+
+    info <- dbGetInfo(object)
+    cat("  User:  ", info$user, "\n")
+    cat("  Host:  ", info$host, "\n")
     cat("  Dbname:", info$dbname, "\n")
     cat("  Connection type:", info$conType, "\n")
     if(verbose){
-      cat("  MySQL server version: ", info$serverVersion, "\n")
-      cat("  MySQL client version: ",
-        dbGetInfo(as(obj, "MySQLDriver"), what="clientVersion")[[1]], "\n")
-      cat("  MySQL protocol version: ", info$protocolVersion, "\n")
-      cat("  MySQL server thread id: ", info$threadId, "\n")
+      cat("  MySQL server version:  ", info$serverVersion, "\n")
+      cat("  MySQL client version:  ", dbGetInfo(MySQL())$clientVersion, "\n")
+      cat("  MySQL protocol version:", info$protocolVersion, "\n")
+      cat("  MySQL server thread id:", info$threadId, "\n")
     }
-    if(length(info$rsId)>0){
-      for(i in seq(along = info$rsId)){
-        cat("   ", i, " ")
-        print(info$rsId[[i]])
-      }
-    } else
-      cat("  No resultSet available\n")
+
+    cat("\nResults:\n")
+    lapply(info$rsId, function(x) print(summary(x)))
+
     invisible(NULL)
   }
 )

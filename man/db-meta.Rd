@@ -36,6 +36,8 @@ Database interface meta-data
 if (mysqlHasDefault()) {
   con <- dbConnect(RMySQL::MySQL())
 
+  summary(con)
+
   dbGetInfo(con)
   dbListResults(con)
   dbListTables(con)
