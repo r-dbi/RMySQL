@@ -33,6 +33,22 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
     echo "No native mysqlclient package found."
   fi
 
+  # Check for mariadb brew package
+  MARIADBPKG=$(echo /usr/local/Cellar/mariadb/*/)
+  if [ -r $MARIADBPKG/include/mysql/mysql.h ]; then
+      echo "Found mariadb in $MARIADBPKG.";
+      echo "PKG_CPPFLAGS= -I$MARIADBPKG/include/mysql" > src/Makevars
+
+      # Copy the static library
+      cp -f $MARIADBPKG/lib/libmysqlclient.a ./src/libmysqlstatic.a
+
+      # This one is dynamically linked against libssl
+      echo "PKG_LIBS= -L. -lz -lmysqlstatic -lssl" >> src/Makevars
+      exit 0
+  else
+    echo "No mariadb found."
+  fi
+
   # Use system 'brew' if available
   if [ $(command -v brew) ]; then
     MYSQLBREWDIR="$(brew --prefix)/Cellar/mysql-connector-c/6.1.3";
