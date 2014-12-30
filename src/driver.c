@@ -1,7 +1,7 @@
 #include "RS-MySQL.h"
 
 static MySQLDriver* dbManager = NULL;
-MySQLDriver* mysql_driver() {
+MySQLDriver* rmysql_driver() {
   if (!dbManager) error("Corrupt MySQL handle");
   return dbManager;
 }
@@ -48,7 +48,7 @@ SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_) {
 }
 
 SEXP rmysql_driver_close() {
-  MySQLDriver *mgr = mysql_driver();
+  MySQLDriver *mgr = rmysql_driver();
 
   if(mgr->num_con)
     error("Open connections -- close them first");
@@ -76,20 +76,6 @@ SEXP RS_DBI_asMgrHandle(int mgrId)
   return mgrHandle;
 }
 
-MySQLDriver* RS_DBI_getManager(SEXP  handle) {
-  MySQLDriver *mgr;
-
-  if(!is_validHandle(handle, MGR_HANDLE_TYPE))
-    RS_DBI_errorMessage("invalid dbManager handle", RS_DBI_ERROR);
-  mgr = dbManager;
-  if(!mgr)
-    RS_DBI_errorMessage(
-      "internal error in RS_DBI_getManager: corrupt dbManager handle",
-      RS_DBI_ERROR);
-  return mgr;
-}
-
-
 SEXP         /* named list */
 RS_DBI_managerInfo(SEXP mgrHandle)
 {
@@ -105,7 +91,7 @@ RS_DBI_managerInfo(SEXP mgrHandle)
     STRSXP};
   int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
 
-  mgr = RS_DBI_getManager(mgrHandle);
+  mgr = rmysql_driver();
   num_con = (int) mgr->num_con;
   mgrLen[0] = num_con;
 
@@ -194,7 +180,7 @@ SEXP
       INTSXP,   STRSXP};
     int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
 
-    mgr = RS_DBI_getManager(mgrHandle);
+    mgr = rmysql_driver();
     if(!mgr)
       RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
     num_con = (int) mgr->num_con;

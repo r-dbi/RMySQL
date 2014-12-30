@@ -321,7 +321,7 @@ SEXP     /* output is a named list */
       num_rec = asInteger(max_rec);
       expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
     if(expand || num_rec == 0){
-      mgr = RS_DBI_getManager(rsHandle);
+      mgr = rmysql_driver();
       num_rec = mgr->fetch_default_rec;
     }
     num_fields = flds->num_fields;

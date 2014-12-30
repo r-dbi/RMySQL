@@ -150,7 +150,6 @@ RS_DBI_exception *exception;
 * to work with the various dbObjects.
 */
 void            RS_DBI_freeManager(SEXP mgrHandle);
-MySQLDriver *RS_DBI_getManager(SEXP handle);
 SEXP RS_DBI_asMgrHandle(int pid);
 SEXP RS_DBI_managerInfo(SEXP mgrHandle);
 
@@ -263,6 +262,7 @@ void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
  */
 
 /* dbManager */
+MySQLDriver* rmysql_driver();
 SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_);
 
 /* dbConnection */

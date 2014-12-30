@@ -9,7 +9,7 @@ SEXP
     SEXP conHandle;
     int  i, indx, con_id;
 
-    mgr = RS_DBI_getManager(mgrHandle);
+    mgr = rmysql_driver();
     indx = RS_DBI_newEntry(mgr->connectionIds, mgr->length);
     if(indx < 0){
       char buf[128], msg[128];
@@ -77,7 +77,7 @@ void
     int indx;
 
     con = RS_DBI_getConnection(conHandle);
-    mgr = RS_DBI_getManager(conHandle);
+    mgr = rmysql_driver();
 
     /* Are there open resultSets? If so, free them first */
     if(con->num_res > 0) {
@@ -134,7 +134,7 @@ RS_DBI_connection* RS_DBI_getConnection(SEXP conHandle) {
   MySQLDriver  *mgr;
   int indx;
 
-  mgr = RS_DBI_getManager(conHandle);
+  mgr = rmysql_driver();
   indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(conHandle));
   if(indx < 0)
     RS_DBI_errorMessage(
