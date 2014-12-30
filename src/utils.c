@@ -215,60 +215,6 @@ int empty_val = (int) -1;
 }
 
 
-/* Translate R/S identifiers (and only R/S names!!!) into
-* valid SQL identifiers;  overwrite input vector. Currently,
-*   (1) translate "." into "_".
-*   (2) first character should be a letter (traslate to "X" if not),
-*       but a double quote signals a "delimited identifier"
-*   (3) check that length <= 18, but only warn, since most (all?)
-*       dbms allow much longer identifiers.
-*   (4) SQL reserved keywords are handled in the R/S calling
-*       function make.SQL.names(), not here.
-* BUG: Compound SQL identifiers are not handled properly.
-*      Note the the dot "." is a valid SQL delimiter, used for specifying
-*      user/table in a compound identifier.  Thus, it's possible that
-*      such compound name is mapped into a legal R/S identifier (preserving
-*      the "."), and then we incorrectly map such delimiting "dot" into "_"
-*      thus loosing the original SQL compound identifier.
-*/
-#define RS_DBI_MAX_IDENTIFIER_LENGTH 18      /* as per SQL92 */
-SEXP
-  RS_DBI_makeSQLNames(SEXP snames)
-  {
-    long     nstrings;
-    char     *name, c;
-    char     errMsg[128];
-    size_t   len;
-    int     i;
-
-    nstrings = (int) GET_LENGTH(snames);
-    for(i = 0; i<nstrings; i++){
-      name = (char *) CHR_EL(snames, i);
-      if(strlen(name)> RS_DBI_MAX_IDENTIFIER_LENGTH){
-        (void) sprintf(errMsg,"SQL identifier %s longer than %d chars",
-          name, RS_DBI_MAX_IDENTIFIER_LENGTH);
-        RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-      }
-      /* check for delimited-identifiers (those in double-quotes);
-      * if missing closing double-quote, warn and treat as non-delim
-      */
-      c = *name;
-      len = strlen(name);
-      if(c=='"' && name[len-1] =='"')
-        continue;
-      if(!isalpha(c) && c!='"') *name = 'X';
-      name++;
-      while((c=*name)){
-        /* TODO: recognize SQL delim "." instances that may have
-        * originated in SQL and R/S make.names() left alone */
-        if(c=='.') *name='_';
-        name++;
-      }
-    }
-
-    return snames;
-  }
-
 /*  These 2 R-specific functions are used by the C macros IS_NA(p,t)
 *  and NA_SET(p,t) (in this way one simply use macros to test and set
 *  NA's regardless whether we're using R or S.
@@ -323,32 +269,6 @@ int
     return out;
   }
 
-
-/* the following function was kindly provided by Mikhail Kondrin
-* it returns the last inserted index.
-* TODO: It returns an int, but it can potentially be inadequate
-*       if the index is an�unsigned integer.  Should we return
-*       a numeric instead?
-*/
-SEXP
-  RS_MySQL_insertid(SEXP conHandle)
-  {
-    MYSQL   *my_con;
-    RS_DBI_connection  *con;
-    SEXP output;
-    char *conDesc[] = {"iid"};
-    SEXPTYPE conType[] = {INTSXP};    /* dj: are we sure an int will do? */
-int  conLen[]  = {1};
-
-con = RS_DBI_getConnection(conHandle);
-my_con = (MYSQL *) con->drvConnection;
-output = RS_DBI_createNamedList(conDesc, conType, conLen, 1);
-
-LST_INT_EL(output,0,0) = (int) mysql_insert_id(my_con);
-
-return output;
-
-  }
 
 /* The single string version of this function was kindly provided by
 * J. T. Lindgren (any bugs are probably dj's)
