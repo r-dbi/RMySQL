@@ -20,6 +20,38 @@ The development version from github:
 devtools::install_github("rstats-db/RMySQL")
 ```
 
+## Basic usage
+
+```R
+library(DBI)
+# Connect to my-db as defined in ~/.my.cnf
+con <- dbConnect(RMySQL::MySQL(), group = "my-db")
+
+dbListTables(con)
+dbWriteTable(con, "mtcars", mtcars)
+dbListTables(con)
+
+dbListFields(con, "mtcars")
+dbReadTable(con, "mtcars")
+
+# You can fetch all results:
+res <- dbSendQuery(con, "SELECT * FROM mtcars WHERE cyl = 4")
+dbFetch(res)
+dbClearResult(res)
+
+# Or a chunk at a time
+res <- dbSendQuery(con, "SELECT * FROM mtcars WHERE cyl = 4")
+while(!dbHasCompleted(res)){
+  chunk <- dbFetch(res, n = 5)
+  print(nrow(chunk))
+}
+# Clear the result
+dbClearResult(res)
+
+# Disconnect from the database
+dbDisconnect(con)
+```
+
 ## MySQL configuration file
 
 Instead of specifying a username and password in calls to `dbConnect()`, it's better to set up a MySQL configuration file that names the databases that you connect to most commonly. This file should live in `~/.my.cnf` and look like:
