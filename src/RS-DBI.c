@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 1999-2002 The Omega Project for Statistical Computing
  *
  * This library is free software; you can redistribute it and/or
@@ -18,12 +18,12 @@
 
 #include "RS-DBI.h"
 
-/* TODO: monitor memory/object size consumption against S limits 
+/* TODO: monitor memory/object size consumption against S limits
  *       in $SHOME/include/options.h we find "max_memory". We then
  *       mem_size to make sure we're not bumping into problems.
  *       But, is mem_size() reliable?  How should we do this?
  *
- * TODO: invoke user-specified generators 
+ * TODO: invoke user-specified generators
  *
  * TODO: Implement exception objects for each dbObject.
  */
@@ -34,7 +34,7 @@ Mgr_Handle *
 RS_DBI_allocManager(const char *drvName, Sint max_con,
 		    Sint fetch_default_rec, Sint force_realloc)
 {
-  /* Currently, the dbManager is a singleton (therefore we don't 
+  /* Currently, the dbManager is a singleton (therefore we don't
    * completly free all the space).  Here we alloc space
    * for the dbManager and return its mgrHandle.  force_realloc
    * means to re-allocate number of connections, etc. (in this case
@@ -56,10 +56,10 @@ RS_DBI_allocManager(const char *drvName, Sint max_con,
   }
   else {                               /* we're re-entering */
     if(dbManager->connections){        /* and mgr is valid */
-      if(!force_realloc)            
+      if(!force_realloc)
 	return mgrHandle;
       else
-	RS_DBI_freeManager(mgrHandle);  /* i.e., free connection arrays*/    
+	RS_DBI_freeManager(mgrHandle);  /* i.e., free connection arrays*/
     }
     counter = dbManager->counter;
     mgr = dbManager;
@@ -70,7 +70,7 @@ RS_DBI_allocManager(const char *drvName, Sint max_con,
   mgr->drvName = RS_DBI_copyString(drvName);
   mgr->drvData = (void *) NULL;
   mgr->managerId = mgr_id;
-  mgr->connections =  (RS_DBI_connection **) 
+  mgr->connections =  (RS_DBI_connection **)
     calloc((size_t) max_con, sizeof(RS_DBI_connection));
   if(!mgr->connections){
     free(mgr);
@@ -91,13 +91,13 @@ RS_DBI_allocManager(const char *drvName, Sint max_con,
     mgr->connectionIds[i] = -1;
     mgr->connections[i] = (RS_DBI_connection *) NULL;
   }
-  
+
   dbManager = mgr;
 
   return mgrHandle;
 }
 
-/* We don't want to completely free the dbManager, but rather we 
+/* We don't want to completely free the dbManager, but rather we
  * re-initialize all the fields except for mgr->counter to ensure we don't
  * re-cycle connection ids across R/S DBI sessions in the the same pid
  * (S/R session).
@@ -108,7 +108,7 @@ RS_DBI_freeManager(Mgr_Handle *mgrHandle)
   RS_DBI_manager *mgr;
 
   mgr = RS_DBI_getManager(mgrHandle);
-  if(mgr->num_con > 0){    
+  if(mgr->num_con > 0){
     char *errMsg = "all opened connections were forcebly closed";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
@@ -138,7 +138,7 @@ RS_DBI_allocConnection(Mgr_Handle *mgrHandle, Sint max_res)
   RS_DBI_connection *con;
   Con_Handle  *conHandle;
   Sint  i, indx, con_id;
-  
+
   mgr = RS_DBI_getManager(mgrHandle);
   indx = RS_DBI_newEntry(mgr->connectionIds, mgr->length);
   if(indx < 0){
@@ -162,7 +162,7 @@ RS_DBI_allocConnection(Mgr_Handle *mgrHandle, Sint max_res)
   con->conParams = (void *) NULL;
   con->counter = (Sint) 0;
   con->length = max_res;           /* length of resultSet vector */
-  
+
   /* result sets for this connection */
   con->resultSets = (RS_DBI_resultSet **)
     calloc((size_t) max_res, sizeof(RS_DBI_resultSet));
@@ -200,7 +200,7 @@ RS_DBI_allocConnection(Mgr_Handle *mgrHandle, Sint max_res)
  * pointer.
  */
 
-void 
+void
 RS_DBI_freeConnection(Con_Handle *conHandle)
 {
   RS_DBI_connection *con;
@@ -225,7 +225,7 @@ RS_DBI_freeConnection(Con_Handle *conHandle)
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
   if(con->drvConnection) {
-    char *errMsg = 
+    char *errMsg =
       "internal error in RS_DBI_freeConnection: driver might have left open its connection on the server";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
@@ -235,7 +235,7 @@ RS_DBI_freeConnection(Con_Handle *conHandle)
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
   if(con->drvData){
-    char *errMsg = 
+    char *errMsg =
       "internal error in RS_DBI_freeConnection: non-freed con->drvData (some memory leaked)";
     RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
   }
@@ -290,7 +290,7 @@ RS_DBI_allocResultSet(Con_Handle *conHandle)
   result->rowCount = (Sint) 0;
   result->completed = (Sint) -1;
   result->fields = (RS_DBI_fields *) NULL;
-  
+
   /* update connection's resultSet table */
   res_id = con->counter;
   con->num_res += (Sint) 1;
@@ -313,7 +313,7 @@ RS_DBI_freeResultSet(Res_Handle *rsHandle)
   result = RS_DBI_getResultSet(rsHandle);
 
   if(result->drvResultSet) {
-    char *errMsg = 
+    char *errMsg =
       "internal error in RS_DBI_freeResultSet: non-freed result->drvResultSet (some memory leaked)";
     RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
   }
@@ -358,7 +358,7 @@ RS_DBI_allocFields(int num_fields)
   flds->scale =    (Sint *) calloc(n, sizeof(Sint));
   flds->nullOk =   (Sint *) calloc(n, sizeof(Sint));
   flds->isVarLength = (Sint *) calloc(n, sizeof(Sint));
-  flds->Sclass =   (Stype *) calloc(n, sizeof(Stype));
+  flds->Sclass =   (SEXPTYPE *) calloc(n, sizeof(SEXPTYPE));
 
   return flds;
 }
@@ -368,7 +368,7 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
 {
   int i;
   if(flds->name) {       /* (as per Jeff Horner's patch) */
-     for(i = 0; i < flds->num_fields; i++) 
+     for(i = 0; i < flds->num_fields; i++)
         if(flds->name[i]) free(flds->name[i]);
      free(flds->name);
   }
@@ -384,7 +384,7 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
   return;
 }
 
-/* Make a data.frame from a named list by adding row.names, and class 
+/* Make a data.frame from a named list by adding row.names, and class
  * attribute.  Use "1", "2", .. as row.names.
  * NOTE: Only tested  under R (not tested at all under S4 or Splus5+).
  */
@@ -393,14 +393,14 @@ RS_DBI_makeDataFrame(s_object *data)
 {
    S_EVALUATOR
 
-   s_object *row_names, *df_class_name; 
+   s_object *row_names, *df_class_name;
 #ifndef USING_R
    s_object *S_RowNamesSymbol;       /* mimic Rinternal.h R_RowNamesSymbol */
    s_object *S_ClassSymbol;
 #endif
    Sint   i, n;
    char   buf[1024];
-   
+
 #ifndef USING_R
    if(IS_LIST(data))
       data = AS_LIST(data);
@@ -431,10 +431,10 @@ RS_DBI_makeDataFrame(s_object *data)
 
    MEM_PROTECT(S_ClassSymbol = NEW_CHARACTER((Sint) 1));
    SET_CHR_EL(S_ClassSymbol, 0, C_S_CPY("class"));
-   /* Note: the fun attribute() is just an educated guess as to 
-    * which function to use for setting attributes (see S.h) 
+   /* Note: the fun attribute() is just an educated guess as to
+    * which function to use for setting attributes (see S.h)
     */
-   (void) attribute(data, S_ClassSymbol, df_class_name); 
+   (void) attribute(data, S_ClassSymbol, df_class_name);
    MEM_UNPROTECT(2);
 #endif
    MEM_UNPROTECT(3);
@@ -446,14 +446,14 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
 		   Sint num_rec, Sint  expand)
 {
   s_object *names, *s_tmp;
-  Sint   j; 
+  Sint   j;
   int    num_fields;
-  Stype  *fld_Sclass;
+  SEXPTYPE  *fld_Sclass;
 
 #ifndef USING_R
   if(IS_LIST(output))
     output = AS_LIST(output);
-  else 
+  else
     RS_DBI_errorMessage(
       "internal error in RS_DBI_allocOutput: could not (re)allocate output list",
       RS_DBI_ERROR);
@@ -466,7 +466,7 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
     for(j = 0; j < (Sint) num_fields; j++){
       /* Note that in R-1.2.3 (at least) we need to protect SET_LENGTH */
       s_tmp = LST_EL(output,j);
-      MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));  
+      MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
       SET_ELEMENT(output, j, s_tmp);
       MEM_UNPROTECT(1);
     }
@@ -480,19 +480,19 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
   fld_Sclass = flds->Sclass;
   for(j = 0; j < (Sint) num_fields; j++){
     switch((int)fld_Sclass[j]){
-    case LOGICAL_TYPE:    
+    case LGLSXP:
       SET_ELEMENT(output, j, NEW_LOGICAL(num_rec));
       break;
-    case CHARACTER_TYPE:
+    case STRSXP:
       SET_ELEMENT(output, j, NEW_CHARACTER(num_rec));
       break;
-    case INTEGER_TYPE:
+    case INTSXP:
       SET_ELEMENT(output, j, NEW_INTEGER(num_rec));
       break;
-    case NUMERIC_TYPE:
+    case REALSXP:
       SET_ELEMENT(output, j, NEW_NUMERIC(num_rec));
       break;
-    case LIST_TYPE:
+    case VECSXP:
       SET_ELEMENT(output, j, NEW_LIST(num_rec));
       break;
 #ifndef USING_R
@@ -516,13 +516,13 @@ RS_DBI_allocOutput(s_object *output, RS_DBI_fields *flds,
 #endif
 
   MEM_UNPROTECT(2);
-  
+
   return;
 }
 
 s_object * 		/* boolean */
 RS_DBI_validHandle(Db_Handle *handle)
-{ 
+{
    S_EVALUATOR
    s_object  *valid;
    int  handleType = 0;
@@ -543,13 +543,13 @@ RS_DBI_validHandle(Db_Handle *handle)
    MEM_UNPROTECT(1);
    return valid;
 }
-    
-void 
+
+void
 RS_DBI_setException(Db_Handle *handle, DBI_EXCEPTION exceptionType,
 		    int errorNum, const char *errorMsg)
 {
   HANDLE_TYPE handleType;
-  
+
   handleType = (int) GET_LENGTH(handle);
   if(handleType == MGR_HANDLE_TYPE){
     RS_DBI_manager *obj;
@@ -557,14 +557,14 @@ RS_DBI_setException(Db_Handle *handle, DBI_EXCEPTION exceptionType,
     obj->exception->exceptionType = exceptionType;
     obj->exception->errorNum = errorNum;
     obj->exception->errorMsg = RS_DBI_copyString(errorMsg);
-  } 
+  }
   else if(handleType==CON_HANDLE_TYPE){
     RS_DBI_connection *obj;
     obj = RS_DBI_getConnection(handle);
     obj->exception->exceptionType = exceptionType;
     obj->exception->errorNum = errorNum;
     obj->exception->errorMsg = RS_DBI_copyString(errorMsg);
-  } 
+  }
   else {
     RS_DBI_errorMessage(
           "internal error in RS_DBI_setException: could not setException",
@@ -573,11 +573,11 @@ RS_DBI_setException(Db_Handle *handle, DBI_EXCEPTION exceptionType,
   return;
 }
 
-void 
+void
 RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type)
 {
   char *driver = "RS-DBI";   /* TODO: use the actual driver name */
-  
+
   switch(exception_type) {
   case RS_DBI_MESSAGE:
     warning("%s driver message: (%s)", driver, msg);
@@ -604,7 +604,7 @@ RS_DBI_copyString(const char *str)
   buffer = (char *) malloc((size_t) strlen(str)+1);
   if(!buffer)
     RS_DBI_errorMessage(
-          "internal error in RS_DBI_copyString: could not alloc string space", 
+          "internal error in RS_DBI_copyString: could not alloc string space",
           RS_DBI_ERROR);
   return strcpy(buffer, str);
 }
@@ -614,11 +614,11 @@ char *
 RS_DBI_nCopyString(const char *str, size_t len, int del_blanks)
 {
   char *str_buffer, *end;
-  
+
   str_buffer = (char *) malloc(len+1);
   if(!str_buffer){
     char errMsg[128];
-    (void) sprintf(errMsg, 
+    (void) sprintf(errMsg,
 		   "could not malloc %ld bytes in RS_DBI_nCopyString",
 		   (long) len+1);
     RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
@@ -636,7 +636,7 @@ RS_DBI_nCopyString(const char *str, size_t len, int del_blanks)
       if(*end != ' ') { end++; break; }
     *end = '\0';
   }
-  else { 
+  else {
     end = str_buffer + len;
     *end = '\0';
   }
@@ -652,14 +652,14 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
   Sint  n = (Sint) 8;
   char  *desc[]={"name", "Sclass", "type", "len", "precision",
  		 "scale","isVarLength", "nullOK"};
-  Stype types[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   LOGICAL_TYPE, LOGICAL_TYPE};
+  SEXPTYPE types[] = {STRSXP, INTSXP, INTSXP,
+       INTSXP, INTSXP, INTSXP,
+		   LGLSXP, LGLSXP};
   Sint  lengths[8];
   int   i, j, num_fields;
 
   num_fields = flds->num_fields;
-  for(j = 0; j < n; j++) 
+  for(j = 0; j < n; j++)
     lengths[j] = (Sint) num_fields;
   S_fields =  RS_DBI_createNamedList(desc, types, lengths, n);
 #ifndef USING_R
@@ -683,10 +683,10 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
   }
 
   return S_fields;
-} 
+}
 
 s_object *
-RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
+RS_DBI_createNamedList(char **names, SEXPTYPE *types, Sint *lengths, Sint  n)
 {
   S_EVALUATOR
   s_object *output, *output_names, *obj = S_NULL_ENTRY;
@@ -698,27 +698,21 @@ RS_DBI_createNamedList(char **names, Stype *types, Sint *lengths, Sint  n)
   for(j = 0; j < n; j++){
     num_elem = lengths[j];
     switch((int)types[j]){
-    case LOGICAL_TYPE: 
+    case LGLSXP:
       MEM_PROTECT(obj = NEW_LOGICAL(num_elem));
       break;
-    case INTEGER_TYPE:
+    case INTSXP:
       MEM_PROTECT(obj = NEW_INTEGER(num_elem));
       break;
-    case NUMERIC_TYPE:
+    case REALSXP:
       MEM_PROTECT(obj = NEW_NUMERIC(num_elem));
       break;
-    case CHARACTER_TYPE:
+    case STRSXP:
       MEM_PROTECT(obj = NEW_CHARACTER(num_elem));
       break;
-    case LIST_TYPE:
+    case VECSXP:
       MEM_PROTECT(obj = NEW_LIST(num_elem));
       break;
-#ifndef USING_R
-      /* this should work in R, but it needs testing first */
-    case RAW_TYPE:
-      MEM_PROTECT(obj = NEW_RAW(num_elem));
-      break;
-#endif
     default:
       RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
     }
@@ -738,7 +732,7 @@ RS_DBI_SclassNames(s_object *type)
   Sint n;
   int  i;
   char *s;
-  
+
   if(type==S_NULL_ENTRY)
      RS_DBI_errorMessage(
            "internal error in RS_DBI_SclassNames: input S types must be nonNULL",
@@ -750,7 +744,7 @@ RS_DBI_SclassNames(s_object *type)
     s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
     if(!s){
       RS_DBI_errorMessage(
-            "internal error RS_DBI_SclassNames: unrecognized S type", 
+            "internal error RS_DBI_SclassNames: unrecognized S type",
             RS_DBI_ERROR);
 	  s = "";
 	}
@@ -761,7 +755,7 @@ RS_DBI_SclassNames(s_object *type)
 }
 
 /* The following functions roughly implement a simple object
- * database. 
+ * database.
  */
 
 Mgr_Handle *
@@ -839,7 +833,7 @@ RS_DBI_getResultSet(Res_Handle *rsHandle)
 {
   RS_DBI_connection *con;
   Sint indx;
-  
+
   con = RS_DBI_getConnection(rsHandle);
   indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
   if(indx<0)
@@ -856,7 +850,7 @@ RS_DBI_getResultSet(Res_Handle *rsHandle)
 /* Very simple objectId (mapping) table. newEntry() returns an index
  * to an empty cell in table, and lookup() returns the position in the
  * table of obj_id.  Notice that we decided not to touch the entries
- * themselves to give total control to the invoking functions (this 
+ * themselves to give total control to the invoking functions (this
  * simplify error management in the invoking routines.)
  */
 Sint
@@ -891,7 +885,7 @@ RS_DBI_lookup(Sint *table, Sint length, Sint obj_id)
  * but the caller should free() it).  The function returns the number
  * of entries.
  */
-Sint 
+Sint
 RS_DBI_listEntries(Sint *table, Sint length, Sint *entries)
 {
   int i,n;
@@ -902,14 +896,14 @@ RS_DBI_listEntries(Sint *table, Sint length, Sint *entries)
   }
   return n;
 }
-void 
+void
 RS_DBI_freeEntry(Sint *table, Sint indx)
 { /* no error checking!!! */
   Sint empty_val = (Sint) -1;
   table[indx] = empty_val;
   return;
 }
-int 
+int
 is_validHandle(Db_Handle *handle, HANDLE_TYPE handleType)
 {
   Sint  mgr_id, len, indx;
@@ -922,7 +916,7 @@ is_validHandle(Db_Handle *handle, HANDLE_TYPE handleType)
     return 0;       /* non handle object */
 
   len = (int) GET_LENGTH(handle);
-  if(len<handleType || handleType<1 || handleType>3) 
+  if(len<handleType || handleType<1 || handleType>3)
     return 0;
   mgr_id = MGR_ID(handle);
   if( ((Sint) getpid()) != mgr_id)
@@ -949,12 +943,12 @@ is_validHandle(Db_Handle *handle, HANDLE_TYPE handleType)
   return 1;
 }
 
-/* The following 3 routines provide metadata for the 3 main objects 
- * dbManager, dbConnection and dbResultSet.  These functions 
- * an object Id and return a list with all the meta-data. In R/S we 
- * simply invoke one of these and extract the metadata piece we need, 
+/* The following 3 routines provide metadata for the 3 main objects
+ * dbManager, dbConnection and dbResultSet.  These functions
+ * an object Id and return a list with all the meta-data. In R/S we
+ * simply invoke one of these and extract the metadata piece we need,
  * which can be NULL if non-existent or un-implemented.
- * 
+ *
  * Actually, each driver should modify these functions to add the
  * driver-specific info, such as server version, client version, etc.
  * That's how the various RS_MySQL_managerInfo, etc., were implemented.
@@ -971,11 +965,11 @@ RS_DBI_managerInfo(Mgr_Handle *mgrHandle)
   Sint n = (Sint) 7;
   char *mgrDesc[] = {"connectionIds", "fetch_default_rec","managerId",
 		     "length", "num_con", "counter", "clientVersion"};
-  Stype mgrType[] = {INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		     INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE, 
-                     CHARACTER_TYPE};
+  SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP,
+                        INTSXP, INTSXP, INTSXP,
+                        STRSXP};
   Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
-  
+
   mgr = RS_DBI_getManager(mgrHandle);
   num_con = (Sint) mgr->num_con;
   mgrLen[0] = num_con;
@@ -986,7 +980,7 @@ RS_DBI_managerInfo(Mgr_Handle *mgrHandle)
     output = AS_LIST(output);
   else
     RS_DBI_errorMessage(
-          "internal error: could not alloc named list", 
+          "internal error: could not alloc named list",
     	  RS_DBI_ERROR);
 #endif
   for(i = 0; i < num_con; i++)
@@ -1002,7 +996,7 @@ RS_DBI_managerInfo(Mgr_Handle *mgrHandle)
   return output;
 }
 
-/* The following should be considered templetes to be 
+/* The following should be considered templetes to be
  * implemented by individual drivers.
  */
 
@@ -1010,7 +1004,7 @@ s_object *        /* return a named list */
 RS_DBI_connectionInfo(Con_Handle *conHandle)
 {
   S_EVALUATOR
-  
+
   RS_DBI_connection  *con;
   s_object *output;
   Sint     i;
@@ -1018,9 +1012,9 @@ RS_DBI_connectionInfo(Con_Handle *conHandle)
   char *conDesc[] = {"host", "user", "dbname", "conType",
 		     "serverVersion", "protocolVersion",
 		     "threadId", "rsHandle"};
-  Stype conType[] = {CHARACTER_TYPE, CHARACTER_TYPE, CHARACTER_TYPE,
-		      CHARACTER_TYPE, CHARACTER_TYPE, INTEGER_TYPE,
-		      INTEGER_TYPE, INTEGER_TYPE};
+  SEXPTYPE conType[] = {STRSXP, STRSXP, STRSXP,
+          STRSXP, STRSXP, INTSXP,
+		      INTSXP, INTSXP};
   Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, -1};
 
   con = RS_DBI_getConnection(conHandle);
@@ -1061,8 +1055,8 @@ RS_DBI_resultSetInfo(Res_Handle *rsHandle)
   Sint  n = (Sint) 6;
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
 		     "rowCount", "completed", "fields"};
-  Stype rsType[]  = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		     INTEGER_TYPE,   INTEGER_TYPE, LIST_TYPE};
+  SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
+    INTSXP,   INTSXP, VECSXP};
   Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
   result = RS_DBI_getResultSet(rsHandle);
@@ -1100,14 +1094,13 @@ RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
   Sint  lengths[7];
   char  *desc[]={"name", "Sclass", "type", "len", "precision",
 		"scale","nullOK"};
-  Stype types[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   INTEGER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-		   LOGICAL_TYPE};
+  SEXPTYPE types[] = {STRSXP, INTSXP, INTSXP,
+                      INTSXP, INTSXP, INTSXP, LGLSXP};
   Sint   i, j;
   int    num_fields;
 
   num_fields = flds->num_fields;
-  for(j = 0; j < n; j++) 
+  for(j = 0; j < n; j++)
     lengths[j] = (Sint) num_fields;
   PROTECT(S_fields =  RS_DBI_createNamedList(desc, types, lengths, n));
 #ifndef USING_R
@@ -1149,21 +1142,21 @@ RS_DBI_getTypeName(Sint t, const struct data_types table[])
   return (char *) 0; /* for -Wall */
 }
 
-/* Translate R/S identifiers (and only R/S names!!!) into 
+/* Translate R/S identifiers (and only R/S names!!!) into
  * valid SQL identifiers;  overwrite input vector. Currently,
- *   (1) translate "." into "_".  
+ *   (1) translate "." into "_".
  *   (2) first character should be a letter (traslate to "X" if not),
  *       but a double quote signals a "delimited identifier"
  *   (3) check that length <= 18, but only warn, since most (all?)
  *       dbms allow much longer identifiers.
- *   (4) SQL reserved keywords are handled in the R/S calling 
+ *   (4) SQL reserved keywords are handled in the R/S calling
  *       function make.SQL.names(), not here.
  * BUG: Compound SQL identifiers are not handled properly.
  *      Note the the dot "." is a valid SQL delimiter, used for specifying
- *      user/table in a compound identifier.  Thus, it's possible that 
+ *      user/table in a compound identifier.  Thus, it's possible that
  *      such compound name is mapped into a legal R/S identifier (preserving
- *      the "."), and then we incorrectly map such delimiting "dot" into "_" 
- *      thus loosing the original SQL compound identifier.  
+ *      the "."), and then we incorrectly map such delimiting "dot" into "_"
+ *      thus loosing the original SQL compound identifier.
  */
 #define RS_DBI_MAX_IDENTIFIER_LENGTH 18      /* as per SQL92 */
 s_object *
@@ -1180,17 +1173,17 @@ RS_DBI_makeSQLNames(s_object *snames)
    for(i = 0; i<nstrings; i++){
       name = (char *) CHR_EL(snames, i);
       if(strlen(name)> RS_DBI_MAX_IDENTIFIER_LENGTH){
-	 (void) sprintf(errMsg,"SQL identifier %s longer than %d chars", 
+	 (void) sprintf(errMsg,"SQL identifier %s longer than %d chars",
 			name, RS_DBI_MAX_IDENTIFIER_LENGTH);
 	 RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
       }
       /* check for delimited-identifiers (those in double-quotes);
-       * if missing closing double-quote, warn and treat as non-delim 
+       * if missing closing double-quote, warn and treat as non-delim
        */
       c = *name;
       len = strlen(name);
-      if(c=='"' && name[len-1] =='"') 
-         continue;  
+      if(c=='"' && name[len-1] =='"')
+         continue;
       if(!isalpha(c) && c!='"') *name = 'X';
       name++;
       while((c=*name)){
@@ -1204,53 +1197,53 @@ RS_DBI_makeSQLNames(s_object *snames)
    return snames;
 }
 #ifdef USING_R
-/*  These 2 R-specific functions are used by the C macros IS_NA(p,t) 
+/*  These 2 R-specific functions are used by the C macros IS_NA(p,t)
  *  and NA_SET(p,t) (in this way one simply use macros to test and set
  *  NA's regardless whether we're using R or S.
  */
 void
-RS_na_set(void *ptr, Stype type)
+RS_na_set(void *ptr, SEXPTYPE type)
 {
   double *d;
   Sint   *i;
   char   *c;
   switch(type){
-  case INTEGER_TYPE:
+  case INTSXP:
     i = (Sint *) ptr;
     *i = NA_INTEGER;
     break;
-  case LOGICAL_TYPE:
+  case LGLSXP:
     i = (Sint *) ptr;
     *i = NA_LOGICAL;
     break;
-  case NUMERIC_TYPE:
+  case REALSXP:
     d = (double *) ptr;
     *d = NA_REAL;
     break;
-  case STRING_TYPE:
+  case STRSXP:
     c = (char *) ptr;
     c = (char *) CHR_EL(NA_STRING, 0);
     break;
   }
 }
 int
-RS_is_na(void *ptr, Stype type)
+RS_is_na(void *ptr, SEXPTYPE type)
 {
    int *i, out = -2;
    char *c;
    double *d;
 
    switch(type){
-   case INTEGER_TYPE:
-   case LOGICAL_TYPE:
+   case INTSXP:
+   case LGLSXP:
       i = (int *) ptr;
       out = (int) ((*i) == NA_INTEGER);
       break;
-   case NUMERIC_TYPE:
+   case REALSXP:
       d = (double *) ptr;
       out = ISNA(*d);
       break;
-   case STRING_TYPE:
+   case STRSXP:
       c = (char *) ptr;
       out = (int) (strcmp(c, CHR_EL(NA_STRING, 0))==0);
       break;

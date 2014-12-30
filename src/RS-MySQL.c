@@ -1,4 +1,4 @@
-/* 
+/*
  * $Id: RS-MySQL.c 360 2009-04-07 16:41:24Z j.horner $
  *
  *
@@ -28,15 +28,15 @@
 #endif
 
 /* R and S DataBase Interface to MySQL
- * 
+ *
  *
  * C Function library which can be used to run SQL queries from
  * inside of S4, Splus5.x, or R.
  * This driver hooks R/S and MySQL and implements the proposed S-DBI
  * generic R/S-database interface 0.2.
- * 
+ *
  * For details see
- *  On S, Appendix A in "Programming with Data" by John M. Chambers. 
+ *  On S, Appendix A in "Programming with Data" by John M. Chambers.
  *  On R, "The .Call and .External Interfaces"  in the "Writing R Extensions"
  *  manual.
  *  On MySQL, The "MySQL Reference Manual" available at http://www.mysql.com
@@ -45,7 +45,7 @@
  * TODO:
  *    1. Make sure the code is thread-safe, in particular,
  *       we need to remove the PROBLEM ... ERROR macros
- *       in RS_DBI_errorMessage() because it's definetely not 
+ *       in RS_DBI_errorMessage() because it's definetely not
  *       thread-safe.  But see RS_DBI_setException().
  *    2. Apparently, MySQL treats TEXT as BLOB's (actually, it seems
  *       that MySQL makes no clear distinction between BLOB's and
@@ -66,14 +66,14 @@ RS_MySQL_init(s_object *config_params, s_object *reload)
     Sint  fetch_default_rec, force_reload, max_con;
     const char *drvName = "MySQL";
 
-    max_con = INT_EL(config_params,0); 
+    max_con = INT_EL(config_params,0);
     fetch_default_rec = INT_EL(config_params,1);
     force_reload = LGL_EL(reload,0);
 
-    mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec, 
+    mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec,
         force_reload);
     return mgrHandle;
-} 
+}
 
 s_object *
 RS_MySQL_closeManager(Mgr_Handle *mgrHandle)
@@ -110,7 +110,7 @@ RS_MySQL_moreResultSets(Con_Handle *conHandle)
     MYSQL             *my_connection;
     my_bool           tmp;
     s_object          *status;            /* boolean */
-  
+
     con = RS_DBI_getConnection(conHandle);
     my_connection = (MYSQL *) con->drvConnection;
 
@@ -137,7 +137,7 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
     MYSQL_RES         *my_result;
     MYSQL             *my_connection;
     Sint              rc, num_fields, is_select;
-  
+
     con = RS_DBI_getConnection(conHandle);
     my_connection = (MYSQL *) con->drvConnection;
 
@@ -161,7 +161,7 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
         if(num_fields>0){
             RS_DBI_errorMessage("error in getting next result set", RS_DBI_ERROR);
         }
-        else 
+        else
             is_select = FALSE;
     }
 
@@ -180,7 +180,7 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
         result->rowsAffected = (Sint) -1;
         result->completed = 0;
     }
-    
+
     if(is_select)
       result->fields = RS_MySQL_createDataMappings(rsHandle);
 
@@ -213,7 +213,7 @@ RS_MySQL_allocConParams(void)
     conParams->password = NULL;
 	conParams->host = NULL;
     conParams->unix_socket = NULL;
-    conParams->port = 0; 
+    conParams->port = 0;
     conParams->client_flag = 0;
 	conParams->groups = NULL;
 	conParams->default_file = NULL;
@@ -230,7 +230,7 @@ RS_MySQL_cloneConParams(RS_MySQL_conParams *cp)
     if (cp->password) new->password = RS_DBI_copyString(cp->password);
 	if (cp->host) new->host = RS_DBI_copyString(cp->host);
     if (cp->unix_socket) new->unix_socket = RS_DBI_copyString(cp->unix_socket);
-    new->port = cp->port; 
+    new->port = cp->port;
     new->client_flag = cp->client_flag;
 	if (cp->groups) new->groups = RS_DBI_copyString(cp->groups);
 	if (cp->default_file) new->default_file = RS_DBI_copyString(cp->default_file);
@@ -254,7 +254,7 @@ RS_MySQL_freeConParams(RS_MySQL_conParams *conParams)
 }
 
 Con_Handle *
-RS_MySQL_newConnection(Mgr_Handle *mgrHandle, 
+RS_MySQL_newConnection(Mgr_Handle *mgrHandle,
     s_object *s_dbname,
     s_object *s_username,
     s_object *s_password,
@@ -298,10 +298,10 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle,
     return RS_MySQL_createConnection(mgrHandle,conParams);
 }
 
-/* RS_MySQL_createConnection - internal function 
+/* RS_MySQL_createConnection - internal function
  *
  * Used by both RS_MySQL_newConnection and RS_MySQL_cloneConnection.
- * It is responsible for the memory associated with conParams. 
+ * It is responsible for the memory associated with conParams.
  */
 Con_Handle *
 RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams)
@@ -346,8 +346,8 @@ RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams)
     if(conParams->default_file)
         mysql_options(my_connection, MYSQL_READ_DEFAULT_FILE, conParams->default_file);
 
-    if(!mysql_real_connect(my_connection, 
-		conParams->host, conParams->username, conParams->password, conParams->dbname, 
+    if(!mysql_real_connect(my_connection,
+		conParams->host, conParams->username, conParams->password, conParams->dbname,
 		conParams->port, conParams->unix_socket, conParams->client_flag)){
 
 		RS_MySQL_freeConParams(conParams);
@@ -357,9 +357,9 @@ RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams)
         RS_DBI_errorMessage(buf, RS_DBI_ERROR);
     }
 
-  
-    /* MySQL connections can only have 1 result set open at a time */  
-    conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1); 
+
+    /* MySQL connections can only have 1 result set open at a time */
+    conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1);
     con = RS_DBI_getConnection(conHandle);
     if(!con){
         mysql_close(my_connection);
@@ -379,11 +379,11 @@ s_object *
 RS_MySQL_closeConnection(Con_Handle *conHandle)
 {
     S_EVALUATOR
-  
+
     RS_DBI_connection *con;
     MYSQL *my_connection;
     s_object *status;
-  
+
     con = RS_DBI_getConnection(conHandle);
     if(con->num_res>0){
         RS_DBI_errorMessage(
@@ -400,18 +400,18 @@ RS_MySQL_closeConnection(Con_Handle *conHandle)
     my_connection = (MYSQL *) con->drvConnection;
     mysql_close(my_connection);
     con->drvConnection = (void *) NULL;
-  
+
     RS_DBI_freeConnection(conHandle);
-    
+
     MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
     LGL_EL(status, 0) = TRUE;
     MEM_UNPROTECT(1);
-  
+
     return status;
-}  
-  
+}
+
 /* Execute (currently) one sql statement (INSERT, DELETE, SELECT, etc.),
- * set coercion type mappings between the server internal data types and 
+ * set coercion type mappings between the server internal data types and
  * S classes.   Returns  an S handle to a resultSet object.
  */
 Res_Handle *
@@ -432,34 +432,34 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
     my_connection = (MYSQL *) con->drvConnection;
     dyn_statement = RS_DBI_copyString(CHR_EL(statement,0));
 
-    /* Do we have a pending resultSet in the current connection?  
+    /* Do we have a pending resultSet in the current connection?
     * MySQL only allows  one resultSet per connection.
     */
     if(con->num_res>0){
         res_id = (Sint) con->resultSetIds[0]; /* recall, MySQL has only 1 res */
-        rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle), 
+        rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle),
                        CON_ID(conHandle), res_id);
         result = RS_DBI_getResultSet(rsHandle);
         if(result->completed == 0){
             free(dyn_statement);
-            RS_DBI_errorMessage( 
+            RS_DBI_errorMessage(
              "connection with pending rows, close resultSet before continuing",
              RS_DBI_ERROR);
         }
-        else 
+        else
             RS_MySQL_closeResultSet(rsHandle);
     }
 
     /* Here is where we actually run the query */
     state = mysql_query(my_connection, dyn_statement);
-    if(state) { 
+    if(state) {
         char errMsg[256];
         free(dyn_statement);
         (void) sprintf(errMsg, "could not run statement: %s",
                   mysql_error(my_connection));
         RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
-    
+
     /* Do we need output column/field descriptors?  Only for SELECT-like
     * statements. The MySQL reference manual suggests invoking
     * mysql_use_result() and if it succeed the statement is SELECT-like
@@ -478,7 +478,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
             free(dyn_statement);
             RS_DBI_errorMessage("error in select/select-like", RS_DBI_ERROR);
         }
-        else 
+        else
             is_select = FALSE;
     }
 
@@ -497,7 +497,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
         result->rowsAffected = (Sint) -1;
         result->completed = 0;
     }
-    
+
     if(is_select)
       result->fields = RS_MySQL_createDataMappings(rsHandle);
 
@@ -511,22 +511,22 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
     MYSQL_RES     *my_result;
     MYSQL_FIELD   *select_dp;
     RS_DBI_connection  *con;
-    RS_DBI_resultSet   *result; 
+    RS_DBI_resultSet   *result;
     RS_DBI_fields      *flds;
     int     j, num_fields, internal_type;
     char    errMsg[2048];
-  
+
     result = RS_DBI_getResultSet(rsHandle);
     my_result = (MYSQL_RES *) result->drvResultSet;
-  
+
     /* here we fetch from the MySQL server the field descriptions */
     select_dp = mysql_fetch_fields(my_result);
-  
+
     con = RS_DBI_getConnection(rsHandle);
     num_fields = (int) mysql_field_count((MYSQL *) con->drvConnection);
-  
+
     flds = RS_DBI_allocFields(num_fields);
-  
+
     /* WARNING: TEXT fields are represented as BLOBS (sic),
      * not VARCHAR or some kind of string type. More troublesome is the
      * fact that a TEXT fields can be BINARY to indicate case-sensitivity.
@@ -534,33 +534,33 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
      * types (IMHO).  A binary object (in SQL92, X/SQL at least) can
      * store all kinds of non-ASCII, non-printable stuff that can
      * potentially screw up S and R CHARACTER_TYPE.  We are on thin ice.
-     * 
+     *
      * I'm aware that I'm introducing a potential bug here by following
      * the MySQL convention of treating BLOB's as TEXT (I'm symplifying
-     * in order to properly handle commonly-found TEXT fields, at the 
+     * in order to properly handle commonly-found TEXT fields, at the
      * risk of core dumping when bona fide Binary objects are being
      * retrieved.
-     * 
+     *
      * Possible workaround: if strlen() of the field equals the
      *    MYSQL_FIELD->length for all rows, then we are probably(?) safe
      * in considering TEXT a character type (non-binary).
      */
     for (j = 0; j < num_fields; j++){
-    
+
         /* First, save the name, MySQL internal field name, type, length, etc. */
-        
+
         flds->name[j] = RS_DBI_copyString(select_dp[j].name);
         flds->type[j] = select_dp[j].type;  /* recall that these are enum*/
         flds->length[j] = select_dp[j].length;
-        flds->precision[j] = select_dp[j].length; 
-        flds->scale[j] = select_dp[j].decimals; 
+        flds->precision[j] = select_dp[j].length;
+        flds->scale[j] = select_dp[j].decimals;
         flds->nullOk[j] = (!IS_NOT_NULL(select_dp[j].flags));
-    
+
         internal_type = select_dp[j].type;
         switch(internal_type) {
         case FIELD_TYPE_VAR_STRING:
         case FIELD_TYPE_STRING:
-            flds->Sclass[j] = CHARACTER_TYPE;
+            flds->Sclass[j] = STRSXP;
             flds->isVarLength[j] = (Sint) 1;
             break;
         case FIELD_TYPE_TINY:            /* 1-byte TINYINT   */
@@ -569,44 +569,44 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
         case FIELD_TYPE_LONG:            /* 4-byte INTEGER   */
             /* if unsigned, turn into numeric (may be too large for ints/long)*/
             if(select_dp[j].flags & UNSIGNED_FLAG)
-                flds->Sclass[j] = NUMERIC_TYPE;
+                flds->Sclass[j] = REALSXP;
             else
-                flds->Sclass[j] = INTEGER_TYPE;
+                flds->Sclass[j] = INTSXP;
             break;
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID >= 50003 /* 5.0.3 */
         case FIELD_TYPE_BIT:
             if(flds->precision[j] <= sizeof(Sint))   /* can R int hold the bytes? */
-                flds->Sclass[j] = INTEGER_TYPE;
+                flds->Sclass[j] = INTSXP;
             else {
-                flds->Sclass[j] = CHARACTER_TYPE;
-                (void) sprintf(errMsg, 
-                    "BIT field in column %d too long (%d bits) for an R integer (imported as character)", 
+                flds->Sclass[j] = STRSXP;
+                (void) sprintf(errMsg,
+                    "BIT field in column %d too long (%d bits) for an R integer (imported as character)",
                     j+1, flds->precision[j]);
             }
 #endif
         case FIELD_TYPE_LONGLONG:        /* TODO: can we fit these in R/S ints? */
             if(sizeof(Sint)>=8)            /* Arg! this ain't pretty:-( */
-                flds->Sclass[j] = INTEGER_TYPE;
-            else 
-                flds->Sclass[j] = NUMERIC_TYPE;
+                flds->Sclass[j] = INTSXP;
+            else
+                flds->Sclass[j] = REALSXP;
         case FIELD_TYPE_DECIMAL:
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID >= 50003 /* 5.0.3 */
         case FIELD_TYPE_NEWDECIMAL:
 #endif
             if(flds->scale[j] > 0 || flds->precision[j] > 10)
-                flds->Sclass[j] = NUMERIC_TYPE;
-            else 
-                flds->Sclass[j] = INTEGER_TYPE;
+                flds->Sclass[j] = REALSXP;
+            else
+                flds->Sclass[j] = INTSXP;
             break;
         case FIELD_TYPE_FLOAT:
         case FIELD_TYPE_DOUBLE:
-            flds->Sclass[j] = NUMERIC_TYPE;
+            flds->Sclass[j] = REALSXP;
             break;
         case FIELD_TYPE_BLOB:         /* TODO: how should we bring large ones*/
         case FIELD_TYPE_TINY_BLOB:
         case FIELD_TYPE_MEDIUM_BLOB:
         case FIELD_TYPE_LONG_BLOB:
-            flds->Sclass[j] = CHARACTER_TYPE;   /* Grr! Hate this! */
+            flds->Sclass[j] = STRSXP;   /* Grr! Hate this! */
             flds->isVarLength[j] = (Sint) 1;
             break;
         case FIELD_TYPE_DATE:
@@ -614,27 +614,27 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
         case FIELD_TYPE_DATETIME:
         case FIELD_TYPE_YEAR:
         case FIELD_TYPE_NEWDATE:
-            flds->Sclass[j] = CHARACTER_TYPE;
+            flds->Sclass[j] = STRSXP;
             flds->isVarLength[j] = (Sint) 1;
             break;
         case FIELD_TYPE_ENUM:
-            flds->Sclass[j] = CHARACTER_TYPE;   /* see the MySQL ref. manual */
+            flds->Sclass[j] = STRSXP;   /* see the MySQL ref. manual */
             flds->isVarLength[j] = (Sint) 1;
             break;
         case FIELD_TYPE_SET:
-            flds->Sclass[j] = CHARACTER_TYPE;
+            flds->Sclass[j] = STRSXP;
             flds->isVarLength[j] = (Sint) 0;
             break;
         default:
-            flds->Sclass[j] = CHARACTER_TYPE;
+            flds->Sclass[j] = STRSXP;
             flds->isVarLength[j] = (Sint) 1;
-            (void) sprintf(errMsg, 
-                "unrecognized MySQL field type %d in column %d imported as character", 
+            (void) sprintf(errMsg,
+                "unrecognized MySQL field type %d in column %d imported as character",
                 internal_type, j);
             RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
             break;
         }
-    }  
+    }
     return flds;
 }
 
@@ -655,10 +655,10 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
     unsigned long  *lens;
     int    i, j, null_item, expand;
     Sint   *fld_nullOk, completed;
-    Stype  *fld_Sclass;
-    Sint   num_rec; 
+    SEXPTYPE  *fld_Sclass;
+    Sint   num_rec;
     int    num_fields;
-    
+
     result = RS_DBI_getResultSet(rsHandle);
     flds = result->fields;
     if(!flds)
@@ -682,12 +682,12 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
 #endif
     fld_Sclass = flds->Sclass;
     fld_nullOk = flds->nullOk;
-    
+
     /* actual fetching....*/
     my_result = (MYSQL_RES *) result->drvResultSet;
     completed = (Sint) 0;
 
-    for(i = 0; ; i++){ 
+    for(i = 0; ; i++){
 
         if(i==num_rec){  /* exhausted the allocated space */
 
@@ -714,7 +714,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
             completed = (Sint) (err_no ? -1 : 1);
             break;
         }
-        lens = mysql_fetch_lengths(my_result); 
+        lens = mysql_fetch_lengths(my_result);
 
         for(j = 0; j < num_fields; j++){
 
@@ -722,14 +722,14 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
 
             switch((int)fld_Sclass[j]){
 
-            case INTEGER_TYPE:
+            case INTSXP:
                 if(null_item)
-                    NA_SET(&(LST_INT_EL(output,j,i)), INTEGER_TYPE);
+                    NA_SET(&(LST_INT_EL(output,j,i)), INTSXP);
                 else
                     LST_INT_EL(output,j,i) = (Sint) atol(row[j]);
                 break;
-    
-            case CHARACTER_TYPE:
+
+            case STRSXP:
                 /* BUG: I need to verify that a TEXT field (which is stored as
                 * a BLOB by MySQL!) is indeed char and not a true
                 * Binary obj (MySQL does not truly distinguish them). This
@@ -744,7 +744,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
                 else {
                     if((size_t) lens[j] != strlen(row[j])){
                         char warn[128];
-                        (void) sprintf(warn, 
+                        (void) sprintf(warn,
                             "internal error: row %ld field %ld truncated",
                             (long) i, (long) j);
                         RS_DBI_errorMessage(warn, RS_DBI_WARNING);
@@ -752,51 +752,30 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
                     SET_LST_CHR_EL(output,j,i,C_S_CPY(row[j]));
                 }
                 break;
-    
-            case NUMERIC_TYPE:
+
+            case REALSXP:
                 if(null_item)
-                    NA_SET(&(LST_NUM_EL(output,j,i)), NUMERIC_TYPE);
+                    NA_SET(&(LST_NUM_EL(output,j,i)), REALSXP);
                 else
                     LST_NUM_EL(output,j,i) = (double) atof(row[j]);
                 break;
 
-#ifndef USING_R
-
-            case SINGLE_TYPE:
-                if(null_item)
-                    NA_SET(&(LST_FLT_EL(output,j,i)), SINGLE_TYPE);
-                else
-                    LST_FLT_EL(output,j,i) = (float) atof(row[j]);
-                break;
-
-            case RAW_TYPE:           /* these are blob's */
-                raw_obj = NEW_RAW((Sint) lens[j]);
-                memcpy(RAW_DATA(raw_obj), row[j], lens[j]);
-                raw_container = LST_EL(output,j);    /* get list of raw objects*/
-                SET_ELEMENT(raw_container, (Sint) i, raw_obj); 
-                SET_ELEMENT(output, (Sint) j, raw_container);
-                break;
-#endif
             default:  /* error, but we'll try the field as character (!)*/
                 if(null_item)
-#ifdef USING_R
                     SET_LST_CHR_EL(output,j,i, NA_STRING);
-#else
-                    NA_CHR_SET(LST_CHR_EL(output,j,i));
-#endif
                 else {
                     char warn[64];
-                    (void) sprintf(warn, 
+                    (void) sprintf(warn,
                         "unrecognized field type %d in column %d",
                         (int) fld_Sclass[j], (int) j);
                     RS_DBI_errorMessage(warn, RS_DBI_WARNING);
                     SET_LST_CHR_EL(output,j,i,C_S_CPY(row[j]));
                 }
                 break;
-            } 
-        } 
+            }
+        }
     }
-  
+
     /* actual number of records fetched */
     if(i < num_rec){
         num_rec = i;
@@ -831,7 +810,7 @@ RS_MySQL_getException(s_object *conHandle)
     RS_DBI_connection   *con;
     Sint  n = 2;
     char *exDesc[] = {"errorNum", "errorMsg"};
-    Stype exType[] = {INTEGER_TYPE, CHARACTER_TYPE};
+    SEXPTYPE exType[] = {INTSXP, STRSXP};
     Sint  exLen[]  = {1, 1};
 
     con = RS_DBI_getConnection(conHandle);
@@ -856,7 +835,7 @@ RS_MySQL_getException(s_object *conHandle)
 s_object *
 RS_MySQL_closeResultSet(s_object *resHandle)
 {
-    S_EVALUATOR 
+    S_EVALUATOR
 
     RS_DBI_resultSet *result;
     MYSQL_RES        *my_result;
@@ -876,7 +855,7 @@ RS_MySQL_closeResultSet(s_object *resHandle)
     /* need to NULL drvResultSet, otherwise can't free the rsHandle */
     result->drvResultSet = (void *) NULL;
     RS_DBI_freeResultSet(resHandle);
-    
+
     MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
     LGL_EL(status, 0) = TRUE;
     MEM_UNPROTECT(1);
@@ -894,13 +873,13 @@ RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
     Sint i, num_con, max_con, *cons, ncon;
     Sint j, n = 8;
     char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
-                        "managerId", "length",        "num_con", 
+                        "managerId", "length",        "num_con",
                         "counter",   "clientVersion"};
-    Stype mgrType[] = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE, 
-                        INTEGER_TYPE,   INTEGER_TYPE, INTEGER_TYPE, 
-                        INTEGER_TYPE,   CHARACTER_TYPE};
+    SEXPTYPE mgrType[] = {STRSXP, INTSXP, INTSXP,
+      INTSXP,   INTSXP, INTSXP,
+      INTSXP,   STRSXP};
     Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
-  
+
     mgr = RS_DBI_getManager(mgrHandle);
     if(!mgr)
         RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
@@ -913,13 +892,13 @@ RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
     if(IS_LIST(output))
         output = AS_LIST(output);
     else
-        RS_DBI_errorMessage("internal error: could not alloc named list", 
+        RS_DBI_errorMessage("internal error: could not alloc named list",
             RS_DBI_ERROR);
 #endif
     j = (Sint) 0;
     if(mgr->drvName)
         SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
-    else 
+    else
         SET_LST_CHR_EL(output,j++,0,C_S_CPY(""));
 
     cons = (Sint *) S_alloc((long)max_con, (int)sizeof(Sint));
@@ -947,7 +926,7 @@ s_object *
 RS_MySQL_connectionInfo(Con_Handle *conHandle)
 {
     S_EVALUATOR
-  
+
     MYSQL   *my_con;
     RS_MySQL_conParams *conParams;
     RS_DBI_connection  *con;
@@ -956,9 +935,9 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
     char *conDesc[] = {"host", "user", "dbname", "conType",
                         "serverVersion", "protocolVersion",
                         "threadId", "rsId"};
-    Stype conType[] = {CHARACTER_TYPE, CHARACTER_TYPE, CHARACTER_TYPE,
-                        CHARACTER_TYPE, CHARACTER_TYPE, INTEGER_TYPE,
-                        INTEGER_TYPE, INTEGER_TYPE};
+    SEXPTYPE conType[] = {STRSXP, STRSXP, STRSXP,
+                          STRSXP, STRSXP, INTSXP,
+                          INTSXP, INTSXP};
     Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
 	char *tmp;
 
@@ -976,7 +955,7 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
     conParams = (RS_MySQL_conParams *) con->conParams;
 
     PROTECT(output);
-  
+
 	tmp = conParams->host? conParams->host : (my_con->host?my_con->host:"");
     SET_LST_CHR_EL(output,0,0,C_S_CPY(tmp));
 	tmp = conParams->username? conParams->username : (my_con->user?my_con->user:"");
@@ -1016,8 +995,8 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
     Sint  n = 6;
     char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
                         "rowCount", "completed", "fieldDescription"};
-    Stype rsType[]  = {CHARACTER_TYPE, INTEGER_TYPE, INTEGER_TYPE,
-            INTEGER_TYPE,   INTEGER_TYPE, LIST_TYPE};
+    SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
+      INTSXP,   INTSXP, VECSXP};
     Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
     result = RS_DBI_getResultSet(rsHandle);
@@ -1052,7 +1031,7 @@ RS_MySQL_typeNames(s_object *type)
     Sint n, *typeCodes;
     int i;
 	char *tname;
-  
+
     n = LENGTH(type);
     typeCodes = INTEGER_DATA(type);
     MEM_PROTECT(typeNames = NEW_CHARACTER(n));
@@ -1066,7 +1045,7 @@ RS_MySQL_typeNames(s_object *type)
 }
 
 /*
- * RS_MySQL_dbApply. 
+ * RS_MySQL_dbApply.
  *
  * R/S: dbApply(rs, INDEX, FUN, group.begin, group.end, end, ...)
  *
@@ -1079,34 +1058,34 @@ RS_MySQL_typeNames(s_object *type)
  * and END_GROUP (just finished with the current group). At these points
  * we invoke the R functions group.end() and group.begin() in the
  * environment() of dbApply
- * [should it be the environment where dbApply was called from (i.e., 
- * dbApply's parent's * frame)?]  
- * Except for the very first group, the order of invocation is 
+ * [should it be the environment where dbApply was called from (i.e.,
+ * dbApply's parent's * frame)?]
+ * Except for the very first group, the order of invocation is
  * end.group() followed by begin.group()
  *
  * NOTE: We're thinking of groups as commonly defined in awk scripts
  * (but also in SAP's ABAP/4) were rows are assumed to be sorted by
  * the "group" fields and we detect a different (new) group when any of
  * the "group" fields changes.  Our implementation does not require
- * the result set to be sorted by group, but for performance-sake, 
+ * the result set to be sorted by group, but for performance-sake,
  * it better be.
  *
  * TODO: 1. Notify the reason for exiting (normal, exhausted maxBatches, etc.)
  *       2. Allow INDEX to be a list, as in tapply().
- *       3. Handle NA's (SQL NULL's) in the INDEX and/or data fields.  
+ *       3. Handle NA's (SQL NULL's) in the INDEX and/or data fields.
  *          Currently they are ignored, thus effectively causing a
  *          new BEGIN_GROUP event.
- *       4. Re-write fetch() in terms of events (END_OF_DATA, 
+ *       4. Re-write fetch() in terms of events (END_OF_DATA,
  *          EXHAUST_DATAFRAME, DB_ERROR, etc.)
  *       5. Create a table of R callback functions indexed by events,
  *          then a handle_event() could conveniently handle all the events.
  */
 
 s_object    *expand_list(s_object *old, Sint new_len);
-void         add_group(s_object *group_names, s_object *data, 
-                 Stype *fld_Sclass, Sint group, 
+void         add_group(s_object *group_names, s_object *data,
+             SEXPTYPE *fld_Sclass, Sint group,
            Sint ngroup, Sint i);
-unsigned int check_groupEvents(s_object *data, Stype fld_Sclass[], 
+unsigned int check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[],
                           Sint row, Sint col);
 
 /* The following are the masks for the events/states we recognize as we
@@ -1215,7 +1194,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     s_object  *raw_obj, *raw_container;
 #endif
     unsigned long  *lens = (unsigned long *)0;
-    Stype  *fld_Sclass;
+    SEXPTYPE  *fld_Sclass;
     Sint   i, j, null_item, expand, *fld_nullOk, completed;
     Sint   num_rec, num_groups;
     int    num_fields;
@@ -1224,7 +1203,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     long   total_records;
     Sint   pushed_back = FALSE;
 
-    unsigned int event = NEVER; 
+    unsigned int event = NEVER;
     int    np = 0;        /* keeps track of MEM_PROTECT()'s */
     s_object    *beginGroupCall, *beginGroupFun = LST_EL(s_funs, 2);
     s_object    *endGroupCall,   *endGroupFun   = LST_EL(s_funs, 3);
@@ -1242,7 +1221,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     endGroupCall = R_NilValue;    /* -Wall */
     if(invoke_endGroup){
         /* TODO: append list(...) to the call object */
-        MEM_PROTECT(endGroupCall = lang4(endGroupFun, R_NilValue, 
+        MEM_PROTECT(endGroupCall = lang4(endGroupFun, R_NilValue,
             R_NilValue, R_NilValue));
         ++np;
     }
@@ -1275,7 +1254,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     np += 2;
 
     /* set conversion for group names */
-    
+
     if(result->rowCount==0){
         event = BEGIN;
         /* here we could invoke the begin function*/
@@ -1327,15 +1306,15 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 
             switch((int)fld_Sclass[j]){
 
-            case INTEGER_TYPE: 
+            case INTSXP:
                 if(null_item)
-                    NA_SET(&(LST_INT_EL(data,j,i)), INTEGER_TYPE);
+                    NA_SET(&(LST_INT_EL(data,j,i)), INTSXP);
                 else
                     LST_INT_EL(data,j,i) = atol(row[j]);
                 LST_INT_EL(cur_rec,j,0) = LST_INT_EL(data,j,i);
                 break;
 
-            case CHARACTER_TYPE: 
+            case STRSXP:
                 /* BUG: I need to verify that a TEXT field (which is stored as
                 * a BLOB by MySQL!) is indeed char and not a true
                 * Binary obj (MySQL does not truly distinguish them). This
@@ -1350,7 +1329,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
                 else {
                     if((size_t) lens[j] != strlen(row[j])){
                         char warn[128];
-                        (void) sprintf(warn, 
+                        (void) sprintf(warn,
                                 "internal error: row %ld field %ld truncated",
                                 (long) i, (long) j);
                         RS_DBI_errorMessage(warn, RS_DBI_WARNING);
@@ -1360,28 +1339,20 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
                 SET_LST_CHR_EL(cur_rec, j, 0, C_S_CPY(LST_CHR_EL(data,j,i)));
                 break;
 
-            case NUMERIC_TYPE:
+            case REALSXP:
                 if(null_item)
-                    NA_SET(&(LST_NUM_EL(data,j,i)), NUMERIC_TYPE);
+                    NA_SET(&(LST_NUM_EL(data,j,i)), REALSXP);
                 else
                     LST_NUM_EL(data,j,i) = (double) atof(row[j]);
                 LST_NUM_EL(cur_rec,j,0) = LST_NUM_EL(data,j,i);
                 break;
 
 #ifndef USING_R
-            case SINGLE_TYPE:
-                if(null_item)
-                    NA_SET(&(LST_FLT_EL(data,j,i)), SINGLE_TYPE);
-                else
-                    LST_FLT_EL(data,j,i) = (float) atof(row[j]);
-                LST_FLT_EL(cur_rec,j,0) = LST_FLT_EL(data,j,i);
-                break;
-
             case RAW_TYPE:           /* these are blob's */
                 raw_obj = NEW_RAW((Sint) lens[j]);
                 memcpy(RAW_DATA(raw_obj), row[j], lens[j]);
                 raw_container = LST_EL(data,j);    /* get list of raw objects*/
-                SET_ELEMENT(raw_container, (Sint) i, raw_obj); 
+                SET_ELEMENT(raw_container, (Sint) i, raw_obj);
                 SET_ELEMENT(data, (Sint) j, raw_container);
                 break;
 #endif
@@ -1395,7 +1366,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 #endif
                 else {
                     char warn[64];
-                    (void) sprintf(warn, 
+                    (void) sprintf(warn,
                             "unrecognized field type %d in column %d",
                             (int) fld_Sclass[j], (int) j);
                     RS_DBI_errorMessage(warn, RS_DBI_WARNING);
@@ -1403,7 +1374,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
                 }
                 SET_LST_CHR_EL(cur_rec,j,0, C_S_CPY(LST_CHR_EL(data,j,i)));
                 break;
-            } 
+            }
         }
 
         if(!pushed_back){
@@ -1414,7 +1385,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
             pushed_back = FALSE;
         }
 
-        /* We just finished processing the new record, now we check 
+        /* We just finished processing the new record, now we check
          * for some events (in addition to NEW_RECORD, of course).
          */
         event = check_groupEvents(data, fld_Sclass, i, group_field);
@@ -1423,8 +1394,8 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 
             if(ngroup==num_groups){                  /* exhausted output list? */
                 num_groups = 2 * num_groups;
-                MEM_PROTECT(SET_LENGTH(out_list, num_groups)); 
-                MEM_PROTECT(SET_LENGTH(group_names, num_groups)); 
+                MEM_PROTECT(SET_LENGTH(out_list, num_groups));
+                MEM_PROTECT(SET_LENGTH(group_names, num_groups));
                 np += 2;
             }
 
@@ -1434,30 +1405,30 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
         }
 
         if(END_GROUP & event){
-     
+
             add_group(group_names, data, fld_Sclass, group_field, ngroup, i-1);
 
             RS_DBI_allocOutput(data, flds, i, expand++);
-            RS_DBI_makeDataFrame(data); 
-     
+            RS_DBI_makeDataFrame(data);
+
             val = RS_DBI_invokeEndGroup(endGroupCall, data,
                     CHR_EL(group_names, ngroup), rho);
             SET_ELEMENT(out_list, ngroup, val);
 
-            /* set length of data to zero to force initialization 
-             * for next group 
+            /* set length of data to zero to force initialization
+             * for next group
              */
             RS_DBI_allocOutput(data, flds, (Sint) 0, (Sint) 1);
             i = 0;                                  /* flush */
-            ++ngroup;   
+            ++ngroup;
             pushed_back = TRUE;
             continue;
         }
 
         i++;
-    }    
-  
-    /* we fetched all the rows we needed/could; compute actual number of 
+    }
+
+    /* we fetched all the rows we needed/could; compute actual number of
      * records fetched.
      * TODO: What should we return in the case of partial groups???
      */
@@ -1469,16 +1440,16 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
         event = PARTIAL_GROUP;
 
     /* wrap up last group */
-    if((END_GROUP & event) || (PARTIAL_GROUP & event)){ 
+    if((END_GROUP & event) || (PARTIAL_GROUP & event)){
 
         add_group(group_names, data, fld_Sclass, group_field, ngroup, i-i);
 
         if(i<num_rec){
             RS_DBI_allocOutput(data, flds, i, expand++);
-            RS_DBI_makeDataFrame(data); 
+            RS_DBI_makeDataFrame(data);
         }
         if(invoke_endGroup){
-            val = RS_DBI_invokeEndGroup(endGroupCall, data, 
+            val = RS_DBI_invokeEndGroup(endGroupCall, data,
                     CHR_EL(group_names, ngroup), rho);
             SET_ELEMENT(out_list, ngroup++, val);
         }
@@ -1499,9 +1470,9 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
         np += 2;
     }
 
-    result->rowCount += total_records;  
+    result->rowCount += total_records;
     result->completed = (int) completed;
- 
+
     SET_NAMES(out_list, group_names);       /* do I need to PROTECT? */
 #ifndef USING_R
     out_list = AS_LIST(out_list);           /* for S4/Splus[56]'s sake */
@@ -1512,36 +1483,29 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 }
 
 unsigned int
-check_groupEvents(s_object *data, Stype fld_Sclass[], Sint irow, Sint jcol)
+check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[], Sint irow, Sint jcol)
 {
     if(irow==0) /* Begin */
         return (BEGIN|BEGIN_GROUP);
 
     switch(fld_Sclass[jcol]){
 
-    case LOGICAL_TYPE:
+    case LGLSXP:
         if(LST_LGL_EL(data,jcol,irow)!=LST_LGL_EL(data,jcol,irow-1))
             return (END_GROUP|BEGIN_GROUP);
         break;
 
-    case INTEGER_TYPE:
+    case INTSXP:
         if(LST_INT_EL(data,jcol,irow)!=LST_INT_EL(data,jcol,irow-1))
             return (END_GROUP|BEGIN_GROUP);
         break;
 
-    case NUMERIC_TYPE:
+    case REALSXP:
         if(LST_NUM_EL(data,jcol,irow)!=LST_NUM_EL(data,jcol,irow-1))
             return (END_GROUP|BEGIN_GROUP);
         break;
-#ifndef USING_R
 
-    case SINGLE_TYPE:
-        if(LST_FLT_EL(data,jcol,irow)!=LST_FLT_EL(data,jcol,irow-1))
-            return (END_GROUP|BEGIN_GROUP);
-        break;
-#endif
-
-    case CHARACTER_TYPE:
+    case STRSXP:
         if(strcmp(LST_CHR_EL(data,jcol,irow), LST_CHR_EL(data,jcol,irow-1)))
             return (END_GROUP|BEGIN_GROUP);
         break;
@@ -1551,35 +1515,30 @@ check_groupEvents(s_object *data, Stype fld_Sclass[], Sint irow, Sint jcol)
            "un-regongnized R/S data type %d", fld_Sclass[jcol]
         ERROR;
         break;
-    }      
+    }
 
     return NEW_RECORD;
 }
 
 /* append current group (as character) to the vector of group names */
 void
-add_group(s_object *group_names, s_object *data, 
-    Stype *fld_Sclass, Sint group_field, Sint ngroup, Sint i)
+add_group(s_object *group_names, s_object *data,
+          SEXPTYPE *fld_Sclass, Sint group_field, Sint ngroup, Sint i)
 {
-    char  buff[1024];   
+    char  buff[1024];
 
     switch((int) fld_Sclass[group_field]){
 
-    case LOGICAL_TYPE:
+    case LGLSXP:
         (void) sprintf(buff, "%ld", (long) LST_LGL_EL(data,group_field,i));
         break;
-    case INTEGER_TYPE:
+    case INTSXP:
         (void) sprintf(buff, "%ld", (long) LST_INT_EL(data,group_field,i));
         break;
-#ifndef USING_R
-    case SINGLE_TYPE:
-        (void) sprintf(buff, "%f", (double) LST_FLT_EL(data,group_field,i));
-        break;
-#endif
-    case NUMERIC_TYPE:
+    case REALSXP:
         (void) sprintf(buff, "%f", (double) LST_NUM_EL(data,group_field,i));
         break;
-    case CHARACTER_TYPE:
+    case STRSXP:
         strcpy(buff, LST_CHR_EL(data,group_field,i));
         break;
     default:
@@ -1591,8 +1550,8 @@ add_group(s_object *group_names, s_object *data,
     return;
 }
 
-/* the following function was kindly provided by Mikhail Kondrin 
- * it returns the last inserted index. 
+/* the following function was kindly provided by Mikhail Kondrin
+ * it returns the last inserted index.
  * TODO: It returns an int, but it can potentially be inadequate
  *       if the index is an�unsigned integer.  Should we return
  *       a numeric instead?
@@ -1601,12 +1560,12 @@ s_object *
 RS_MySQL_insertid(Con_Handle *conHandle)
 {
     S_EVALUATOR
- 
+
     MYSQL   *my_con;
     RS_DBI_connection  *con;
     s_object   *output;
     char *conDesc[] = {"iid"};
-    Stype conType[] = {INTEGER_TYPE};    /* dj: are we sure an int will do? */
+    SEXPTYPE conType[] = {INTSXP};    /* dj: are we sure an int will do? */
     Sint  conLen[]  = {1};
 
     con = RS_DBI_getConnection(conHandle);
@@ -1625,7 +1584,7 @@ RS_MySQL_insertid(Con_Handle *conHandle)
 
 }
 
-/* The single string version of this function was kindly provided by 
+/* The single string version of this function was kindly provided by
  * J. T. Lindgren (any bugs are probably dj's)
  *
  * NOTE/BUG?: This function could potentially grab a huge amount of memory
@@ -1674,7 +1633,7 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
         SET_CHR_EL(output, i, C_S_CPY(escapedString));
     }
 
-    MEM_UNPROTECT(1); 
+    MEM_UNPROTECT(1);
     return output;
 }
 
@@ -1701,17 +1660,17 @@ void R_init_RMySQL(DllInfo *info){
 	 * when the major or minor revision number differ. The integer format is XYYZZ
 	 * where X is the major revision, YY is the minor revision, and ZZ is the revision
 	 * within the minor revision.
-   
+
    * Jeroen 2014: this is incorrect. It merely compares the VERSION and VERSION.server
    * files contained within the connector library. It has nothing to do with build vs
    * compile. Disabling this.
-   
+
   int compiled=MYSQL_VERSION_ID;
   int loaded = (int)mysql_get_client_version();
   if ( (compiled-(compiled%100)) != (loaded-(loaded%100)) ){
     warning("\n\n   RMySQL was compiled with MySQL %s but loading MySQL %s instead!\n   This may cause problems with your database connections.\n\n   Please install MySQL %s.\n\n   If you have already done so, you may need to set your environment\n   variable MYSQL_HOME to the proper install directory.",MYSQL_SERVER_VERSION,mysql_get_client_info(),MYSQL_SERVER_VERSION);
   }
-  
+
    */
 }
 
