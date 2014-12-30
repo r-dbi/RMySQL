@@ -42,11 +42,11 @@ dbWriteTable(con, "mtcars", datasets::mtcars, overwrite = TRUE)
 
 sql <- "SELECT cyl FROM mtcars LIMIT 5; SELECT vs FROM mtcars LIMIT 5"
 rs1 <- dbSendQuery(con, sql)
-fetch(rs1, n = -1)
+dbFetch(rs1, n = -1)
 
 if (dbMoreResults(con)) {
    rs2 <- dbNextResult(con)
-   fetch(rs2, n = -1)
+   dbFetch(rs2, n = -1)
 }
 
 dbClearResult(rs1)

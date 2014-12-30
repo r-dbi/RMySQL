@@ -104,7 +104,7 @@ setGeneric("dbApply", function(res, ...) {
 #' if (mysqlHasDefault()) {
 #' con <- dbConnect(RMySQL::MySQL())
 #'
-#' dbWriteTable(con, "mtcars", mtcars)
+#' dbWriteTable(con, "mtcars", mtcars, overwrite = TRUE)
 #' res <- dbSendQuery(con, "SELECT * FROM mtcars ORDER BY cyl")
 #' dbApply(res, "cyl", function(x, grp) quantile(x$mpg, names=FALSE))
 #'
@@ -216,11 +216,11 @@ setMethod("dbApply", "MySQLResult",
 #'
 #' sql <- "SELECT cyl FROM mtcars LIMIT 5; SELECT vs FROM mtcars LIMIT 5"
 #' rs1 <- dbSendQuery(con, sql)
-#' fetch(rs1, n = -1)
+#' dbFetch(rs1, n = -1)
 #'
 #' if (dbMoreResults(con)) {
 #'    rs2 <- dbNextResult(con)
-#'    fetch(rs2, n = -1)
+#'    dbFetch(rs2, n = -1)
 #' }
 #'
 #' dbClearResult(rs1)

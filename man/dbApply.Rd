@@ -75,7 +75,7 @@ all the groups at the same time.
 if (mysqlHasDefault()) {
 con <- dbConnect(RMySQL::MySQL())
 
-dbWriteTable(con, "mtcars", mtcars)
+dbWriteTable(con, "mtcars", mtcars, overwrite = TRUE)
 res <- dbSendQuery(con, "SELECT * FROM mtcars ORDER BY cyl")
 dbApply(res, "cyl", function(x, grp) quantile(x$mpg, names=FALSE))
 

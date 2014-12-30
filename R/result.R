@@ -14,12 +14,29 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
   new("MySQLConnection", Id = from@Id[1:2])
 })
 
+mysqlFetch <- function(res, n, ...) {
+  rel <- .Call(RS_MySQL_fetch, res@Id, nrec = as.integer(n))
+
+  if (length(rel) > 0) {
+    n <- length(rel[[1]])
+  } else {
+    n <- 0
+  }
+
+  attr(rel, "row.names") <- .set_row_names(n)
+  class(rel) <- "data.frame"
+  rel
+}
+
 #' Execute a SQL statement on a database connection.
 #'
 #' To retrieve results a chunk at a time, use \code{dbSendQuery},
 #' \code{dbFetch}, then \code{dbClearResult}. Alternatively, if you want all the
 #' results (and they'll fit in memory) use \code{dbGetQuery} which sends,
 #' fetches and clears for you.
+#'
+#' \code{fetch()} will be deprecated in the near future; please use
+#' \code{dbFetch()} instead.
 #'
 #' @param conn an \code{\linkS4class{MySQLConnection}} object.
 #' @param res,dbObj A  \code{\linkS4class{MySQLResult}} object.
@@ -38,7 +55,7 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #'
 #' # Send query to pull requests in batches
 #' res <- dbSendQuery(con, "SELECT * FROM arrests")
-#' data <- fetch(res, n = 2)
+#' data <- dbFetch(res, n = 2)
 #' data
 #' dbHasCompleted(res)
 #'
@@ -49,27 +66,25 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 #' }
 #' @rdname query
 #' @useDynLib RMySQL RS_MySQL_fetch
-setMethod("fetch", c("MySQLResult", "numeric"), function(res, n, ...) {
-  rel <- .Call(RS_MySQL_fetch, res@Id, nrec = as.integer(n))
+setMethod("dbFetch", c("MySQLResult", "numeric"), mysqlFetch)
 
-  if (length(rel) > 0) {
-    n <- length(rel[[1]])
-  } else {
-    n <- 0
-  }
-
-  attr(rel, "row.names") <- .set_row_names(n)
-  class(rel) <- "data.frame"
-  rel
-})
+#' @export
+#' @rdname query
+setMethod("fetch", c("MySQLResult", "numeric"), mysqlFetch)
 
 #' @param n maximum number of records to retrieve per fetch. Use \code{-1} to
 #'    retrieve all pending records; use \code{0} for to fetch the default
 #'    number of rows as defined in \code{\link{MySQL}}
 #' @rdname query
 #' @export
+setMethod("dbFetch", c("MySQLResult", "missing"), function(res, n, ...) {
+  mysqlFetch(res, n = 0, ...)
+})
+
+#' @rdname query
+#' @export
 setMethod("fetch", c("MySQLResult", "missing"), function(res, n, ...) {
-  fetch(res, n = 0, ...)
+  mysqlFetch(res, n = 0, ...)
 })
 
 #' @rdname query
@@ -143,7 +158,7 @@ setMethod("dbListFields", c("MySQLResult", "missing"), function(conn, name, ...)
 #' @examples
 #' if (mysqlHasDefault()) {
 #' con <- dbConnect(RMySQL::MySQL())
-#' dbWriteTable(con, "t1", datasets::USArrests)
+#' dbWriteTable(con, "t1", datasets::USArrests, overwrite = TRUE)
 #'
 #' rs <- dbSendQuery(con, "SELECT * FROM t1 WHERE UrbanPop >= 80")
 #' dbGetStatement(rs)

@@ -8,7 +8,7 @@ test_that("query returns expected number of rows", {
   dbWriteTable(conn, 'iris', datasets::iris, row.names = FALSE)
   rs <- dbSendQuery(conn, "SELECT * FROM iris WHERE Species='versicolor'")
 
-  x <- fetch(rs, n = 2)
+  x <- dbFetch(rs, n = 2)
   expect_equal(nrow(x), 2)
   expect_equal(dbGetRowCount(rs), 2)
 

@@ -28,7 +28,8 @@
 
  *  Assorted fixes accumulated since last release 3 years ago.
 
- *  `fetch()` now returns a 0-row data frame (instead of an 0-col data frame)
+ *  Implement `dbFetch()` method; please use this in preference to `fetch()`.
+    `dbFetch()` now returns a 0-row data frame (instead of an 0-col data frame)
     if there are no results.
 
  *  Methods no longer automatically close open result sets. This was implemented 

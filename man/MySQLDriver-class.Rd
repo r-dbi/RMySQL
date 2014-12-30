@@ -34,13 +34,13 @@ It returns a singleton that allows you to connect to MySQL.
 if (mysqlHasDefault()) {
 # connect to a database and load some data
 con <- dbConnect(RMySQL::MySQL())
-dbWriteTable(con, "USArrests", datasets::USArrests)
+dbWriteTable(con, "USArrests", datasets::USArrests, overwrite = TRUE)
 
 # query
 rs <- dbSendQuery(con, "SELECT * FROM USArrests")
-d1 <- fetch(rs, n = 10)      # extract data in chunks of 10 rows
+d1 <- dbFetch(rs, n = 10)      # extract data in chunks of 10 rows
 dbHasCompleted(rs)
-d2 <- fetch(rs, n = -1)      # extract all remaining data
+d2 <- dbFetch(rs, n = -1)      # extract all remaining data
 dbHasCompleted(rs)
 dbClearResult(rs)
 dbListTables(con)
