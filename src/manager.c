@@ -179,7 +179,7 @@ SEXP RS_DBI_validHandle(SEXP handle) {
 }
 
 int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
-  int  mgr_id, len, indx;
+  int  len, indx;
   RS_DBI_manager    *mgr;
   RS_DBI_connection *con;
 
@@ -191,7 +191,6 @@ int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
   len = (int) GET_LENGTH(handle);
   if(len<handleType || handleType<1 || handleType>3)
     return 0;
-  mgr_id = MGR_ID(handle);
 
   /* at least we have a potential valid dbManager */
   mgr = dbManager;

@@ -307,7 +307,6 @@ void
   {
     double *d;
     int   *i;
-    char   *c;
     switch(type){
     case INTSXP:
       i = (int *) ptr;
@@ -320,10 +319,6 @@ void
     case REALSXP:
       d = (double *) ptr;
       *d = NA_REAL;
-      break;
-    case STRSXP:
-      c = (char *) ptr;
-      c = (char *) CHR_EL(NA_STRING, 0);
       break;
     }
   }
@@ -475,3 +470,32 @@ SEXP
     UNPROTECT(2);
     return ret;
   }
+
+
+/* the following type names are from "mysql_com.h" */
+const struct data_types RS_MySQL_dataTypes[] = {
+    { "FIELD_TYPE_DECIMAL",    FIELD_TYPE_DECIMAL},
+    { "FIELD_TYPE_TINY",       FIELD_TYPE_TINY},
+    { "FIELD_TYPE_SHORT",      FIELD_TYPE_SHORT},
+    { "FIELD_TYPE_LONG",       FIELD_TYPE_LONG},
+    { "FIELD_TYPE_FLOAT",      FIELD_TYPE_FLOAT},
+    { "FIELD_TYPE_DOUBLE",     FIELD_TYPE_DOUBLE},
+    { "FIELD_TYPE_NULL",       FIELD_TYPE_NULL},
+    { "FIELD_TYPE_TIMESTAMP",  FIELD_TYPE_TIMESTAMP},
+    { "FIELD_TYPE_LONGLONG",   FIELD_TYPE_LONGLONG},
+    { "FIELD_TYPE_INT24",      FIELD_TYPE_INT24},
+    { "FIELD_TYPE_DATE",       FIELD_TYPE_DATE},
+    { "FIELD_TYPE_TIME",       FIELD_TYPE_TIME},
+    { "FIELD_TYPE_DATETIME",   FIELD_TYPE_DATETIME},
+    { "FIELD_TYPE_YEAR",       FIELD_TYPE_YEAR},
+    { "FIELD_TYPE_NEWDATE",    FIELD_TYPE_NEWDATE},
+    { "FIELD_TYPE_ENUM",       FIELD_TYPE_ENUM},
+    { "FIELD_TYPE_SET",        FIELD_TYPE_SET},
+    { "FIELD_TYPE_TINY_BLOB",  FIELD_TYPE_TINY_BLOB},
+    { "FIELD_TYPE_MEDIUM_BLOB",FIELD_TYPE_MEDIUM_BLOB},
+    { "FIELD_TYPE_LONG_BLOB",  FIELD_TYPE_LONG_BLOB},
+    { "FIELD_TYPE_BLOB",       FIELD_TYPE_BLOB},
+    { "FIELD_TYPE_VAR_STRING", FIELD_TYPE_VAR_STRING},
+    { "FIELD_TYPE_STRING",     FIELD_TYPE_STRING},
+    { (char *) 0, -1 }
+};
