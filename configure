@@ -65,4 +65,11 @@ else
   echo "File mysql.h not found. Please install mysql development library, e.g: libmysqlclient-dev (deb) or mariadb-devel (rpm)."
   exit 1
 fi
-echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
+
+if [ -r /usr/lib/mysql ]; then
+  echo "PKG_LIBS= -L/usr/lib/mysql -lmysqlclient -lz" >> src/Makevars
+elif [ -r /usr/lib64/mysql ]; then
+  echo "PKG_LIBS= -L/usr/lib64/mysql -lmysqlclient -lz" >> src/Makevars
+else
+  echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
+fi
