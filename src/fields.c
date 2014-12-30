@@ -21,87 +21,6 @@ void RS_DBI_freeFields(RS_DBI_fields *flds) {
   return;
 }
 
-SEXP RS_DBI_copyfields(RS_DBI_fields *flds){
-
-  SEXP S_fields;
-  int  n = (int) 8;
-  char  *desc[]={"name", "Sclass", "type", "len", "precision",
-    "scale","isVarLength", "nullOK"};
-  SEXPTYPE types[] = {STRSXP, INTSXP, INTSXP,
-    INTSXP, INTSXP, INTSXP,
-    LGLSXP, LGLSXP};
-  int  lengths[8];
-  int   i, j, num_fields;
-
-  num_fields = flds->num_fields;
-  for(j = 0; j < n; j++)
-    lengths[j] = (int) num_fields;
-  S_fields =  RS_DBI_createNamedList(desc, types, lengths, n);
-
-  /* copy contentes from flds into an R/S list */
-  for(i = 0; i < num_fields; i++){
-    SET_LST_CHR_EL(S_fields,0,i, C_S_CPY(flds->name[i]));
-    LST_INT_EL(S_fields,1,i) = (int) flds->Sclass[i];
-    LST_INT_EL(S_fields,2,i) = (int) flds->type[i];
-    LST_INT_EL(S_fields,3,i) = (int) flds->length[i];
-    LST_INT_EL(S_fields,4,i) = (int) flds->precision[i];
-    LST_INT_EL(S_fields,5,i) = (int) flds->scale[i];
-    LST_INT_EL(S_fields,6,i) = (int) flds->isVarLength[i];
-    LST_INT_EL(S_fields,7,i) = (int) flds->nullOk[i];
-  }
-
-  return S_fields;
-}
-
-
-SEXP RS_DBI_getFieldDescriptions(RS_DBI_fields *flds){
-
-  SEXP S_fields;
-  int  n = (int) 7;
-  int  lengths[7];
-  char  *desc[]={"name", "Sclass", "type", "len", "precision",
-    "scale","nullOK"};
-  SEXPTYPE types[] = {STRSXP, INTSXP, INTSXP,
-    INTSXP, INTSXP, INTSXP, LGLSXP};
-  int   i, j;
-  int    num_fields;
-
-  num_fields = flds->num_fields;
-  for(j = 0; j < n; j++)
-    lengths[j] = (int) num_fields;
-  PROTECT(S_fields =  RS_DBI_createNamedList(desc, types, lengths, n));
-
-  /* copy contentes from flds into an R/S list */
-  for(i = 0; i < (int) num_fields; i++){
-    SET_LST_CHR_EL(S_fields,0,i,C_S_CPY(flds->name[i]));
-    LST_INT_EL(S_fields,1,i) = (int) flds->Sclass[i];
-    LST_INT_EL(S_fields,2,i) = (int) flds->type[i];
-    LST_INT_EL(S_fields,3,i) = (int) flds->length[i];
-    LST_INT_EL(S_fields,4,i) = (int) flds->precision[i];
-    LST_INT_EL(S_fields,5,i) = (int) flds->scale[i];
-    LST_INT_EL(S_fields,6,i) = (int) flds->nullOk[i];
-  }
-  UNPROTECT(1);
-  return(S_fields);
-}
-
-
-/* given a type id return its human-readable name.
- * We define an RS_DBI_dataTypeTable */
-char* RS_DBI_getTypeName(int t, const struct data_types table[]) {
-  int i;
-  char buf[128];
-
-  for (i = 0; table[i].typeName != (char *) 0; i++) {
-    if (table[i].typeId == t)
-      return table[i].typeName;
-  }
-  sprintf(buf, "unknown type (%ld)", (long) t);
-  RS_DBI_errorMessage(buf, RS_DBI_WARNING);
-  return (char *) 0; /* for -Wall */
-}
-
-
 RS_DBI_fields* RS_MySQL_createDataMappings(SEXP rsHandle) {
   // Fetch MySQL field descriptions
   RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
@@ -173,8 +92,8 @@ RS_DBI_fields* RS_MySQL_createDataMappings(SEXP rsHandle) {
         }
         break;
       case FIELD_TYPE_LONGLONG:       /* 8-byte BIGINT   */
-        warning("BIGINT in col %d imported as numeric", j);
         flds->Sclass[j] = REALSXP;
+        break;
 
   #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID >= 50003 /* 5.0.3 */
       case FIELD_TYPE_BIT:
@@ -235,4 +154,88 @@ RS_DBI_fields* RS_MySQL_createDataMappings(SEXP rsHandle) {
     }
   }
   return flds;
+}
+
+struct data_types {
+  char *typeName;
+  int typeId;
+};
+struct data_types rmysql_types[] = {
+  { "DECIMAL",    FIELD_TYPE_DECIMAL},
+  { "TINYINT",       FIELD_TYPE_TINY},
+  { "SMALLINT",      FIELD_TYPE_SHORT},
+  { "INTEGER",       FIELD_TYPE_LONG},
+  { "MEDIUMINT",      FIELD_TYPE_INT24},
+  { "BIGINT",   FIELD_TYPE_LONGLONG},
+  { "FLOAT",      FIELD_TYPE_FLOAT},
+  { "DOUBLE",     FIELD_TYPE_DOUBLE},
+  { "NULL",       FIELD_TYPE_NULL},
+  { "TIMESTAMP",  FIELD_TYPE_TIMESTAMP},
+  { "DATE",       FIELD_TYPE_DATE},
+  { "TIME",       FIELD_TYPE_TIME},
+  { "DATETIME",   FIELD_TYPE_DATETIME},
+  { "YEAR",       FIELD_TYPE_YEAR},
+  { "ENUM",       FIELD_TYPE_ENUM},
+  { "SET",        FIELD_TYPE_SET},
+  { "BLOB/TEXT",       FIELD_TYPE_BLOB},
+  { "VAR_STRING", FIELD_TYPE_VAR_STRING},
+  { "STRING",     FIELD_TYPE_STRING},
+  { NULL, -1 }
+};
+
+char* rmysql_type(int type) {
+  for (int i = 0; rmysql_types[i].typeName != NULL; i++) {
+    if (rmysql_types[i].typeId == type)
+      return rmysql_types[i].typeName;
+  }
+  return "<unknown>";
+}
+
+SEXP rmysql_fields_info(SEXP rsHandle) {
+  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
+  RS_DBI_fields* flds = result->fields;
+  int n = flds->num_fields;
+
+  // Allocate output
+  SEXP output = PROTECT(allocVector(VECSXP, 4));
+  SEXP output_nms = PROTECT(allocVector(STRSXP, 4));
+  SET_NAMES(output, output_nms);
+  UNPROTECT(1);
+
+  SET_STRING_ELT(output_nms, 0, mkChar("name"));
+  SEXP names = PROTECT(allocVector(STRSXP, n));
+  for (int j = 0; j < n; j++) {
+    SET_STRING_ELT(names, j, mkChar(flds->name[j]));
+  }
+  SET_VECTOR_ELT(output, 0, names);
+  UNPROTECT(1);
+
+  SET_STRING_ELT(output_nms, 1, mkChar("Sclass"));
+  SEXP sclass = PROTECT(allocVector(STRSXP, n));
+  for (int j = 0; j < n; j++) {
+    const char* type = type2char(flds->Sclass[j]);
+    SET_STRING_ELT(sclass, j, mkChar(type));
+  }
+  SET_VECTOR_ELT(output, 1, sclass);
+  UNPROTECT(1);
+
+  SET_STRING_ELT(output_nms, 2, mkChar("type"));
+  SEXP types = PROTECT(allocVector(STRSXP, n));
+  for (int j = 0; j < n; j++) {
+    char* type = rmysql_type(flds->type[j]);
+    SET_STRING_ELT(types, j, mkChar(type));
+  }
+  SET_VECTOR_ELT(output, 2, types);
+  UNPROTECT(1);
+
+  SET_STRING_ELT(output_nms, 3, mkChar("length"));
+  SEXP lens = PROTECT(allocVector(INTSXP, n));
+  for (int j = 0; j < n; j++) {
+    INTEGER(lens)[j] = flds->length[j];
+  }
+  SET_VECTOR_ELT(output, 3, lens);
+  UNPROTECT(1);
+
+  UNPROTECT(1);
+  return output;
 }

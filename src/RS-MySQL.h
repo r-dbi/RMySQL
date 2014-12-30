@@ -178,7 +178,6 @@ int  RS_DBI_listEntries(int *table, int length, int *entries);
 void  RS_DBI_freeEntry(int *table, int indx);
 
 /* description of the fields in a result set */
-SEXP RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);
 void           RS_DBI_freeFields(RS_DBI_fields *flds);
 
 /* we (re)allocate the actual output list in here (with the help of
@@ -196,19 +195,6 @@ void  RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exceptionType);
 char     *RS_DBI_copyString(const char *str);
 char     *RS_DBI_nCopyString(const char *str, size_t len, int del_blanks);
 
-/* We now define a generic data type name-Id mapping struct
-* and initialize the RS_dataTypeTable[].  Each driver could
-* define similar table for generating friendly type names
-*/
-struct data_types {
-  char *typeName;
-  int typeId;
-};
-
-/* return the primitive type name for a primitive type id */
-char     *RS_DBI_getTypeName(int typeCode, const struct data_types table[]);
-/* same, but callable from S/R and vectorized */
-SEXP RS_DBI_SclassNames(SEXP types);
 
 SEXP RS_DBI_createNamedList(char  **names,
   SEXPTYPE *types,
@@ -218,7 +204,6 @@ SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 
 void RS_na_set(void *ptr, SEXPTYPE type);
 int  RS_is_na(void *ptr, SEXPTYPE type);
-extern const struct data_types RS_dataTypeTable[];
 
 /* Note that MySQL client/server buffers are limited to 16MB and 1MB,
  * respectively (MySQL 4.1.1-alpha manual).  So plan accordingly!
@@ -294,38 +279,7 @@ SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP statement);
 
 SEXP RS_MySQL_versionId(void);
 
-/* the following type names are from "mysql_com.h" */
-static struct data_types RS_MySQL_dataTypes[] = {
-    { "FIELD_TYPE_DECIMAL",    FIELD_TYPE_DECIMAL},
-    { "FIELD_TYPE_TINY",       FIELD_TYPE_TINY},
-    { "FIELD_TYPE_SHORT",      FIELD_TYPE_SHORT},
-    { "FIELD_TYPE_LONG",       FIELD_TYPE_LONG},
-    { "FIELD_TYPE_FLOAT",      FIELD_TYPE_FLOAT},
-    { "FIELD_TYPE_DOUBLE",     FIELD_TYPE_DOUBLE},
-    { "FIELD_TYPE_NULL",       FIELD_TYPE_NULL},
-    { "FIELD_TYPE_TIMESTAMP",  FIELD_TYPE_TIMESTAMP},
-    { "FIELD_TYPE_LONGLONG",   FIELD_TYPE_LONGLONG},
-    { "FIELD_TYPE_INT24",      FIELD_TYPE_INT24},
-    { "FIELD_TYPE_DATE",       FIELD_TYPE_DATE},
-    { "FIELD_TYPE_TIME",       FIELD_TYPE_TIME},
-    { "FIELD_TYPE_DATETIME",   FIELD_TYPE_DATETIME},
-    { "FIELD_TYPE_YEAR",       FIELD_TYPE_YEAR},
-    { "FIELD_TYPE_NEWDATE",    FIELD_TYPE_NEWDATE},
-    { "FIELD_TYPE_ENUM",       FIELD_TYPE_ENUM},
-    { "FIELD_TYPE_SET",        FIELD_TYPE_SET},
-    { "FIELD_TYPE_TINY_BLOB",  FIELD_TYPE_TINY_BLOB},
-    { "FIELD_TYPE_MEDIUM_BLOB",FIELD_TYPE_MEDIUM_BLOB},
-    { "FIELD_TYPE_LONG_BLOB",  FIELD_TYPE_LONG_BLOB},
-    { "FIELD_TYPE_BLOB",       FIELD_TYPE_BLOB},
-    { "FIELD_TYPE_VAR_STRING", FIELD_TYPE_VAR_STRING},
-    { "FIELD_TYPE_STRING",     FIELD_TYPE_STRING},
-    { (char *) 0, -1 }
-};
-
-SEXP RS_DBI_copyfields(RS_DBI_fields *flds);
-
 SEXP RS_MySQL_typeNames(SEXP typeIds);
-extern const struct data_types RS_dataTypeTable[];
 
 #ifdef _cplusplus
 }

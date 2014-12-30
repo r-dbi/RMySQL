@@ -91,8 +91,6 @@ SEXP RS_DBI_asResHandle(int mgrId, int conId, int resId)
   return resHandle;
 }
 
-
-
 RS_DBI_resultSet* RS_DBI_getResultSet(SEXP rsHandle) {
   RS_DBI_connection *con;
   int indx;
@@ -111,35 +109,30 @@ RS_DBI_resultSet* RS_DBI_getResultSet(SEXP rsHandle) {
 }
 
 
-SEXP        /* return a named list */
-    RS_DBI_resultSetInfo(SEXP rsHandle)
-    {
-      RS_DBI_resultSet       *result;
-      SEXP output, flds;
-      int  n = (int) 6;
-      char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-        "rowCount", "completed", "fields"};
-      SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
-        INTSXP,   INTSXP, VECSXP};
-      int  rsLen[]   = {1, 1, 1, 1, 1, 1};
+SEXP RS_DBI_resultSetInfo(SEXP rsHandle) {
+  RS_DBI_resultSet       *result;
+  SEXP output, flds;
+  int  n = (int) 6;
+  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
+    "rowCount", "completed", "fields"};
+  SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
+    INTSXP,   INTSXP, VECSXP};
+  int  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
-      result = RS_DBI_getResultSet(rsHandle);
-      if(result->fields)
-        flds = RS_DBI_copyfields(result->fields);
-      else
-        flds = R_NilValue;
+  result = RS_DBI_getResultSet(rsHandle);
+  flds = R_NilValue;
 
-      output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
+  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 
-      SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
-      LST_INT_EL(output,1,0) = result->isSelect;
-      LST_INT_EL(output,2,0) = result->rowsAffected;
-      LST_INT_EL(output,3,0) = result->rowCount;
-      LST_INT_EL(output,4,0) = result->completed;
-      SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
+  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+  LST_INT_EL(output,1,0) = result->isSelect;
+  LST_INT_EL(output,2,0) = result->rowsAffected;
+  LST_INT_EL(output,3,0) = result->rowCount;
+  LST_INT_EL(output,4,0) = result->completed;
+  SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
 
-      return output;
-    }
+  return output;
+}
 
 
 SEXP
@@ -459,53 +452,28 @@ SEXP
   }
 
 
-SEXP
-  RS_MySQL_resultSetInfo(SEXP rsHandle)
-  {
-    RS_DBI_resultSet   *result;
-    SEXP output, flds;
-    int  n = 6;
-    char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-      "rowCount", "completed", "fieldDescription"};
-    SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
-      INTSXP,   INTSXP, VECSXP};
-    int  rsLen[]   = {1, 1, 1, 1, 1, 1};
+SEXP RS_MySQL_resultSetInfo(SEXP rsHandle) {
+  RS_DBI_resultSet   *result;
+  SEXP output, flds;
+  int  n = 6;
+  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
+    "rowCount", "completed", "fieldDescription"};
+  SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
+    INTSXP,   INTSXP, VECSXP};
+  int  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
-    result = RS_DBI_getResultSet(rsHandle);
-    if(result->fields)
-      flds = RS_DBI_getFieldDescriptions(result->fields);
-    else
-      flds = R_NilValue;
+  result = RS_DBI_getResultSet(rsHandle);
+  flds = R_NilValue;
 
-    output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
+  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 
-    SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
-    LST_INT_EL(output,1,0) = result->isSelect;
-    LST_INT_EL(output,2,0) = result->rowsAffected;
-    LST_INT_EL(output,3,0) = result->rowCount;
-    LST_INT_EL(output,4,0) = result->completed;
-    if(flds != R_NilValue)
-      SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
+  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+  LST_INT_EL(output,1,0) = result->isSelect;
+  LST_INT_EL(output,2,0) = result->rowsAffected;
+  LST_INT_EL(output,3,0) = result->rowCount;
+  LST_INT_EL(output,4,0) = result->completed;
+  if(flds != R_NilValue)
+    SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
 
-    return output;
-  }
-
-SEXP
-  RS_MySQL_typeNames(SEXP type)
-  {
-    SEXP typeNames;
-    int n, *typeCodes;
-    int i;
-    char *tname;
-
-    n = LENGTH(type);
-    typeCodes = INTEGER(type);
-    PROTECT(typeNames = NEW_CHARACTER(n));
-    for(i = 0; i < n; i++) {
-      tname = RS_DBI_getTypeName(typeCodes[i], RS_MySQL_dataTypes);
-      if (!tname) tname = "";
-      SET_CHR_EL(typeNames, i, C_S_CPY(tname));
-    }
-    UNPROTECT(1);
-    return typeNames;
-  }
+  return output;
+}

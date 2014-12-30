@@ -112,22 +112,11 @@ setMethod("dbClearResult", "MySQLResult", function(res, ...) {
 #' @rdname query
 #' @param what optional
 #' @export
-#' @useDynLib RMySQL RS_MySQL_resultSetInfo RS_DBI_SclassNames RS_MySQL_typeNames
+#' @useDynLib RMySQL RS_MySQL_resultSetInfo
 setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
   checkValid(dbObj)
 
   info <- .Call(RS_MySQL_resultSetInfo, dbObj@Id)
-
-  flds <- info$fieldDescription[[1]]
-  if (!is.null(flds)) {
-    attr(flds, "row.names") <- .set_row_names(length(flds$type))
-    class(flds) <- "data.frame"
-
-    flds$Sclass <- .Call(RS_DBI_SclassNames, flds$Sclass)
-    flds$type <- .Call(RS_MySQL_typeNames, as.integer(flds$type))
-  }
-  info$fields <- flds
-  info$fieldDescription <- NULL
 
   if (!missing(what)) {
     info[what]
@@ -145,8 +134,9 @@ setMethod("dbGetStatement", "MySQLResult", function(res, ...) {
 #' @param name Table name.
 #' @rdname query
 #' @export
+#' @useDynLib RMySQL rmysql_fields_info
 setMethod("dbListFields", c("MySQLResult", "missing"), function(conn, name, ...) {
-  dbGetInfo(conn)$fields$name
+  .Call(rmysql_fields_info, conn@Id)$name
 })
 
 #' Database interface meta-data.
@@ -177,7 +167,7 @@ NULL
 #' @export
 #' @rdname result-meta
 setMethod("dbColumnInfo", "MySQLResult", function(res, ...) {
-  dbGetInfo(res)$fields
+  as.data.frame(.Call(rmysql_fields_info, res@Id))
 })
 
 #' @export

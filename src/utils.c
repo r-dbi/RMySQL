@@ -165,35 +165,6 @@ SEXP RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
   return(output);
 }
 
-SEXP RS_DBI_SclassNames(SEXP type) {
-  SEXP typeNames;
-  int *typeCodes;
-  int n;
-  int  i;
-  char *s;
-
-  if(type==R_NilValue)
-    RS_DBI_errorMessage(
-      "internal error in RS_DBI_SclassNames: input S types must be nonNULL",
-      RS_DBI_ERROR);
-  n = LENGTH(type);
-  typeCodes = INTEGER(type);
-  PROTECT(typeNames = NEW_CHARACTER(n));
-  for(i = 0; i < n; i++) {
-    s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
-    if(!s){
-      RS_DBI_errorMessage(
-        "internal error RS_DBI_SclassNames: unrecognized S type",
-        RS_DBI_ERROR);
-      s = "";
-    }
-    SET_CHR_EL(typeNames, i, C_S_CPY(s));
-  }
-  UNPROTECT(1);
-  return typeNames;
-}
-
-
 /* Very simple objectId (mapping) table. newEntry() returns an index
  * to an empty cell in table, and lookup() returns the position in the
  * table of obj_id.  Notice that we decided not to touch the entries
@@ -351,35 +322,6 @@ int
     }
     return out;
   }
-
-/* the codes come from from R/src/main/util.c */
-const struct data_types RS_dataTypeTable[] = {
-  { "NULL",		NILSXP	   },  /* real types */
-  { "symbol",		SYMSXP	   },
-  { "pairlist",	LISTSXP	   },
-  { "closure",	CLOSXP	   },
-  { "environment",	ENVSXP	   },
-  { "promise",	PROMSXP	   },
-  { "language",	LANGSXP	   },
-  { "special",	SPECIALSXP },
-  { "builtin",	BUILTINSXP },
-  { "char",		CHARSXP	   },
-  { "logical",	LGLSXP	   },
-  { "integer",	INTSXP	   },
-  { "double",		REALSXP	   }, /*-  "real", for R <= 0.61.x */
-  { "complex",	CPLXSXP	   },
-  { "character",	STRSXP	   },
-  { "...",		DOTSXP	   },
-  { "any",		ANYSXP	   },
-  { "expression",	EXPRSXP	   },
-  { "list",		VECSXP	   },
-  { "raw",		RAWSXP     },
-  /* aliases : */
-  { "numeric",	REALSXP	   },
-  { "name",		SYMSXP	   },
-  { (char *)0,	-1	   }
-};
-
 
 
 /* the following function was kindly provided by Mikhail Kondrin
