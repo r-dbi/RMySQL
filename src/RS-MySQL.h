@@ -37,7 +37,7 @@ extern  "C" {
 #include <ctype.h> /* for isalpha */
 
 /* We now define 4 important data structures:
-* RS_DBI_manager, RS_DBI_connection, RS_DBI_resultSet, and
+* MySQLDriver, RS_DBI_connection, RS_DBI_resultSet, and
 * RS_DBI_fields, corresponding to dbManager, dbConnection,
 * dbResultSet, and list of field descriptions.
 */
@@ -99,7 +99,6 @@ char *errorMsg;           /* SQL error message */
 */
 typedef struct st_sdbi_resultset {
   void  *drvResultSet;   /* the actual (driver's) cursor/result set */
-void  *drvData;        /* a pointer to driver-specific data */
 int  managerId;       /* the 3 *Id's are used for   */
 int  connectionId;    /* validating stuff coming from S */
 int  resultSetId;
@@ -121,7 +120,6 @@ RS_DBI_fields *fields;
 typedef struct st_sdbi_connection {
   void  *conParams;      /* pointer to connection params (host, user, etc)*/
 void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
-void  *drvData;        /* to be used at will by individual drivers */
 RS_DBI_resultSet  **resultSets;    /* vector to result set ptrs  */
 int   *resultSetIds;
 int   length;                     /* max num of concurrent resultSets */
@@ -133,9 +131,7 @@ RS_DBI_exception *exception;
 } RS_DBI_connection;
 
 /* dbManager */
-typedef struct st_sdbi_manager {
-  char *drvName;                    /* what driver are we implementing?*/
-void *drvData;                    /* to be used by the drv implementation*/
+typedef struct MySQLDriver {
 RS_DBI_connection **connections;  /* list of dbConnections */
 int *connectionIds;              /* array of connectionIds */
 int length;                      /* max num of concurrent connections */
@@ -144,22 +140,9 @@ int counter;                     /* num of connections handled so far*/
 int fetch_default_rec;           /* default num of records per fetch */
 int managerId;                   /* typically, process id */
 RS_DBI_exception *exception;
-} RS_DBI_manager;
+} MySQLDriver;
 
 /* All RS_DBI functions and their signatures */
-
-/* Note: the following alloc functions allocate the space for the
-* corresponding manager, connection, resultSet; they all
-* return handles.  All DBI functions (free/get/etc) use the handle
-* to work with the various dbObjects.
-*/
-SEXP RS_DBI_allocManager(const char *drvName, int max_con,
-  int fetch_default_rec,
-  int force_realloc);
-void            RS_DBI_freeManager(SEXP mgrHandle);
-RS_DBI_manager *RS_DBI_getManager(SEXP handle);
-SEXP RS_DBI_asMgrHandle(int pid);
-SEXP RS_DBI_managerInfo(SEXP mgrHandle);
 
 /* dbConnection */
 SEXP RS_DBI_allocConnection(SEXP mgrHandle,
@@ -195,8 +178,6 @@ int  RS_DBI_listEntries(int *table, int length, int *entries);
 void  RS_DBI_freeEntry(int *table, int indx);
 
 /* description of the fields in a result set */
-RS_DBI_fields *RS_DBI_allocFields(int num_fields);
-SEXP RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);
 void           RS_DBI_freeFields(RS_DBI_fields *flds);
 
 /* we (re)allocate the actual output list in here (with the help of
@@ -209,32 +190,11 @@ void  RS_DBI_allocOutput(SEXP output,
   int expand);
 void RS_DBI_makeDataFrame(SEXP data);
 
-/* TODO: We need to elevate RS_DBI_errorMessage to either
-* dbManager and/or dbConnection methods.  I still need to
-* go back and re-code the error-handling throughout, darn!
-*/
 void  RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exceptionType);
-void  RS_DBI_setException(SEXP handle,
-  DBI_EXCEPTION exceptionType,
-  int errorNum,
-  const char *errorMsg);
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 char     *RS_DBI_nCopyString(const char *str, size_t len, int del_blanks);
 
-/* We now define a generic data type name-Id mapping struct
-* and initialize the RS_dataTypeTable[].  Each driver could
-* define similar table for generating friendly type names
-*/
-struct data_types {
-  char *typeName;
-  int typeId;
-};
-
-/* return the primitive type name for a primitive type id */
-char     *RS_DBI_getTypeName(int typeCode, const struct data_types table[]);
-/* same, but callable from S/R and vectorized */
-SEXP RS_DBI_SclassNames(SEXP types);
 
 SEXP RS_DBI_createNamedList(char  **names,
   SEXPTYPE *types,
@@ -244,7 +204,6 @@ SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 
 void RS_na_set(void *ptr, SEXPTYPE type);
 int  RS_is_na(void *ptr, SEXPTYPE type);
-extern const struct data_types RS_dataTypeTable[];
 
 /* Note that MySQL client/server buffers are limited to 16MB and 1MB,
  * respectively (MySQL 4.1.1-alpha manual).  So plan accordingly!
@@ -278,8 +237,9 @@ void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
  */
 
 /* dbManager */
-SEXP RS_MySQL_init(SEXP config_params, SEXP reload);
-SEXP    RS_MySQL_close(SEXP mgrHandle);
+MySQLDriver* rmysql_driver();
+SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_);
+SEXP rmysql_driver_info();
 
 /* dbConnection */
 SEXP RS_MySQL_newConnection(SEXP mgrHandle,
@@ -295,7 +255,7 @@ SEXP RS_MySQL_newConnection(SEXP mgrHandle,
 SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams);
 SEXP RS_MySQL_cloneConnection(SEXP conHandle);
 SEXP RS_MySQL_closeConnection(SEXP conHandle);
-SEXP RS_MySQL_getException(SEXP conHandle);    /* err No, Msg */
+SEXP rmysql_exception_info(SEXP conHandle);
 
 /* dbResultSet */
 SEXP RS_MySQL_exec(SEXP conHandle, SEXP statement);
@@ -312,20 +272,12 @@ RS_DBI_fields *RS_MySQL_createDataMappings(SEXP resHandle);
 /* the following funs return named lists with meta-data for
  * the manager, connections, and  result sets, respectively.
  */
-SEXP RS_MySQL_managerInfo(SEXP mgrHandle);
 SEXP RS_MySQL_connectionInfo(SEXP conHandle);
 SEXP RS_MySQL_resultSetInfo(SEXP rsHandle);
 
 SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP statement);
 
 SEXP RS_MySQL_versionId(void);
-
-extern const struct data_types RS_MySQL_dataTypes[];
-
-SEXP RS_DBI_copyfields(RS_DBI_fields *flds);
-
-SEXP RS_MySQL_typeNames(SEXP typeIds);
-extern const struct data_types RS_dataTypeTable[];
 
 #ifdef _cplusplus
 }

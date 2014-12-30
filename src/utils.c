@@ -165,35 +165,6 @@ SEXP RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
   return(output);
 }
 
-SEXP RS_DBI_SclassNames(SEXP type) {
-  SEXP typeNames;
-  int *typeCodes;
-  int n;
-  int  i;
-  char *s;
-
-  if(type==R_NilValue)
-    RS_DBI_errorMessage(
-      "internal error in RS_DBI_SclassNames: input S types must be nonNULL",
-      RS_DBI_ERROR);
-  n = LENGTH(type);
-  typeCodes = INTEGER(type);
-  PROTECT(typeNames = NEW_CHARACTER(n));
-  for(i = 0; i < n; i++) {
-    s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
-    if(!s){
-      RS_DBI_errorMessage(
-        "internal error RS_DBI_SclassNames: unrecognized S type",
-        RS_DBI_ERROR);
-      s = "";
-    }
-    SET_CHR_EL(typeNames, i, C_S_CPY(s));
-  }
-  UNPROTECT(1);
-  return typeNames;
-}
-
-
 /* Very simple objectId (mapping) table. newEntry() returns an index
  * to an empty cell in table, and lookup() returns the position in the
  * table of obj_id.  Notice that we decided not to touch the entries
@@ -244,60 +215,6 @@ int empty_val = (int) -1;
 }
 
 
-/* Translate R/S identifiers (and only R/S names!!!) into
-* valid SQL identifiers;  overwrite input vector. Currently,
-*   (1) translate "." into "_".
-*   (2) first character should be a letter (traslate to "X" if not),
-*       but a double quote signals a "delimited identifier"
-*   (3) check that length <= 18, but only warn, since most (all?)
-*       dbms allow much longer identifiers.
-*   (4) SQL reserved keywords are handled in the R/S calling
-*       function make.SQL.names(), not here.
-* BUG: Compound SQL identifiers are not handled properly.
-*      Note the the dot "." is a valid SQL delimiter, used for specifying
-*      user/table in a compound identifier.  Thus, it's possible that
-*      such compound name is mapped into a legal R/S identifier (preserving
-*      the "."), and then we incorrectly map such delimiting "dot" into "_"
-*      thus loosing the original SQL compound identifier.
-*/
-#define RS_DBI_MAX_IDENTIFIER_LENGTH 18      /* as per SQL92 */
-SEXP
-  RS_DBI_makeSQLNames(SEXP snames)
-  {
-    long     nstrings;
-    char     *name, c;
-    char     errMsg[128];
-    size_t   len;
-    int     i;
-
-    nstrings = (int) GET_LENGTH(snames);
-    for(i = 0; i<nstrings; i++){
-      name = (char *) CHR_EL(snames, i);
-      if(strlen(name)> RS_DBI_MAX_IDENTIFIER_LENGTH){
-        (void) sprintf(errMsg,"SQL identifier %s longer than %d chars",
-          name, RS_DBI_MAX_IDENTIFIER_LENGTH);
-        RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-      }
-      /* check for delimited-identifiers (those in double-quotes);
-      * if missing closing double-quote, warn and treat as non-delim
-      */
-      c = *name;
-      len = strlen(name);
-      if(c=='"' && name[len-1] =='"')
-        continue;
-      if(!isalpha(c) && c!='"') *name = 'X';
-      name++;
-      while((c=*name)){
-        /* TODO: recognize SQL delim "." instances that may have
-        * originated in SQL and R/S make.names() left alone */
-        if(c=='.') *name='_';
-        name++;
-      }
-    }
-
-    return snames;
-  }
-
 /*  These 2 R-specific functions are used by the C macros IS_NA(p,t)
 *  and NA_SET(p,t) (in this way one simply use macros to test and set
 *  NA's regardless whether we're using R or S.
@@ -347,61 +264,6 @@ int
     return out;
   }
 
-/* the codes come from from R/src/main/util.c */
-const struct data_types RS_dataTypeTable[] = {
-  { "NULL",		NILSXP	   },  /* real types */
-  { "symbol",		SYMSXP	   },
-  { "pairlist",	LISTSXP	   },
-  { "closure",	CLOSXP	   },
-  { "environment",	ENVSXP	   },
-  { "promise",	PROMSXP	   },
-  { "language",	LANGSXP	   },
-  { "special",	SPECIALSXP },
-  { "builtin",	BUILTINSXP },
-  { "char",		CHARSXP	   },
-  { "logical",	LGLSXP	   },
-  { "integer",	INTSXP	   },
-  { "double",		REALSXP	   }, /*-  "real", for R <= 0.61.x */
-  { "complex",	CPLXSXP	   },
-  { "character",	STRSXP	   },
-  { "...",		DOTSXP	   },
-  { "any",		ANYSXP	   },
-  { "expression",	EXPRSXP	   },
-  { "list",		VECSXP	   },
-  { "raw",		RAWSXP     },
-  /* aliases : */
-  { "numeric",	REALSXP	   },
-  { "name",		SYMSXP	   },
-  { (char *)0,	-1	   }
-};
-
-
-
-/* the following function was kindly provided by Mikhail Kondrin
-* it returns the last inserted index.
-* TODO: It returns an int, but it can potentially be inadequate
-*       if the index is an�unsigned integer.  Should we return
-*       a numeric instead?
-*/
-SEXP
-  RS_MySQL_insertid(SEXP conHandle)
-  {
-    MYSQL   *my_con;
-    RS_DBI_connection  *con;
-    SEXP output;
-    char *conDesc[] = {"iid"};
-    SEXPTYPE conType[] = {INTSXP};    /* dj: are we sure an int will do? */
-int  conLen[]  = {1};
-
-con = RS_DBI_getConnection(conHandle);
-my_con = (MYSQL *) con->drvConnection;
-output = RS_DBI_createNamedList(conDesc, conType, conLen, 1);
-
-LST_INT_EL(output,0,0) = (int) mysql_insert_id(my_con);
-
-return output;
-
-  }
 
 /* The single string version of this function was kindly provided by
 * J. T. Lindgren (any bugs are probably dj's)
@@ -471,31 +333,22 @@ SEXP
     return ret;
   }
 
+void RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type) {
+  char *driver = "RS-DBI";   /* TODO: use the actual driver name */
 
-/* the following type names are from "mysql_com.h" */
-const struct data_types RS_MySQL_dataTypes[] = {
-    { "FIELD_TYPE_DECIMAL",    FIELD_TYPE_DECIMAL},
-    { "FIELD_TYPE_TINY",       FIELD_TYPE_TINY},
-    { "FIELD_TYPE_SHORT",      FIELD_TYPE_SHORT},
-    { "FIELD_TYPE_LONG",       FIELD_TYPE_LONG},
-    { "FIELD_TYPE_FLOAT",      FIELD_TYPE_FLOAT},
-    { "FIELD_TYPE_DOUBLE",     FIELD_TYPE_DOUBLE},
-    { "FIELD_TYPE_NULL",       FIELD_TYPE_NULL},
-    { "FIELD_TYPE_TIMESTAMP",  FIELD_TYPE_TIMESTAMP},
-    { "FIELD_TYPE_LONGLONG",   FIELD_TYPE_LONGLONG},
-    { "FIELD_TYPE_INT24",      FIELD_TYPE_INT24},
-    { "FIELD_TYPE_DATE",       FIELD_TYPE_DATE},
-    { "FIELD_TYPE_TIME",       FIELD_TYPE_TIME},
-    { "FIELD_TYPE_DATETIME",   FIELD_TYPE_DATETIME},
-    { "FIELD_TYPE_YEAR",       FIELD_TYPE_YEAR},
-    { "FIELD_TYPE_NEWDATE",    FIELD_TYPE_NEWDATE},
-    { "FIELD_TYPE_ENUM",       FIELD_TYPE_ENUM},
-    { "FIELD_TYPE_SET",        FIELD_TYPE_SET},
-    { "FIELD_TYPE_TINY_BLOB",  FIELD_TYPE_TINY_BLOB},
-    { "FIELD_TYPE_MEDIUM_BLOB",FIELD_TYPE_MEDIUM_BLOB},
-    { "FIELD_TYPE_LONG_BLOB",  FIELD_TYPE_LONG_BLOB},
-    { "FIELD_TYPE_BLOB",       FIELD_TYPE_BLOB},
-    { "FIELD_TYPE_VAR_STRING", FIELD_TYPE_VAR_STRING},
-    { "FIELD_TYPE_STRING",     FIELD_TYPE_STRING},
-    { (char *) 0, -1 }
-};
+switch(exception_type) {
+case RS_DBI_MESSAGE:
+  warning("%s driver message: (%s)", driver, msg);
+  break;
+case RS_DBI_WARNING:
+  warning("%s driver warning: (%s)", driver, msg);
+  break;
+case RS_DBI_ERROR:
+  error("%s driver: (%s)", driver, msg);
+  break;
+case RS_DBI_TERMINATE:
+  error("%s driver fatal: (%s)", driver, msg); /* was TERMINATE */
+break;
+}
+return;
+}

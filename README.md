@@ -64,12 +64,12 @@ option1=value1
 option2=value2
 ```
 
-If you want to be able to run the examples, you'll need to set up a database called `rs-dbi`. For a default single user install of MySQL, the following code should work:
+If you want to run the examples, you'll need to set the proper options in the `[rs-dbi]` group of any MySQL option file, such as /etc/my.cnf or the .my.cnf file in your home directory. For a default single user install of MySQL, the following code should work:
 
 ```
 [rs-dbi]
 database=test
-username=root
+user=root
 password=
 ```
 

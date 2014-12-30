@@ -7,7 +7,7 @@
 \alias{RMySQL-package}
 \title{Class MySQLDriver with constructor MySQL.}
 \usage{
-MySQL(max.con = 16, fetch.default.rec = 500, force.reload = FALSE)
+MySQL(max.con = 16, fetch.default.rec = 500)
 }
 \arguments{
 \item{max.con}{maximum number of connections that can be open
@@ -20,10 +20,6 @@ algorithm to manage its connection table.}
 \item{fetch.default.rec}{number of records to fetch at one time from the
 database. (The \code{\link[DBI]{fetch}} method uses this number as a
 default.)}
-
-\item{force.reload}{should the client code be reloaded (reinitialized)?
-Setting this to \code{TRUE} allows you to change default settings.
-All connections should be closed before re-loading.}
 }
 \description{
 An MySQL driver implementing the R database (DBI) API.

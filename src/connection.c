@@ -4,12 +4,12 @@
 SEXP
   RS_DBI_allocConnection(SEXP mgrHandle, int max_res)
   {
-    RS_DBI_manager    *mgr;
+    MySQLDriver    *mgr;
     RS_DBI_connection *con;
     SEXP conHandle;
     int  i, indx, con_id;
 
-    mgr = RS_DBI_getManager(mgrHandle);
+    mgr = rmysql_driver();
     indx = RS_DBI_newEntry(mgr->connectionIds, mgr->length);
     if(indx < 0){
       char buf[128], msg[128];
@@ -28,7 +28,6 @@ SEXP
     con_id = mgr->counter;
     con->connectionId = con_id;
     con->drvConnection = (void *) NULL;
-    con->drvData = (void *) NULL;    /* to be used by the driver in any way*/
     con->conParams = (void *) NULL;
     con->counter = (int) 0;
     con->length = max_res;           /* length of resultSet vector */
@@ -74,11 +73,11 @@ void
   RS_DBI_freeConnection(SEXP conHandle)
   {
     RS_DBI_connection *con;
-    RS_DBI_manager    *mgr;
+    MySQLDriver    *mgr;
     int indx;
 
     con = RS_DBI_getConnection(conHandle);
-    mgr = RS_DBI_getManager(conHandle);
+    mgr = rmysql_driver();
 
     /* Are there open resultSets? If so, free them first */
     if(con->num_res > 0) {
@@ -102,11 +101,6 @@ void
     if(con->conParams){
       char *errMsg =
         "internal error in RS_DBI_freeConnection: non-freed con->conParams (tiny memory leaked)";
-      RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-    }
-    if(con->drvData){
-      char *errMsg =
-        "internal error in RS_DBI_freeConnection: non-freed con->drvData (some memory leaked)";
       RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
     }
     /* delete this connection from manager's connection table */
@@ -137,10 +131,10 @@ SEXP RS_DBI_asConHandle(int mgrId, int conId)
 }
 
 RS_DBI_connection* RS_DBI_getConnection(SEXP conHandle) {
-  RS_DBI_manager  *mgr;
+  MySQLDriver  *mgr;
   int indx;
 
-  mgr = RS_DBI_getManager(conHandle);
+  mgr = rmysql_driver();
   indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(conHandle));
   if(indx < 0)
     RS_DBI_errorMessage(
@@ -217,7 +211,7 @@ SEXP
   {
 
     return RS_MySQL_createConnection(
-      RS_DBI_asMgrHandle(MGR_ID(conHandle)),
+      ScalarInteger(0),
       RS_MySQL_cloneConParams(RS_DBI_getConnection(conHandle)->conParams));
   }
 
@@ -471,3 +465,56 @@ SEXP
     return output;
 
   }
+
+SEXP RS_DBI_validHandle(SEXP handle) {
+  int  handleType = 0;
+
+  switch( (int) GET_LENGTH(handle)){
+  case MGR_HANDLE_TYPE:
+    handleType = MGR_HANDLE_TYPE;
+    break;
+  case CON_HANDLE_TYPE:
+    handleType = CON_HANDLE_TYPE;
+    break;
+  case RES_HANDLE_TYPE:
+    handleType = RES_HANDLE_TYPE;
+    break;
+  }
+
+  return ScalarLogical(is_validHandle(handle, handleType));
+}
+
+int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
+  int  mgr_id, len, indx;
+  MySQLDriver    *mgr = rmysql_driver();
+  RS_DBI_connection *con;
+
+  if(IS_INTEGER(handle))
+    handle = AS_INTEGER(handle);
+  else
+    return 0;       /* non handle object */
+
+    len = (int) GET_LENGTH(handle);
+    if(len<handleType || handleType<1 || handleType>3)
+      return 0;
+    mgr_id = MGR_ID(handle);
+
+    /* at least we have a potential valid dbManager */
+    if(!mgr || !mgr->connections)  return 0;   /* expired manager*/
+    if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
+
+    /* ... on to connections */
+    indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(handle));
+    if(indx<0) return 0;
+    con = mgr->connections[indx];
+    if(!con) return 0;
+    if(!con->resultSets) return 0;       /* un-initialized (invalid) */
+    if(handleType==CON_HANDLE_TYPE) return 1; /* valid connection id */
+
+    /* .. on to resultSets */
+    indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(handle));
+    if(indx < 0) return 0;
+    if(!con->resultSets[indx]) return 0;
+
+    return 1;
+}

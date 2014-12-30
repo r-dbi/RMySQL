@@ -201,12 +201,12 @@ setMethod("summary", "MySQLConnection",
 
 #' @rdname db-meta
 #' @export
-#' @useDynLib RMySQL RS_MySQL_getException
+#' @useDynLib RMySQL rmysql_exception_info
 setMethod("dbGetException", "MySQLConnection",
   def = function(conn, ...) {
     checkValid(conn)
 
-    .Call(RS_MySQL_getException, conn@Id)
+    .Call(rmysql_exception_info, conn@Id)
   }
 )
 

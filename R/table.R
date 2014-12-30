@@ -227,7 +227,10 @@ setMethod("dbListFields", c("MySQLConnection", "character"),
 #' @export
 #' @keywords internal
 setMethod("dbColumnInfo", "MySQLConnection", function(res, name, ...) {
-  dbGetQuery(res, paste("DESCRIBE", name))
+  rs <- dbSendQuery(res, paste0("SELECT * from ", dbQuoteIdentifier(res, name)))
+  on.exit(dbClearResult(rs))
+
+  dbColumnInfo(rs)
 })
 
 

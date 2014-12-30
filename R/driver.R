@@ -23,9 +23,6 @@ setClass("MySQLDriver",
 #' @param fetch.default.rec number of records to fetch at one time from the
 #'   database. (The \code{\link[DBI]{fetch}} method uses this number as a
 #'   default.)
-#' @param force.reload should the client code be reloaded (reinitialized)?
-#'   Setting this to \code{TRUE} allows you to change default settings.
-#'   All connections should be closed before re-loading.
 #' @export
 #' @import methods DBI
 #' @useDynLib RMySQL
@@ -49,16 +46,13 @@ setClass("MySQLDriver",
 #' dbRemoveTable(con, "USArrests")
 #' dbDisconnect(con)
 #' }
-#' @useDynLib RMySQL RS_MySQL_init
-MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
+#' @useDynLib RMySQL rmysql_driver_init
+MySQL <- function(max.con=16, fetch.default.rec = 500) {
   if (fetch.default.rec <= 0) {
     stop("default num of records per fetch must be positive")
   }
 
-  config.params <- as.integer(c(max.con, fetch.default.rec))
-  force <- as.logical(force.reload)
-
-  drvId <- .Call(RS_MySQL_init, config.params, force)
+  drvId <- .Call(rmysql_driver_init, max.con, fetch.default.rec)
   new("MySQLDriver", Id = drvId)
 }
 
@@ -68,11 +62,11 @@ MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @return A logical indicating whether the operation succeeded or not.
 #' @export
-#' @useDynLib RMySQL RS_MySQL_closeManager
+#' @useDynLib RMySQL rmysql_driver_close
 setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
   if(!dbIsValid(drv)) return(TRUE)
 
-  .Call(RS_MySQL_closeManager, drv@Id)
+  .Call(rmysql_driver_close)
 })
 
 
@@ -89,11 +83,11 @@ setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
 #' dbGetInfo(db)
 #' dbListConnections(db)
 #' summary(db)
-#' @useDynLib RMySQL RS_MySQL_managerInfo
+#' @useDynLib RMySQL rmysql_driver_info
 setMethod("dbGetInfo", "MySQLDriver", function(dbObj, what="", ...) {
   checkValid(dbObj)
 
-  info <- .Call(RS_MySQL_managerInfo, dbObj@Id)
+  info <- .Call(rmysql_driver_info)
   info$connectionIds <- lapply(info$connectionIds, function(conId) {
     new("MySQLConnection", Id = c(dbObj@Id, conId))
   })
