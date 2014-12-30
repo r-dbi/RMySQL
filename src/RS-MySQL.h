@@ -34,17 +34,6 @@ extern  "C" {
 #include <mysql_com.h>
 #include <string.h>
 
-
-/* WIN32 uses int _getpid()  */
-#if defined WIN32
-#include <process.h>
-/* #define getpid _getpid */
-#include <ctype.h>
-/* #define pid_t int */
-#else
-#include <unistd.h>
-#endif
-
 #include <ctype.h> /* for isalpha */
 
 /* We now define 4 important data structures:

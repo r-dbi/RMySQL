@@ -140,7 +140,7 @@ setMethod("summary", "MySQLDriver", function(object, verbose = FALSE, ...) {
 #' @export
 setMethod("show", "MySQLDriver", function(object) {
   expired <- if(dbIsValid(object)) "" else "Expired "
-  cat("<", expired, "MySQLDriver:", object@Id, ">\n",
+  cat("<", expired, "MySQLDriver>\n",
     sep = "")
   invisible(NULL)
 })
