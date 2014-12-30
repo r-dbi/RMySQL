@@ -1,6 +1,6 @@
 #ifndef _RS_MYSQL_H
 #define _RS_MYSQL_H 1
-/*  
+/*
  * Copyright (C) 1999-2002 The Omega Project for Statistical Computing.
  *
  * This library is free software; you can redistribute it and/or
@@ -38,8 +38,8 @@ extern  "C" {
  * respectively (MySQL 4.1.1-alpha manual).  So plan accordingly!
  */
 
-/* MySQL connection parameters struct, allocating and freeing 
- * methods. See mysql_real_connect() for details on the params 
+/* MySQL connection parameters struct, allocating and freeing
+ * methods. See mysql_real_connect() for details on the params
  * themselves.
  */
 typedef struct st_sdbi_conParams {
@@ -48,7 +48,7 @@ typedef struct st_sdbi_conParams {
     char *password;
     char *host;
     char *unix_socket;
-    unsigned int  port; 
+    unsigned int  port;
     unsigned int  client_flag;
 	char *groups;
 	char *default_file;
@@ -61,56 +61,52 @@ void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
 /* The following functions are the S/R entry points into the C implementation
  * (i.e., these are the only ones visible from R/S) we use the prefix
  * "RS_MySQL" in function names to denote this.
- * These functions are  built on top of the underlying RS_DBI manager, 
+ * These functions are  built on top of the underlying RS_DBI manager,
  * connection, and resultsets structures and functions (see RS-DBI.h).
- * 
- * Note: A handle is just an R/S object (see RS-DBI.h for details), i.e.,
- *       Mgr_Handle, Con_Handle, Res_Handle, Db_Handle are s_object 
- *       (integer vectors, to be precise).
  */
-  
+
 /* dbManager */
-Mgr_Handle *RS_MySQL_init(s_object *config_params, s_object *reload);
-s_object   *RS_MySQL_close(Mgr_Handle *mgrHandle); 
+SEXP RS_MySQL_init(SEXP config_params, SEXP reload);
+SEXP    RS_MySQL_close(SEXP mgrHandle);
 
 /* dbConnection */
-Con_Handle *RS_MySQL_newConnection(Mgr_Handle *mgrHandle, 
-    s_object *s_dbname,
-    s_object *s_username,
-    s_object *s_password,
-    s_object *s_myhost,
-    s_object *s_unix_socket,
-    s_object *s_port,
-    s_object *s_client_flag,
-    s_object *s_groups,
-    s_object *s_default_file);
-Con_Handle *RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams);
-Con_Handle *RS_MySQL_cloneConnection(Con_Handle *conHandle);
-s_object   *RS_MySQL_closeConnection(Con_Handle *conHandle);
-s_object   *RS_MySQL_getException(Con_Handle *conHandle);    /* err No, Msg */
+SEXP RS_MySQL_newConnection(SEXP mgrHandle,
+  SEXP s_dbname,
+  SEXP s_username,
+  SEXP s_password,
+  SEXP s_myhost,
+  SEXP s_unix_socket,
+  SEXP s_port,
+  SEXP s_client_flag,
+  SEXP s_groups,
+  SEXP s_default_file);
+SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams);
+SEXP RS_MySQL_cloneConnection(SEXP conHandle);
+SEXP RS_MySQL_closeConnection(SEXP conHandle);
+SEXP RS_MySQL_getException(SEXP conHandle);    /* err No, Msg */
 
 /* dbResultSet */
-Res_Handle *RS_MySQL_exec(Con_Handle *conHandle, s_object *statement);
-s_object   *RS_MySQL_fetch(Res_Handle *rsHandle, s_object *max_rec);
-s_object   *RS_MySQL_closeResultSet(Res_Handle *rsHandle); 
+SEXP RS_MySQL_exec(SEXP conHandle, SEXP statement);
+SEXP RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec);
+SEXP RS_MySQL_closeResultSet(SEXP rsHandle);
 
 /* Multiple result set function (as of MySQL Version 4.1) */
-Res_Handle *RS_MySQL_nextResultSet(Con_Handle *conHandle);
-s_object   *RS_MySQL_moreResultSets(Con_Handle *conHandle);  /* boolean */
+SEXP RS_MySQL_nextResultSet(SEXP conHandle);
+SEXP RS_MySQL_moreResultSets(SEXP conHandle);  /* boolean */
 
-s_object   *RS_MySQL_validHandle(Db_Handle *handle);      /* boolean */
+SEXP RS_MySQL_validHandle(SEXP handle);      /* boolean */
 
-RS_DBI_fields *RS_MySQL_createDataMappings(Res_Handle *resHandle);
-/* the following funs return named lists with meta-data for 
+RS_DBI_fields *RS_MySQL_createDataMappings(SEXP resHandle);
+/* the following funs return named lists with meta-data for
  * the manager, connections, and  result sets, respectively.
  */
-s_object *RS_MySQL_managerInfo(Mgr_Handle *mgrHandle);
-s_object *RS_MySQL_connectionInfo(Con_Handle *conHandle);
-s_object *RS_MySQL_resultSetInfo(Res_Handle *rsHandle);
+SEXP RS_MySQL_managerInfo(SEXP mgrHandle);
+SEXP RS_MySQL_connectionInfo(SEXP conHandle);
+SEXP RS_MySQL_resultSetInfo(SEXP rsHandle);
 
-s_object *RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *statement);
+SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP statement);
 
-s_object *RS_MySQL_versionId(void);
+SEXP RS_MySQL_versionId(void);
 
 /* the following type names are from "mysql_com.h" */
 static struct data_types RS_MySQL_dataTypes[] = {
@@ -140,7 +136,7 @@ static struct data_types RS_MySQL_dataTypes[] = {
     { (char *) 0, -1 }
 };
 
-s_object *RS_MySQL_typeNames(s_object *typeIds);
+SEXP RS_MySQL_typeNames(SEXP typeIds);
 extern const struct data_types RS_dataTypeTable[];
 
 #ifdef _cplusplus

@@ -48,8 +48,8 @@
  */
 
 
-Mgr_Handle *
-RS_MySQL_init(s_object *config_params, s_object *reload)
+SEXP
+RS_MySQL_init(SEXP config_params, SEXP reload)
 {
     S_EVALUATOR
 
@@ -57,7 +57,7 @@ RS_MySQL_init(s_object *config_params, s_object *reload)
      * connections, and max of records per fetch (this can be over-ridden
      * explicitly in the S call to fetch).
      */
-    Mgr_Handle *mgrHandle;
+    SEXP mgrHandle;
     int  fetch_default_rec, force_reload, max_con;
     const char *drvName = "MySQL";
 
@@ -70,13 +70,13 @@ RS_MySQL_init(s_object *config_params, s_object *reload)
     return mgrHandle;
 }
 
-s_object *
-RS_MySQL_closeManager(Mgr_Handle *mgrHandle)
+SEXP
+RS_MySQL_closeManager(SEXP mgrHandle)
 {
     S_EVALUATOR
 
     RS_DBI_manager *mgr;
-    s_object *status;
+    SEXP status;
 
     mgr = RS_DBI_getManager(mgrHandle);
     if(mgr->num_con)
@@ -96,15 +96,15 @@ RS_MySQL_closeManager(Mgr_Handle *mgrHandle)
  * SQL scripts
  */
 
-s_object * /* boolean */
-RS_MySQL_moreResultSets(Con_Handle *conHandle)
+SEXP  /* boolean */
+RS_MySQL_moreResultSets(SEXP conHandle)
 {
     S_EVALUATOR
 
     RS_DBI_connection *con;
     MYSQL             *my_connection;
     my_bool           tmp;
-    s_object          *status;            /* boolean */
+    SEXP status;            /* boolean */
 
     con = RS_DBI_getConnection(conHandle);
     my_connection = (MYSQL *) con->drvConnection;
@@ -121,14 +121,14 @@ RS_MySQL_moreResultSets(Con_Handle *conHandle)
     return status;
 }
 
-Res_Handle *
-RS_MySQL_nextResultSet(Con_Handle *conHandle)
+SEXP
+RS_MySQL_nextResultSet(SEXP conHandle)
 {
     S_EVALUATOR
 
     RS_DBI_connection *con;
     RS_DBI_resultSet  *result;
-    Res_Handle        *rsHandle;
+    SEXP rsHandle;
     MYSQL_RES         *my_result;
     MYSQL             *my_connection;
     int              rc, num_fields, is_select;
@@ -183,8 +183,8 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
 }
 
 /* open a connection with the same parameters used for in conHandle */
-Con_Handle *
-RS_MySQL_cloneConnection(Con_Handle *conHandle)
+SEXP
+RS_MySQL_cloneConnection(SEXP conHandle)
 {
     S_EVALUATOR
 
@@ -248,17 +248,17 @@ RS_MySQL_freeConParams(RS_MySQL_conParams *conParams)
     return;
 }
 
-Con_Handle *
-RS_MySQL_newConnection(Mgr_Handle *mgrHandle,
-    s_object *s_dbname,
-    s_object *s_username,
-    s_object *s_password,
-    s_object *s_myhost,
-    s_object *s_unix_socket,
-    s_object *s_port,
-    s_object *s_client_flag,
-    s_object *s_groups,
-    s_object *s_default_file)
+SEXP
+RS_MySQL_newConnection(SEXP mgrHandle,
+  SEXP s_dbname,
+  SEXP s_username,
+  SEXP s_password,
+  SEXP s_myhost,
+  SEXP s_unix_socket,
+  SEXP s_port,
+  SEXP s_client_flag,
+  SEXP s_groups,
+  SEXP s_default_file)
 {
     S_EVALUATOR
 
@@ -298,13 +298,13 @@ RS_MySQL_newConnection(Mgr_Handle *mgrHandle,
  * Used by both RS_MySQL_newConnection and RS_MySQL_cloneConnection.
  * It is responsible for the memory associated with conParams.
  */
-Con_Handle *
-RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams)
+SEXP
+RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams)
 {
     S_EVALUATOR
 
     RS_DBI_connection  *con;
-    Con_Handle  *conHandle;
+  SEXP conHandle;
     MYSQL     *my_connection;
 
     if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
@@ -370,14 +370,14 @@ RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams)
 }
 
 
-s_object *
-RS_MySQL_closeConnection(Con_Handle *conHandle)
+SEXP
+RS_MySQL_closeConnection(SEXP conHandle)
 {
     S_EVALUATOR
 
     RS_DBI_connection *con;
     MYSQL *my_connection;
-    s_object *status;
+    SEXP status;
 
     con = RS_DBI_getConnection(conHandle);
     if(con->num_res>0){
@@ -409,13 +409,13 @@ RS_MySQL_closeConnection(Con_Handle *conHandle)
  * set coercion type mappings between the server internal data types and
  * S classes.   Returns  an S handle to a resultSet object.
  */
-Res_Handle *
-RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
+SEXP
+RS_MySQL_exec(SEXP conHandle, SEXP statement)
 {
     S_EVALUATOR
 
     RS_DBI_connection *con;
-    Res_Handle        *rsHandle;
+    SEXP rsHandle;
     RS_DBI_resultSet  *result;
     MYSQL             *my_connection;
     MYSQL_RES         *my_result;
@@ -501,7 +501,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
 }
 
 RS_DBI_fields *
-RS_MySQL_createDataMappings(Res_Handle *rsHandle)
+RS_MySQL_createDataMappings(SEXP rsHandle)
 {
     MYSQL_RES     *my_result;
     MYSQL_FIELD   *select_dp;
@@ -633,8 +633,8 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
     return flds;
 }
 
-s_object *    /* output is a named list */
-RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
+SEXP     /* output is a named list */
+RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec)
 {
     S_EVALUATOR
 
@@ -643,7 +643,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
     RS_DBI_fields    *flds;
     MYSQL_RES *my_result;
     MYSQL_ROW  row;
-    s_object  *output, *s_tmp;
+    SEXP output, s_tmp;
 
     unsigned long  *lens;
     int    i, j, null_item, expand;
@@ -775,13 +775,13 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
 /* return a 2-elem list with the last exception number and
  * exception message on a given connection.
  */
-s_object *
-RS_MySQL_getException(s_object *conHandle)
+SEXP
+RS_MySQL_getException(SEXP conHandle)
 {
     S_EVALUATOR
 
     MYSQL *my_connection;
-    s_object  *output;
+    SEXP output;
     RS_DBI_connection   *con;
     int  n = 2;
     char *exDesc[] = {"errorNum", "errorMsg"};
@@ -801,14 +801,14 @@ RS_MySQL_getException(s_object *conHandle)
     return output;
 }
 
-s_object *
-RS_MySQL_closeResultSet(s_object *resHandle)
+SEXP
+RS_MySQL_closeResultSet(SEXP resHandle)
 {
     S_EVALUATOR
 
     RS_DBI_resultSet *result;
     MYSQL_RES        *my_result;
-    s_object *status;
+    SEXP status;
 
     result = RS_DBI_getResultSet(resHandle);
 
@@ -832,13 +832,13 @@ RS_MySQL_closeResultSet(s_object *resHandle)
     return status;
 }
 
-s_object *
-RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
+SEXP
+RS_MySQL_managerInfo(SEXP mgrHandle)
 {
     S_EVALUATOR
 
     RS_DBI_manager *mgr;
-    s_object *output;
+    SEXP output;
     int i, num_con, max_con, *cons, ncon;
     int j, n = 8;
     char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
@@ -885,15 +885,15 @@ RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
     return output;
 }
 
-s_object *
-RS_MySQL_connectionInfo(Con_Handle *conHandle)
+SEXP
+RS_MySQL_connectionInfo(SEXP conHandle)
 {
     S_EVALUATOR
 
     MYSQL   *my_con;
     RS_MySQL_conParams *conParams;
     RS_DBI_connection  *con;
-    s_object   *output;
+    SEXP output;
     int       i, n = 8, *res, nres;
     char *conDesc[] = {"host", "user", "dbname", "conType",
                         "serverVersion", "protocolVersion",
@@ -942,13 +942,13 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
 
 }
 
-s_object *
-RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
+SEXP
+RS_MySQL_resultSetInfo(SEXP rsHandle)
 {
     S_EVALUATOR
 
     RS_DBI_resultSet   *result;
-    s_object  *output, *flds;
+    SEXP output, flds;
     int  n = 6;
     char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
                         "rowCount", "completed", "fieldDescription"};
@@ -975,10 +975,10 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
     return output;
 }
 
-s_object *
-RS_MySQL_typeNames(s_object *type)
+SEXP
+RS_MySQL_typeNames(SEXP type)
 {
-    s_object *typeNames;
+    SEXP typeNames;
     int n, *typeCodes;
     int i;
 	char *tname;
@@ -1032,11 +1032,11 @@ RS_MySQL_typeNames(s_object *type)
  *          then a handle_event() could conveniently handle all the events.
  */
 
-s_object    *expand_list(s_object *old, int new_len);
-void         add_group(s_object *group_names, s_object *data,
+SEXP     expand_list(SEXP old, int new_len);
+void         add_group(SEXP group_names, SEXP data,
              SEXPTYPE *fld_Sclass, int group,
            int ngroup, int i);
-unsigned int check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[],
+unsigned int check_groupEvents(SEXP data, SEXPTYPE fld_Sclass[],
                           int row, int col);
 
 /* The following are the masks for the events/states we recognize as we
@@ -1057,14 +1057,14 @@ unsigned int check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[],
 #define DBMS_ERROR    512  /* error in remote dbms                */
 
 /* beginGroupFun takes only one arg: the name of the current group */
-s_object *
-RS_DBI_invokeBeginGroup(s_object *callObj,      /* should be initialized */
+SEXP
+RS_DBI_invokeBeginGroup(SEXP callObj,      /* should be initialized */
                         const char *group_name, /* one string */
-                        s_object *rho)
+                        SEXP rho)
 {
     S_EVALUATOR
 
-    s_object *s_group_name, *val;
+    SEXP s_group_name, val;
 
     /* make a copy of the argument */
     PROTECT(s_group_name = NEW_CHARACTER((int) 1));
@@ -1078,14 +1078,14 @@ RS_DBI_invokeBeginGroup(s_object *callObj,      /* should be initialized */
     return R_NilValue;
 }
 
-s_object *
-RS_DBI_invokeNewRecord(s_object *callObj,   /* should be initialized already */
-                       s_object *new_record,/* a 1-row data.frame */
-                       s_object *rho)
+SEXP
+RS_DBI_invokeNewRecord(SEXP callObj,   /* should be initialized already */
+    SEXP new_record,/* a 1-row data.frame */
+    SEXP rho)
 {
     S_EVALUATOR
 
-    s_object *df, *val;
+    SEXP df, val;
 
     /* make a copy of the argument */
     PROTECT(df = duplicate(new_record));
@@ -1099,13 +1099,13 @@ RS_DBI_invokeNewRecord(s_object *callObj,   /* should be initialized already */
 }
 
 /* endGroupFun takes two args: a data.frame and the group name */
-s_object *
-RS_DBI_invokeEndGroup(s_object *callObj, s_object *data,
-                      const char *group_name, s_object *rho)
+SEXP
+RS_DBI_invokeEndGroup(SEXP callObj, SEXP data,
+                      const char *group_name, SEXP rho)
 {
     S_EVALUATOR
 
-    s_object *s_x, *s_group_name, *val;
+    SEXP s_x, s_group_name, val;
 
     /* make copies of the arguments */
     PROTECT(callObj = duplicate(callObj));
@@ -1124,13 +1124,13 @@ RS_DBI_invokeEndGroup(s_object *callObj, s_object *data,
     return val;
 }
 
-s_object *                               /* output is a named list */
-RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
-                 s_object *s_group_field,/* this is a 0-based field number */
-                 s_object *s_funs,       /* a 5-elem list with handler funs */
-                 s_object *rho,          /* the env where to run funs */
-                 s_object *s_batch_size, /* alloc these many rows */
-                 s_object *s_max_rec)    /* max rows per group */
+SEXP                                /* output is a named list */
+RS_MySQL_dbApply(SEXP rsHandle,     /* resultset handle */
+    SEXP s_group_field,/* this is a 0-based field number */
+    SEXP s_funs,       /* a 5-elem list with handler funs */
+    SEXP rho,          /* the env where to run funs */
+    SEXP s_batch_size, /* alloc these many rows */
+    SEXP s_max_rec)    /* max rows per group */
 {
     S_EVALUATOR
 
@@ -1140,7 +1140,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     MYSQL_RES *my_result;
     MYSQL_ROW  row;
 
-    s_object  *data, *cur_rec, *out_list, *group_names, *val;
+    SEXP data, cur_rec, out_list, group_names, val;
 
     unsigned long  *lens = (unsigned long *)0;
     SEXPTYPE  *fld_Sclass;
@@ -1154,9 +1154,9 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 
     unsigned int event = NEVER;
     int    np = 0;        /* keeps track of PROTECT()'s */
-    s_object    *beginGroupCall, *beginGroupFun = LST_EL(s_funs, 2);
-    s_object    *endGroupCall,   *endGroupFun   = LST_EL(s_funs, 3);
-    s_object    *newRecordCall,   *newRecordFun  = LST_EL(s_funs, 4);
+    SEXP beginGroupCall, beginGroupFun = LST_EL(s_funs, 2);
+    SEXP endGroupCall,   endGroupFun   = LST_EL(s_funs, 3);
+    SEXP newRecordCall,  newRecordFun  = LST_EL(s_funs, 4);
     int        invoke_beginGroup = (GET_LENGTH(beginGroupFun)>0);
     int        invoke_endGroup   = (GET_LENGTH(endGroupFun)>0);
     int        invoke_newRecord  = (GET_LENGTH(newRecordFun)>0);
@@ -1411,7 +1411,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 }
 
 unsigned int
-check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[], int irow, int jcol)
+check_groupEvents(SEXP data, SEXPTYPE fld_Sclass[], int irow, int jcol)
 {
     if(irow==0) /* Begin */
         return (BEGIN|BEGIN_GROUP);
@@ -1450,7 +1450,7 @@ check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[], int irow, int jcol)
 
 /* append current group (as character) to the vector of group names */
 void
-add_group(s_object *group_names, s_object *data,
+add_group(SEXP group_names, SEXP data,
           SEXPTYPE *fld_Sclass, int group_field, int ngroup, int i)
 {
     char  buff[1024];
@@ -1484,14 +1484,14 @@ add_group(s_object *group_names, s_object *data,
  *       if the index is an�unsigned integer.  Should we return
  *       a numeric instead?
  */
-s_object *
-RS_MySQL_insertid(Con_Handle *conHandle)
+SEXP
+RS_MySQL_insertid(SEXP conHandle)
 {
     S_EVALUATOR
 
     MYSQL   *my_con;
     RS_DBI_connection  *con;
-    s_object   *output;
+    SEXP output;
     char *conDesc[] = {"iid"};
     SEXPTYPE conType[] = {INTSXP};    /* dj: are we sure an int will do? */
     int  conLen[]  = {1};
@@ -1514,8 +1514,7 @@ RS_MySQL_insertid(Con_Handle *conHandle)
  *   we protect against potentially deadly requests?
  */
 
-s_object *
-RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
+SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP strings)
 {
     RS_DBI_connection *con;
     MYSQL             *my_connection;
@@ -1523,7 +1522,7 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
     int i, nStrings;
     char *str;
     char *escapedString;
-    s_object  *output;
+    SEXP output;
 
     con = RS_DBI_getConnection(conHandle);
     my_connection = (MYSQL *) con->drvConnection;
@@ -1559,10 +1558,10 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
     return output;
 }
 
-s_object *
+SEXP
 RS_MySQL_clientLibraryVersions(void)
 {
-	s_object *ret, *name;
+  SEXP ret, name;
 
 	PROTECT(name=NEW_CHARACTER(2));
 	SET_STRING_ELT(name, 0, COPY_TO_USER_STRING(MYSQL_SERVER_VERSION));

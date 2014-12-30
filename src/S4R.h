@@ -28,7 +28,6 @@ extern "C" {
 #endif
 
 #  include "S.h"
-#  define USE_RINTERNALS 1
 #  include "Rdefines.h"
 #  define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
 

@@ -52,14 +52,6 @@ typedef enum enum_dbi_exception {
   RS_DBI_TERMINATE
 } DBI_EXCEPTION;
 
-/* dbObject handles are simple S/R integer vectors of 1, 2, or 3 integers
- * the *_ID macros extract the appropriate scalar.
- */
-
-#define Mgr_Handle s_object
-#define Con_Handle s_object
-#define Res_Handle s_object
-#define Db_Handle  s_object       /* refers to any one of the above */
 /* The integer value for the following enum's needs to equal
  * GET_LENGTH(handle) for the various handles.
  */
@@ -161,32 +153,32 @@ typedef struct st_sdbi_manager {
  * return handles.  All DBI functions (free/get/etc) use the handle
  * to work with the various dbObjects.
  */
-Mgr_Handle     *RS_DBI_allocManager(const char *drvName, int max_con,
+SEXP RS_DBI_allocManager(const char *drvName, int max_con,
 				    int fetch_default_rec,
 				    int force_realloc);
-void            RS_DBI_freeManager(Mgr_Handle *mgrHandle);
-RS_DBI_manager *RS_DBI_getManager(Db_Handle *handle);
-Mgr_Handle     *RS_DBI_asMgrHandle(int pid);
-s_object       *RS_DBI_managerInfo(Mgr_Handle *mgrHandle);
+void            RS_DBI_freeManager(SEXP mgrHandle);
+RS_DBI_manager *RS_DBI_getManager(SEXP handle);
+SEXP RS_DBI_asMgrHandle(int pid);
+SEXP RS_DBI_managerInfo(SEXP mgrHandle);
 
 /* dbConnection */
-Con_Handle        *RS_DBI_allocConnection(Mgr_Handle *mgrHandle,
+SEXP RS_DBI_allocConnection(SEXP mgrHandle,
 					  int max_res);
-void               RS_DBI_freeConnection(Con_Handle *conHandle);
-RS_DBI_connection *RS_DBI_getConnection(Db_Handle *handle);
-Con_Handle        *RS_DBI_asConHandle(int mgrId, int conId);
-s_object          *RS_DBI_connectionInfo(Con_Handle *con_Handle);
+void               RS_DBI_freeConnection(SEXP conHandle);
+RS_DBI_connection *RS_DBI_getConnection(SEXP handle);
+SEXP RS_DBI_asConHandle(int mgrId, int conId);
+SEXP RS_DBI_connectionInfo(SEXP con_Handle);
 
 /* dbResultSet */
-Res_Handle        *RS_DBI_allocResultSet(Con_Handle *conHandle);
-void               RS_DBI_freeResultSet(Res_Handle *rsHandle);
-RS_DBI_resultSet  *RS_DBI_getResultSet(Res_Handle *rsHandle);
-Res_Handle        *RS_DBI_asResHandle(int pid, int conId, int resId);
-s_object          *RS_DBI_resultSetInfo(Res_Handle *rsHandle);
+SEXP RS_DBI_allocResultSet(SEXP conHandle);
+void               RS_DBI_freeResultSet(SEXP rsHandle);
+RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
+SEXP RS_DBI_asResHandle(int pid, int conId, int resId);
+SEXP RS_DBI_resultSetInfo(SEXP rsHandle);
 
 /* utility funs */
-s_object *RS_DBI_validHandle(Db_Handle *handle); /* callable from S/R */
-int       is_validHandle(Db_Handle *handle, HANDLE_TYPE handleType);
+SEXP RS_DBI_validHandle(SEXP handle); /* callable from S/R */
+int       is_validHandle(SEXP handle, HANDLE_TYPE handleType);
 
 /* a simple object database (mapping table) -- it uses simple linear
  * search (we don't expect to have more than a handful of simultaneous
@@ -204,25 +196,25 @@ void  RS_DBI_freeEntry(int *table, int indx);
 
 /* description of the fields in a result set */
 RS_DBI_fields *RS_DBI_allocFields(int num_fields);
-s_object      *RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);
+SEXP RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);
 void           RS_DBI_freeFields(RS_DBI_fields *flds);
 
 /* we (re)allocate the actual output list in here (with the help of
  * RS_DBI_fields).  This should be some kind of R/S "relation"
  * table, not a dataframe nor a list.
  */
-void  RS_DBI_allocOutput(s_object *output,
+void  RS_DBI_allocOutput(SEXP output,
 			RS_DBI_fields *flds,
 			int num_rec,
 			int expand);
-void RS_DBI_makeDataFrame(s_object *data);
+void RS_DBI_makeDataFrame(SEXP data);
 
 /* TODO: We need to elevate RS_DBI_errorMessage to either
  * dbManager and/or dbConnection methods.  I still need to
  * go back and re-code the error-handling throughout, darn!
  */
 void  RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exceptionType);
-void  RS_DBI_setException(Db_Handle *handle,
+void  RS_DBI_setException(SEXP handle,
 			  DBI_EXCEPTION exceptionType,
 			  int errorNum,
 			  const char *errorMsg);
@@ -242,13 +234,13 @@ struct data_types {
 /* return the primitive type name for a primitive type id */
 char     *RS_DBI_getTypeName(int typeCode, const struct data_types table[]);
 /* same, but callable from S/R and vectorized */
-s_object *RS_DBI_SclassNames(s_object *types);
+SEXP RS_DBI_SclassNames(SEXP types);
 
-s_object *RS_DBI_createNamedList(char  **names,
+SEXP RS_DBI_createNamedList(char  **names,
          SEXPTYPE *types,
 				 int  *lengths,
 				 int  n);
-s_object *RS_DBI_copyFields(RS_DBI_fields *flds);
+SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
 
 void RS_na_set(void *ptr, SEXPTYPE type);
 int  RS_is_na(void *ptr, SEXPTYPE type);
