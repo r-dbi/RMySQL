@@ -301,7 +301,7 @@ SEXP     /* output is a named list */
 
       unsigned long  *lens;
       int    i, j, null_item, expand;
-      int   *fld_nullOk, completed;
+      int   completed;
       SEXPTYPE  *fld_Sclass;
       int   num_rec;
       int    num_fields;
@@ -321,7 +321,6 @@ SEXP     /* output is a named list */
     PROTECT(output = NEW_LIST((int) num_fields));
     RS_DBI_allocOutput(output, flds, num_rec, 0);
     fld_Sclass = flds->Sclass;
-    fld_nullOk = flds->nullOk;
 
     /* actual fetching....*/
     my_result = (MYSQL_RES *) result->drvResultSet;

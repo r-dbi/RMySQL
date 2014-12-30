@@ -224,7 +224,6 @@ void
   {
     double *d;
     int   *i;
-    char   *c;
     switch(type){
     case INTSXP:
       i = (int *) ptr;
@@ -237,10 +236,6 @@ void
     case REALSXP:
       d = (double *) ptr;
       *d = NA_REAL;
-      break;
-    case STRSXP:
-      c = (char *) ptr;
-      c = (char *) CHR_EL(NA_STRING, 0);
       break;
     }
   }
@@ -338,7 +333,6 @@ SEXP
     return ret;
   }
 
-
 void RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type) {
   char *driver = "RS-DBI";   /* TODO: use the actual driver name */
 
@@ -358,4 +352,3 @@ break;
 }
 return;
 }
-

@@ -279,8 +279,6 @@ SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP statement);
 
 SEXP RS_MySQL_versionId(void);
 
-SEXP RS_MySQL_typeNames(SEXP typeIds);
-
 #ifdef _cplusplus
 }
 #endif

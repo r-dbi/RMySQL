@@ -67,7 +67,7 @@ SEXP
 const char *group_name, /* one string */
 SEXP rho)
   {
-    SEXP s_group_name, val;
+    SEXP s_group_name;
 
     /* make a copy of the argument */
     PROTECT(s_group_name = NEW_CHARACTER((int) 1));
@@ -75,7 +75,7 @@ SEXP rho)
 
     /* and stick into call object */
     SETCADR(callObj, s_group_name);
-    val = eval(callObj, rho);
+    eval(callObj, rho);
     UNPROTECT(1);
 
     return R_NilValue;
@@ -86,14 +86,14 @@ SEXP
     SEXP new_record,/* a 1-row data.frame */
     SEXP rho)
   {
-    SEXP df, val;
+    SEXP df;
 
     /* make a copy of the argument */
     PROTECT(df = duplicate(new_record));
 
     /* and stick it into the call object */
     SETCADR(callObj, df);
-    val = eval(callObj, rho);
+    eval(callObj, rho);
     UNPROTECT(1);
 
     return R_NilValue;
@@ -141,7 +141,7 @@ SEXP                                /* output is a named list */
 
       unsigned long  *lens = (unsigned long *)0;
       SEXPTYPE  *fld_Sclass;
-      int   i, j, null_item, expand, *fld_nullOk, completed;
+      int   i, j, null_item, expand, completed;
       int   num_rec, num_groups;
       int    num_fields;
       int   max_rec = INT_EL(s_max_rec,0);     /* max rec per group */
@@ -184,7 +184,6 @@ SEXP                                /* output is a named list */
           RS_DBI_ERROR);
       num_fields = flds->num_fields;
       fld_Sclass = flds->Sclass;
-      fld_nullOk = flds->nullOk;
       PROTECT(data = NEW_LIST((int) num_fields));     /* buffer records */
       PROTECT(cur_rec = NEW_LIST((int) num_fields));  /* current record */
       np += 2;

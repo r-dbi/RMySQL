@@ -16,8 +16,22 @@ if [ "$MYSQL_INC" ]; then
   exit 0
 fi
 
-# Static link on OSX
+# Force static linking on OSX to support redistributable binary packages.
 if [ $(echo "$OSTYPE" | grep "darwin") ]; then
+
+  # Check for the presence of the Mac OS X 'native' package
+  NATIVEPKG=$(echo /usr/local/mysql-connector-c-*)
+  if [ -r $NATIVEPKG/include/mysql.h ]; then
+      echo "Using native mysqlclient from $NATIVEPKG";
+      echo "PKG_CPPFLAGS= -I$NATIVEPKG/include" > src/Makevars
+
+      # Copy the static library
+      cp -f $NATIVEPKG/lib/libmysqlclient.a ./src/libmysqlstatic.a
+      echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
+      exit 0
+  else
+    echo "No native mysqlclient package found."
+  fi
 
   # Use system 'brew' if available
   if [ $(command -v brew) ]; then
@@ -27,14 +41,16 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
       brew install ./tools/mysql-connector-c.rb;
     fi
     if [ -r "$MYSQLBREWDIR/include/mysql.h" ]; then
-      echo "libmysql found in $MYSQLBREWDIR";
+      echo "Brewed libmysql found in $MYSQLBREWDIR";
       echo "PKG_CPPFLAGS= -I$MYSQLBREWDIR/include" > src/Makevars
 
       # Force using the static library
-      cp -f $MYSQLBREWDIR/lib/libmysqlclient.a ./src/
-      echo "PKG_LIBS= -lz libmysqlclient.a" >> src/Makevars
+      cp -f $MYSQLBREWDIR/lib/libmysqlclient.a ./src/libmysqlstatic.a
+      echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
       exit 0
     fi
+  else
+    echo "No system brew found."
   fi
 
   # Try brewing locally
@@ -46,9 +62,10 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
      HOMEBREW_CACHE="/tmp" $LOCALBREW/bin/brew install ./tools/mysql-connector-c.rb;
   fi
   if [ -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/mysql.h" ]; then
+    echo "Using local brew from $LOCALBREW."
     echo "PKG_CPPFLAGS= -I../$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/" > src/Makevars
-    echo "PKG_LIBS= -lz libmysqlclient.a" >> src/Makevars
-    cp -f $LOCALBREW/Cellar/mysql-connector-c/6.1.3/lib/libmysqlclient.a ./src/
+    cp -f $LOCALBREW/Cellar/mysql-connector-c/6.1.3/lib/libmysqlclient.a ./src/libmysqlstatic.a
+    echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
     exit 0;
   fi
   echo "Failed to install mysql-connector-c."

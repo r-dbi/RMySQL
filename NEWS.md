@@ -1,6 +1,6 @@
 # Version 0.10
 
- *  New maintainer: Jereon Ooms
+ *  New maintainer: Jeroen Ooms
 
  *  Internal changes to support static linking on Windows; this means that
     windows a binary is now available on CRAN.
