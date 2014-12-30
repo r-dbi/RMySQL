@@ -32,14 +32,6 @@ extern "C" {
 #  include "Rdefines.h"
 #  define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
 
-/* The following are macros defined in the Green Book, but missing
- * in Rdefines.h.  The semantics are as close to S4's as possible (?).
- */
-#  define COPY(x) duplicate(x)
-#  define EVAL_IN_FRAME(expr,n)  eval(expr,n)
-#  define GET_FROM_FRAME(name,n) findVar(install(name),n)
-#  define ASSIGN_IN_FRAME(name,obj,n) defineVar(install(name),COPY(obj),n)
-
 /* data types common to R and S4 */
 #  undef INTEGER_DATA
 #  define INTEGER_DATA(x) (INTEGER(x))

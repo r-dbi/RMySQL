@@ -1072,7 +1072,7 @@ RS_DBI_invokeBeginGroup(s_object *callObj,      /* should be initialized */
 
     /* and stick into call object */
     SETCADR(callObj, s_group_name);
-    val = EVAL_IN_FRAME(callObj, rho);
+    val = eval(callObj, rho);
     UNPROTECT(1);
 
     return S_NULL_ENTRY;
@@ -1092,7 +1092,7 @@ RS_DBI_invokeNewRecord(s_object *callObj,   /* should be initialized already */
 
     /* and stick it into the call object */
     SETCADR(callObj, df);
-    val = EVAL_IN_FRAME(callObj, rho);
+    val = eval(callObj, rho);
     UNPROTECT(1);
 
     return S_NULL_ENTRY;
@@ -1118,7 +1118,7 @@ RS_DBI_invokeEndGroup(s_object *callObj, s_object *data,
     SETCADDR(callObj, s_group_name);
     SETCADDDR(callObj, R_DotsSymbol);
 
-    val = EVAL_IN_FRAME(callObj, rho);
+    val = eval(callObj, rho);
 
     UNPROTECT(3);
     return val;
