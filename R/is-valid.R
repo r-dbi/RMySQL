@@ -33,8 +33,9 @@ checkValid <- function(obj) {
 
 #' @export
 #' @rdname isIdCurrent
+#' @useDynLib RMySQL rmysql_driver_valid
 setMethod("dbIsValid", "MySQLDriver", function(dbObj) {
-  .Call(RS_DBI_validHandle, dbObj@Id)
+  .Call(rmysql_driver_valid)
 })
 
 #' @export

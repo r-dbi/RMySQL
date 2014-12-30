@@ -26,7 +26,6 @@ SEXP
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
     result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
-    result->drvData = (void *) NULL;   /* this can be used by driver*/
     result->statement = (char *) NULL;
     result->managerId = MGR_ID(conHandle);
     result->connectionId = CON_ID(conHandle);
@@ -63,11 +62,7 @@ void
         "internal error in RS_DBI_freeResultSet: non-freed result->drvResultSet (some memory leaked)";
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
-    if(result->drvData){
-      char *errMsg =
-        "internal error in RS_DBI_freeResultSet: non-freed result->drvData (some memory leaked)";
-      RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-    }
+
     if(result->statement)
       free(result->statement);
     if(result->fields)
@@ -96,8 +91,6 @@ SEXP RS_DBI_asResHandle(int mgrId, int conId, int resId)
   return resHandle;
 }
 
-
-
 RS_DBI_resultSet* RS_DBI_getResultSet(SEXP rsHandle) {
   RS_DBI_connection *con;
   int indx;
@@ -116,35 +109,30 @@ RS_DBI_resultSet* RS_DBI_getResultSet(SEXP rsHandle) {
 }
 
 
-SEXP        /* return a named list */
-    RS_DBI_resultSetInfo(SEXP rsHandle)
-    {
-      RS_DBI_resultSet       *result;
-      SEXP output, flds;
-      int  n = (int) 6;
-      char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-        "rowCount", "completed", "fields"};
-      SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
-        INTSXP,   INTSXP, VECSXP};
-      int  rsLen[]   = {1, 1, 1, 1, 1, 1};
+SEXP RS_DBI_resultSetInfo(SEXP rsHandle) {
+  RS_DBI_resultSet       *result;
+  SEXP output, flds;
+  int  n = (int) 6;
+  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
+    "rowCount", "completed", "fields"};
+  SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
+    INTSXP,   INTSXP, VECSXP};
+  int  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
-      result = RS_DBI_getResultSet(rsHandle);
-      if(result->fields)
-        flds = RS_DBI_copyfields(result->fields);
-      else
-        flds = R_NilValue;
+  result = RS_DBI_getResultSet(rsHandle);
+  flds = R_NilValue;
 
-      output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
+  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 
-      SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
-      LST_INT_EL(output,1,0) = result->isSelect;
-      LST_INT_EL(output,2,0) = result->rowsAffected;
-      LST_INT_EL(output,3,0) = result->rowCount;
-      LST_INT_EL(output,4,0) = result->completed;
-      SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
+  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+  LST_INT_EL(output,1,0) = result->isSelect;
+  LST_INT_EL(output,2,0) = result->rowsAffected;
+  LST_INT_EL(output,3,0) = result->rowCount;
+  LST_INT_EL(output,4,0) = result->completed;
+  SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
 
-      return output;
-    }
+  return output;
+}
 
 
 SEXP
@@ -304,7 +292,7 @@ SEXP
 SEXP     /* output is a named list */
     RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec)
     {
-      RS_DBI_manager   *mgr;
+      MySQLDriver   *mgr;
       RS_DBI_resultSet *result;
       RS_DBI_fields    *flds;
       MYSQL_RES *my_result;
@@ -326,7 +314,7 @@ SEXP     /* output is a named list */
       num_rec = asInteger(max_rec);
       expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
     if(expand || num_rec == 0){
-      mgr = RS_DBI_getManager(rsHandle);
+      mgr = rmysql_driver();
       num_rec = mgr->fetch_default_rec;
     }
     num_fields = flds->num_fields;
@@ -463,53 +451,28 @@ SEXP
   }
 
 
-SEXP
-  RS_MySQL_resultSetInfo(SEXP rsHandle)
-  {
-    RS_DBI_resultSet   *result;
-    SEXP output, flds;
-    int  n = 6;
-    char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
-      "rowCount", "completed", "fieldDescription"};
-    SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
-      INTSXP,   INTSXP, VECSXP};
-    int  rsLen[]   = {1, 1, 1, 1, 1, 1};
+SEXP RS_MySQL_resultSetInfo(SEXP rsHandle) {
+  RS_DBI_resultSet   *result;
+  SEXP output, flds;
+  int  n = 6;
+  char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
+    "rowCount", "completed", "fieldDescription"};
+  SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
+    INTSXP,   INTSXP, VECSXP};
+  int  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
-    result = RS_DBI_getResultSet(rsHandle);
-    if(result->fields)
-      flds = RS_DBI_getFieldDescriptions(result->fields);
-    else
-      flds = R_NilValue;
+  result = RS_DBI_getResultSet(rsHandle);
+  flds = R_NilValue;
 
-    output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
+  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 
-    SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
-    LST_INT_EL(output,1,0) = result->isSelect;
-    LST_INT_EL(output,2,0) = result->rowsAffected;
-    LST_INT_EL(output,3,0) = result->rowCount;
-    LST_INT_EL(output,4,0) = result->completed;
-    if(flds != R_NilValue)
-      SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
+  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+  LST_INT_EL(output,1,0) = result->isSelect;
+  LST_INT_EL(output,2,0) = result->rowsAffected;
+  LST_INT_EL(output,3,0) = result->rowCount;
+  LST_INT_EL(output,4,0) = result->completed;
+  if(flds != R_NilValue)
+    SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
 
-    return output;
-  }
-
-SEXP
-  RS_MySQL_typeNames(SEXP type)
-  {
-    SEXP typeNames;
-    int n, *typeCodes;
-    int i;
-    char *tname;
-
-    n = LENGTH(type);
-    typeCodes = INTEGER(type);
-    PROTECT(typeNames = NEW_CHARACTER(n));
-    for(i = 0; i < n; i++) {
-      tname = RS_DBI_getTypeName(typeCodes[i], RS_MySQL_dataTypes);
-      if (!tname) tname = "";
-      SET_CHR_EL(typeNames, i, C_S_CPY(tname));
-    }
-    UNPROTECT(1);
-    return typeNames;
-  }
+  return output;
+}
