@@ -2,12 +2,13 @@
 
  *  New maintainer: Jereon Ooms
 
- *  Internal changes to support static linking on Windows.
+ *  Internal changes to support static linking on Windows; this means that
+    windows a binary is now available on CRAN.
 
  *  The following internal functions are no longer exported: please
     use the corresponding DBI generic instead:
 
-    `isIdCurrent`, `mysqlInitDriver`, `mysqlCloseDriver`, `mysqlDescribeDriver`,
+    `mysqlInitDriver`, `mysqlCloseDriver`, `mysqlDescribeDriver`,
     `mysqlDriverInfo`, `mysqlNewConnection`, `mysqlCloneConnection`,
     `mysqlDescribeConnection`, `mysqlConnectionInfo`, `mysqlCloseConnection`,
     `mysqlExecStatement`, `mysqlQuickSQL`, `mysqlDBApply`, `mysqlFetch`,
@@ -23,10 +24,8 @@
     behaviour for MySQLDriver, MySQLConnection and MySQLResult so this
     simplifies the code
 
- *  Implement methods for `dbIsValid()`; please use these instead of
+ *  Implemented methods for `dbIsValid()`; please use these instead of
     `isIdCurrent()`.
-
- *  Assorted fixes accumulated since last release 3 years ago.
 
  *  Implement `dbFetch()` method; please use this in preference to `fetch()`.
     `dbFetch()` now returns a 0-row data frame (instead of an 0-col data frame)
@@ -52,3 +51,5 @@
     
     * When given a zero-row data frame it will just creates the table 
       definition. 
+
+ *  Assorted fixes accumulated since last release 3 years ago.
