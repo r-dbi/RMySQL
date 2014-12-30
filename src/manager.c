@@ -215,3 +215,93 @@ int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
 }
 
 
+
+
+
+SEXP
+  RS_MySQL_init(SEXP config_params, SEXP reload)
+  {
+    /* Currently we can specify the defaults for 2 parameters, max num of
+    * connections, and max of records per fetch (this can be over-ridden
+    * explicitly in the S call to fetch).
+    */
+    SEXP mgrHandle;
+    int  fetch_default_rec, force_reload, max_con;
+    const char *drvName = "MySQL";
+
+    max_con = INTEGER(config_params)[0];
+    fetch_default_rec = INTEGER(config_params)[1];
+    force_reload = LOGICAL(reload)[0];
+
+    mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec,
+      force_reload);
+    return mgrHandle;
+  }
+
+SEXP
+  RS_MySQL_closeManager(SEXP mgrHandle)
+  {
+    RS_DBI_manager *mgr;
+
+    mgr = RS_DBI_getManager(mgrHandle);
+    if(mgr->num_con)
+      RS_DBI_errorMessage(
+        "there are opened connections -- close them first",
+        RS_DBI_ERROR);
+
+    RS_DBI_freeManager(mgrHandle);
+
+    return ScalarLogical(TRUE);
+  }
+
+
+SEXP
+  RS_MySQL_managerInfo(SEXP mgrHandle)
+  {
+    RS_DBI_manager *mgr;
+    SEXP output;
+    int i, num_con, max_con, *cons, ncon;
+    int j, n = 8;
+    char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
+      "managerId", "length",        "num_con",
+      "counter",   "clientVersion"};
+    SEXPTYPE mgrType[] = {STRSXP, INTSXP, INTSXP,
+      INTSXP,   INTSXP, INTSXP,
+      INTSXP,   STRSXP};
+    int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
+
+    mgr = RS_DBI_getManager(mgrHandle);
+    if(!mgr)
+      RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
+    num_con = (int) mgr->num_con;
+    max_con = (int) mgr->length;
+    mgrLen[1] = num_con;
+
+    output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
+
+    j = (int) 0;
+    if(mgr->drvName)
+      SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
+    else
+      SET_LST_CHR_EL(output,j++,0,C_S_CPY(""));
+
+    cons = (int *) S_alloc((long)max_con, (int)sizeof(int));
+    ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
+    if(ncon != num_con){
+      RS_DBI_errorMessage(
+        "internal error: corrupt RS_DBI connection table",
+        RS_DBI_ERROR);
+    }
+
+    for(i = 0; i < num_con; i++)
+      LST_INT_EL(output, j, i) = cons[i];
+    j++;
+    LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
+    LST_INT_EL(output,j++,0) = mgr->managerId;
+    LST_INT_EL(output,j++,0) = mgr->length;
+    LST_INT_EL(output,j++,0) = mgr->num_con;
+    LST_INT_EL(output,j++,0) = mgr->counter;
+    SET_LST_CHR_EL(output,j++,0,C_S_CPY(mysql_get_client_info()));
+
+    return output;
+  }

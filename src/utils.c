@@ -380,3 +380,98 @@ const struct data_types RS_dataTypeTable[] = {
   { (char *)0,	-1	   }
 };
 
+
+
+/* the following function was kindly provided by Mikhail Kondrin
+* it returns the last inserted index.
+* TODO: It returns an int, but it can potentially be inadequate
+*       if the index is an�unsigned integer.  Should we return
+*       a numeric instead?
+*/
+SEXP
+  RS_MySQL_insertid(SEXP conHandle)
+  {
+    MYSQL   *my_con;
+    RS_DBI_connection  *con;
+    SEXP output;
+    char *conDesc[] = {"iid"};
+    SEXPTYPE conType[] = {INTSXP};    /* dj: are we sure an int will do? */
+int  conLen[]  = {1};
+
+con = RS_DBI_getConnection(conHandle);
+my_con = (MYSQL *) con->drvConnection;
+output = RS_DBI_createNamedList(conDesc, conType, conLen, 1);
+
+LST_INT_EL(output,0,0) = (int) mysql_insert_id(my_con);
+
+return output;
+
+  }
+
+/* The single string version of this function was kindly provided by
+* J. T. Lindgren (any bugs are probably dj's)
+*
+* NOTE/BUG?: This function could potentially grab a huge amount of memory
+*   if given (not inappropriately) very large binary objects. How should
+*   we protect against potentially deadly requests?
+*/
+
+SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP strings)
+{
+  RS_DBI_connection *con;
+  MYSQL             *my_connection;
+  long len, old_len;
+  int i, nStrings;
+  char *str;
+  char *escapedString;
+  SEXP output;
+
+  con = RS_DBI_getConnection(conHandle);
+  my_connection = (MYSQL *) con->drvConnection;
+
+  nStrings = GET_LENGTH(strings);
+  PROTECT(output = NEW_CHARACTER(nStrings));
+
+  old_len = (long) 1;
+  escapedString = (char *) S_alloc(old_len, (int) sizeof(char));
+  if(!escapedString){
+    RS_DBI_errorMessage(
+      "(RS_MySQL_escapeStrings) could not allocate memory",
+      RS_DBI_ERROR);
+  }
+
+  for(i=0; i<nStrings; i++){
+    str = RS_DBI_copyString(CHR_EL(strings,i));
+    len = (long) strlen(str);
+    escapedString = (char *) S_realloc(escapedString,
+      (long) 2*len+1, old_len, (int)sizeof(char));
+    if(!escapedString){
+      RS_DBI_errorMessage(
+        "(RS_MySQL_escapeStrings) could not (re)allocate memory",
+        RS_DBI_ERROR);
+    }
+
+    mysql_real_escape_string(my_connection, escapedString, str, len);
+
+    SET_CHR_EL(output, i, C_S_CPY(escapedString));
+  }
+
+  UNPROTECT(1);
+  return output;
+}
+
+SEXP
+  RS_MySQL_clientLibraryVersions(void)
+  {
+    SEXP ret, name;
+
+    PROTECT(name=NEW_CHARACTER(2));
+    SET_STRING_ELT(name, 0, COPY_TO_USER_STRING(MYSQL_SERVER_VERSION));
+    SET_STRING_ELT(name, 1, COPY_TO_USER_STRING(mysql_get_client_info()));
+    PROTECT(ret=NEW_INTEGER(2));
+    INTEGER(ret)[0] = (int)MYSQL_VERSION_ID;
+    INTEGER(ret)[1] = (int)mysql_get_client_version();
+    SET_NAMES(ret,name);
+    UNPROTECT(2);
+    return ret;
+  }

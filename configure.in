@@ -1,43 +1,43 @@
 dnl
 dnl RMySQL
-dnl 
+dnl
 dnl $Id$
 dnl
 dnl Generate a "configure" script that will install the RMySQL package.
 dnl
 dnl NOTE: The resulting configure script implements the following logic:
 dnl
-dnl 1. If PKG_CPPFLAGS and PKG_LIBS are defined, use them (as suggested in 
+dnl 1. If PKG_CPPFLAGS and PKG_LIBS are defined, use them (as suggested in
 dnl    Section 1.2.1 in the "Writing R Extensions, 1.3.0). Ditto for
 dnl    MYSQL_DIR, MYSQL_INC, MYSQL_LIB.
 dnl
 dnl 2. We check for mysql.h and -lmysqlclient in system directories, and if
-dnl    found, we use these (provide the user does not explicitly request 
+dnl    found, we use these (provide the user does not explicitly request
 dnl    another version, see below).  Notice that the MySQL source distribution
 dnl    installs by default to /usr/local/lib/mysql and /usr/local/include/mysql
 dnl
 dnl 3. Alternatively, if the user specifies explicitly a particular MySQL
-dnl    installation we use that version. This can be requested through 
-dnl         --with-mysql-dir=DIR 
+dnl    installation we use that version. This can be requested through
+dnl         --with-mysql-dir=DIR
 dnl         --with-mysql-inc=<include-DIR>
 dnl    or   --with-mysql-lib=<library-DIR>
 dnl
 dnl    (these are equivent to setting and exporting MYSQL_{DIR,INC,LIB})
 dnl    In the first case, DIR is assumed to include the lib and include
-dnl    subdirectories;  individual locations of these two may be 
+dnl    subdirectories;  individual locations of these two may be
 dnl    specified independently through <include-inc> and <library-dir>,
 dnl    respectively.  If we found these, we exit.
 dnl
 dnl 4. We check for the GNU implementation of getopt_long and set the
 dnl    C preprocessor macro HAVE_GETOPT_LONG accordingly.  On windows
-dnl    (including MinGW) should be false. 
+dnl    (including MinGW) should be false.
 dnl
-dnl Global variables: The following variables may be set and exported 
+dnl Global variables: The following variables may be set and exported
 dnl prior to running configure:
 dnl    PKG_CPPFLAGS, PKG_LIBS, MYSQL_DIR, MYSQL_INC, MYSQL_LIB
 dnl
 
-AC_INIT(src/RS-MySQL.c)
+AC_INIT(src/RS-MySQL.h)
 
 AC_PROG_CPP
 
@@ -59,30 +59,30 @@ AC_CHECK_LIB(c, getopt_long,
 # to use another version/installation)
 #
 AC_CHECK_LIB(mysqlclient, mysql_init,
-             HAVE_MYSQL_LIB="yes", 
+             HAVE_MYSQL_LIB="yes",
              HAVE_MYSQL_LIB="")
 
-AC_CHECK_HEADERS(mysql.h, 
-             HAVE_MYSQL_INC="yes", 
+AC_CHECK_HEADERS(mysql.h,
+             HAVE_MYSQL_INC="yes",
              HAVE_MYSQL_INC="")
 #
 # the user may still want a particular MySQL installation/version (possibly
-# overriding system directories). Note that we don't clobber the shell 
+# overriding system directories). Note that we don't clobber the shell
 # variables MYSQL_DIR, MSYQL_INC, MYSQL_LIB, that may be inherited from the
 # global shell environement.
 #
 AC_ARG_WITH(mysql-dir,
             [--with-mysql-dir=MYSQL_DIR      specifies an existing MySQL base dir],
             MYSQL_DIR="${with_mysql_dir}")
-AC_ARG_WITH(mysql-inc, 
+AC_ARG_WITH(mysql-inc,
             [--with-mysql-inc=MYSQL_INC      specifies an existing MySQL include dir],
             MYSQL_INC="${with_mysql_inc}")
 AC_ARG_WITH(mysql-lib,
             [--with-mysql-lib=MYSQL_LIB      specifies an existing MySQL lib dir],
             MYSQL_LIB="${with_mysql_lib}")
 
-# handle the uniformative cases of --with-mysql w.o. argument 
-# and the case of -with-no-mysql 
+# handle the uniformative cases of --with-mysql w.o. argument
+# and the case of -with-no-mysql
 test "${MYSQL_DIR}" = "yes" -o "${MYSQL_DIR}" = "no" && MYSQL_DIR=""
 test "${MYSQL_LIB}" = "yes" -o "${MYSQL_LIB}" = "no" && MYSQL_LIB=""
 test "${MYSQL_INC}" = "yes" -o "${MYSQL_INC}" = "no" && MYSQL_INC=""
@@ -95,7 +95,7 @@ if test -n "${MYSQL_DIR}" ; then
               MYSQL_LIB="${MYSQL_DIR}/lib/mysql"
 fi
 
-# 
+#
 # We now determine whether we found the lib and header files (we still
 # need to check PKG_*, in case the user only defined one them)
 #
@@ -112,16 +112,16 @@ fi
 if test -z "${PKG_CPPFLAGS}" ; then
    if test -n "${MYSQL_INC}" ; then
       # use the one specified in --with-mysql-inc=DIR
-      PKG_CPPFLAGS="-I${MYSQL_INC}" 
+      PKG_CPPFLAGS="-I${MYSQL_INC}"
       FOUND_INC="yes"
    else
       if test -n "${HAVE_MYSQL_INC}" ; then
-         # use the one in the system dirs 
-         PKG_CPPFLAGS="" 
+         # use the one in the system dirs
+         PKG_CPPFLAGS=""
          FOUND_INC="yes"
       else
-         PKG_CPPFLAGS=""  
-         FOUND_INC="no"   
+         PKG_CPPFLAGS=""
+         FOUND_INC="no"
       fi
    fi
 fi
@@ -153,7 +153,7 @@ fi
 if test -z "${HAVE_MYSQL_INC}" -a -z "${PKG_CPPFLAGS}" ; then
    for dir in /usr/local/include /usr/include /usr/local/mysql/include \
               /opt/include /include
-   do 
+   do
        candidate="${dir}/mysql"
        AC_CHECK_HEADER(${candidate}/mysql.h,
                     HAVE_MYSQL_INC="${candidate}",
@@ -167,12 +167,12 @@ if test -z "${HAVE_MYSQL_INC}" -a -z "${PKG_CPPFLAGS}" ; then
 fi
 
 # don't go any further if don't have libz
-if test "${HAVE_COMPRESS}" = "no" ; then 
+if test "${HAVE_COMPRESS}" = "no" ; then
    echo ""
    echo "Configuration error:"
    echo '   Could not locate the library "libz" required by MySQL.'
    echo ""
-   echo "INSTRUCTIONS:" 
+   echo "INSTRUCTIONS:"
    echo ""
    echo '   The "libz" library is required by the MySQL client library'
    echo "   in order to compress/uncompress connections between clients"
@@ -212,7 +212,7 @@ if test "${FOUND_INC}" = "no" -o -z "${PKG_LIBS}" ; then
    echo "2. Alternatively, you may pass the configure arguments"
    echo "      --with-mysql-dir=<base-dir> (distribution directory)"
    echo "   or"
-   echo "      --with-mysql-inc=<base-inc> (where MySQL header files reside)" 
+   echo "      --with-mysql-inc=<base-inc> (where MySQL header files reside)"
    echo "      --with-mysql-lib=<base-lib> (where MySQL libraries reside)"
    echo "   in the call to R INSTALL --configure-args='...' "
    echo ""

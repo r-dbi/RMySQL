@@ -51,3 +51,31 @@ void
     }
     return;
   }
+
+
+/* return a 2-elem list with the last exception number and
+* exception message on a given connection.
+*/
+SEXP
+  RS_MySQL_getException(SEXP conHandle)
+  {
+    MYSQL *my_connection;
+    SEXP output;
+    RS_DBI_connection   *con;
+    int  n = 2;
+    char *exDesc[] = {"errorNum", "errorMsg"};
+    SEXPTYPE exType[] = {INTSXP, STRSXP};
+    int  exLen[]  = {1, 1};
+
+    con = RS_DBI_getConnection(conHandle);
+    if(!con->drvConnection)
+      RS_DBI_errorMessage("internal error: corrupt connection handle",
+        RS_DBI_ERROR);
+    output = RS_DBI_createNamedList(exDesc, exType, exLen, n);
+
+    my_connection = (MYSQL *) con->drvConnection;
+    LST_INT_EL(output,0,0) = (int) mysql_errno(my_connection);
+    SET_LST_CHR_EL(output,1,0,C_S_CPY(mysql_error(my_connection)));
+
+    return output;
+  }
