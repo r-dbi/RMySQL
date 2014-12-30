@@ -28,7 +28,6 @@ SEXP
     con_id = mgr->counter;
     con->connectionId = con_id;
     con->drvConnection = (void *) NULL;
-    con->drvData = (void *) NULL;    /* to be used by the driver in any way*/
     con->conParams = (void *) NULL;
     con->counter = (int) 0;
     con->length = max_res;           /* length of resultSet vector */
@@ -102,11 +101,6 @@ void
     if(con->conParams){
       char *errMsg =
         "internal error in RS_DBI_freeConnection: non-freed con->conParams (tiny memory leaked)";
-      RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-    }
-    if(con->drvData){
-      char *errMsg =
-        "internal error in RS_DBI_freeConnection: non-freed con->drvData (some memory leaked)";
       RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
     }
     /* delete this connection from manager's connection table */

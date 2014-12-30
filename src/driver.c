@@ -40,7 +40,6 @@ SEXP mysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_, SEXP reload_) {
   }
 
   /* Ok, we're here to expand number of connections, etc.*/
-  mgr->drvData = (void *) NULL;
   mgr->managerId = 0;
   mgr->connections = calloc(max_con, sizeof(RS_DBI_connection));
   if (!mgr->connections) {
@@ -82,10 +81,6 @@ void
     mgr = RS_DBI_getManager(mgrHandle);
     if(mgr->num_con > 0){
       char *errMsg = "all opened connections were forcebly closed";
-      RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-    }
-    if(mgr->drvData){
-      char *errMsg = "mgr->drvData was not freed (some memory leaked)";
       RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
     }
     if(mgr->connections) {

@@ -26,7 +26,6 @@ SEXP
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
     result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
-    result->drvData = (void *) NULL;   /* this can be used by driver*/
     result->statement = (char *) NULL;
     result->managerId = MGR_ID(conHandle);
     result->connectionId = CON_ID(conHandle);
@@ -63,11 +62,7 @@ void
         "internal error in RS_DBI_freeResultSet: non-freed result->drvResultSet (some memory leaked)";
       RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
     }
-    if(result->drvData){
-      char *errMsg =
-        "internal error in RS_DBI_freeResultSet: non-freed result->drvData (some memory leaked)";
-      RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-    }
+
     if(result->statement)
       free(result->statement);
     if(result->fields)

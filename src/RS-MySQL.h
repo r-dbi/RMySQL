@@ -99,7 +99,6 @@ char *errorMsg;           /* SQL error message */
 */
 typedef struct st_sdbi_resultset {
   void  *drvResultSet;   /* the actual (driver's) cursor/result set */
-void  *drvData;        /* a pointer to driver-specific data */
 int  managerId;       /* the 3 *Id's are used for   */
 int  connectionId;    /* validating stuff coming from S */
 int  resultSetId;
@@ -121,7 +120,6 @@ RS_DBI_fields *fields;
 typedef struct st_sdbi_connection {
   void  *conParams;      /* pointer to connection params (host, user, etc)*/
 void  *drvConnection;  /* pointer to the actual DBMS connection struct*/
-void  *drvData;        /* to be used at will by individual drivers */
 RS_DBI_resultSet  **resultSets;    /* vector to result set ptrs  */
 int   *resultSetIds;
 int   length;                     /* max num of concurrent resultSets */
@@ -134,7 +132,6 @@ RS_DBI_exception *exception;
 
 /* dbManager */
 typedef struct MySQLDriver {
-void *drvData;                    /* to be used by the drv implementation*/
 RS_DBI_connection **connections;  /* list of dbConnections */
 int *connectionIds;              /* array of connectionIds */
 int length;                      /* max num of concurrent connections */
