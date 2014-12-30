@@ -6,38 +6,17 @@ MySQLDriver* mysql_driver() {
   return dbManager;
 }
 
-/* Currently, the dbManager is a singleton (therefore we don't
- * completly free all the space).  Here we alloc space
- * for the dbManager and return its mgrHandle.  force_realloc
- * means to re-allocate number of connections, etc. (in this case
- * we require to have all connections closed).  (Note that if we
- * re-allocate, we don't re-set the counter, and thus we make sure
- * we don't recycle connection Ids in a giver S/R session).
- */
-SEXP mysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_, SEXP reload_) {
-  int max_con = asInteger(max_con_),
-      fetch_default_rec = asInteger(fetch_default_rec_),
-      reload = asLogical(reload_);
-
+SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_) {
   SEXP mgrHandle = RS_DBI_asMgrHandle(0);
-  MySQLDriver* mgr;
+  if (dbManager) return mgrHandle;
+
+  int max_con = asInteger(max_con_),
+      fetch_default_rec = asInteger(fetch_default_rec_);
 
   int counter = 0;
-  if (!dbManager) {                      /* alloc for the first time */
-    counter = 0;                       /* connections handled so far */
-    mgr = (MySQLDriver*) malloc(sizeof(MySQLDriver));
-    if (!mgr)
-      error("Could not allocate memory for the MySQL driver");
-  } else {                               /* we're re-entering */
-    if (dbManager->connections) {        /* and mgr is valid */
-      if (!reload)
-        return mgrHandle;
-
-      RS_DBI_freeManager(mgrHandle);  /* i.e., free connection arrays*/
-    }
-    counter = dbManager->counter;
-    mgr = dbManager;
-  }
+  MySQLDriver* mgr = (MySQLDriver*) malloc(sizeof(MySQLDriver));
+  if (!mgr)
+    error("Could not allocate memory for the MySQL driver");
 
   /* Ok, we're here to expand number of connections, etc.*/
   mgr->managerId = 0;
@@ -68,32 +47,24 @@ SEXP mysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_, SEXP reload_) {
   return mgrHandle;
 }
 
-/* We don't want to completely free the dbManager, but rather we
-* re-initialize all the fields except for mgr->counter to ensure we don't
-* re-cycle connection ids across R/S DBI sessions in the the same pid
-* (S/R session).
-*/
-void
-  RS_DBI_freeManager(SEXP mgrHandle)
-  {
-    MySQLDriver *mgr;
+SEXP rmysql_driver_close() {
+  MySQLDriver *mgr = mysql_driver();
 
-    mgr = RS_DBI_getManager(mgrHandle);
-    if(mgr->num_con > 0){
-      char *errMsg = "all opened connections were forcebly closed";
-      RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
-    }
-    if(mgr->connections) {
-      free(mgr->connections);
-      mgr->connections = (RS_DBI_connection **) NULL;
-    }
-    if(mgr->connectionIds) {
-      free(mgr->connectionIds);
-      mgr->connectionIds = (int *) NULL;
-    }
-    return;
+  if(mgr->num_con)
+    error("Open connections -- close them first");
+
+  if(mgr->connections) {
+    free(mgr->connections);
+    mgr->connections = (RS_DBI_connection **) NULL;
   }
 
+  if(mgr->connectionIds) {
+    free(mgr->connectionIds);
+    mgr->connectionIds = (int *) NULL;
+  }
+
+  return ScalarLogical(TRUE);
+}
 
 SEXP RS_DBI_asMgrHandle(int mgrId)
 {
@@ -206,23 +177,6 @@ int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
 
   return 1;
 }
-
-
-SEXP
-  RS_MySQL_closeManager(SEXP mgrHandle)
-  {
-    MySQLDriver *mgr;
-
-    mgr = RS_DBI_getManager(mgrHandle);
-    if(mgr->num_con)
-      RS_DBI_errorMessage(
-        "there are opened connections -- close them first",
-        RS_DBI_ERROR);
-
-    RS_DBI_freeManager(mgrHandle);
-
-    return ScalarLogical(TRUE);
-  }
 
 
 SEXP

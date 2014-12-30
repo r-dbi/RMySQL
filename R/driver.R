@@ -23,9 +23,6 @@ setClass("MySQLDriver",
 #' @param fetch.default.rec number of records to fetch at one time from the
 #'   database. (The \code{\link[DBI]{fetch}} method uses this number as a
 #'   default.)
-#' @param force.reload should the client code be reloaded (reinitialized)?
-#'   Setting this to \code{TRUE} allows you to change default settings.
-#'   All connections should be closed before re-loading.
 #' @export
 #' @import methods DBI
 #' @useDynLib RMySQL
@@ -49,13 +46,13 @@ setClass("MySQLDriver",
 #' dbRemoveTable(con, "USArrests")
 #' dbDisconnect(con)
 #' }
-#' @useDynLib RMySQL mysql_driver_init
-MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
+#' @useDynLib RMySQL rmysql_driver_init
+MySQL <- function(max.con=16, fetch.default.rec = 500) {
   if (fetch.default.rec <= 0) {
     stop("default num of records per fetch must be positive")
   }
 
-  drvId <- .Call(mysql_driver_init, max.con, fetch.default.rec, force)
+  drvId <- .Call(rmysql_driver_init, max.con, fetch.default.rec)
   new("MySQLDriver", Id = drvId)
 }
 
@@ -65,11 +62,11 @@ MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
 #' @param ... Ignored. Needed for compatibility with generic.
 #' @return A logical indicating whether the operation succeeded or not.
 #' @export
-#' @useDynLib RMySQL RS_MySQL_closeManager
+#' @useDynLib RMySQL rmysql_driver_close
 setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
   if(!dbIsValid(drv)) return(TRUE)
 
-  .Call(RS_MySQL_closeManager, drv@Id)
+  .Call(rmysql_driver_close)
 })
 
 

@@ -263,8 +263,7 @@ void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
  */
 
 /* dbManager */
-SEXP mysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_, SEXP reload_);
-SEXP RS_MySQL_close(SEXP mgrHandle);
+SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_);
 
 /* dbConnection */
 SEXP RS_MySQL_newConnection(SEXP mgrHandle,

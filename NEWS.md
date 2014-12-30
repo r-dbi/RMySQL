@@ -53,3 +53,6 @@
       definition. 
 
  *  Assorted fixes accumulated since last release 3 years ago.
+
+ * `MySQL()` no longer has `force.reload` argument - it's not obvious that
+    this ever worked.
