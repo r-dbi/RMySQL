@@ -58,7 +58,7 @@ RS_MySQL_init(s_object *config_params, s_object *reload)
      * explicitly in the S call to fetch).
      */
     Mgr_Handle *mgrHandle;
-    Sint  fetch_default_rec, force_reload, max_con;
+    int  fetch_default_rec, force_reload, max_con;
     const char *drvName = "MySQL";
 
     max_con = INT_EL(config_params,0);
@@ -86,9 +86,9 @@ RS_MySQL_closeManager(Mgr_Handle *mgrHandle)
 
     RS_DBI_freeManager(mgrHandle);
 
-    MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+    PROTECT(status = NEW_LOGICAL((int) 1));
     LGL_EL(status,0) = TRUE;
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
     return status;
 }
 
@@ -110,13 +110,13 @@ RS_MySQL_moreResultSets(Con_Handle *conHandle)
     my_connection = (MYSQL *) con->drvConnection;
 
     tmp = mysql_more_results(my_connection);
-    MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+    PROTECT(status = NEW_LOGICAL((int) 1));
     if(tmp)
        LGL_EL(status, 0) = TRUE;
     else
        LGL_EL(status, 0) = FALSE;
 
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
 
     return status;
 }
@@ -131,12 +131,12 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
     Res_Handle        *rsHandle;
     MYSQL_RES         *my_result;
     MYSQL             *my_connection;
-    Sint              rc, num_fields, is_select;
+    int              rc, num_fields, is_select;
 
     con = RS_DBI_getConnection(conHandle);
     my_connection = (MYSQL *) con->drvConnection;
 
-    rc = (Sint) mysql_next_result(my_connection);
+    rc = (int) mysql_next_result(my_connection);
 
     if(rc<0){
         RS_DBI_errorMessage("no more result sets", RS_DBI_ERROR);
@@ -150,8 +150,8 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
     if(!my_result)
         my_result = (MYSQL_RES *) NULL;
 
-    num_fields = (Sint) mysql_field_count(my_connection);
-    is_select = (Sint) TRUE;
+    num_fields = (int) mysql_field_count(my_connection);
+    is_select = (int) TRUE;
     if(!my_result){
         if(num_fields>0){
             RS_DBI_errorMessage("error in getting next result set", RS_DBI_ERROR);
@@ -165,14 +165,14 @@ RS_MySQL_nextResultSet(Con_Handle *conHandle)
     result = RS_DBI_getResultSet(rsHandle);
     result->statement = RS_DBI_copyString("<UNKNOWN>");
     result->drvResultSet = (void *) my_result;
-    result->rowCount = (Sint) 0;
+    result->rowCount = (int) 0;
     result->isSelect = is_select;
     if(!is_select){
-        result->rowsAffected = (Sint) mysql_affected_rows(my_connection);
+        result->rowsAffected = (int) mysql_affected_rows(my_connection);
         result->completed = 1;
     }
     else {
-        result->rowsAffected = (Sint) -1;
+        result->rowsAffected = (int) -1;
         result->completed = 0;
     }
 
@@ -354,7 +354,7 @@ RS_MySQL_createConnection(Mgr_Handle *mgrHandle, RS_MySQL_conParams *conParams)
 
 
     /* MySQL connections can only have 1 result set open at a time */
-    conHandle = RS_DBI_allocConnection(mgrHandle, (Sint) 1);
+    conHandle = RS_DBI_allocConnection(mgrHandle, (int) 1);
     con = RS_DBI_getConnection(conHandle);
     if(!con){
         mysql_close(my_connection);
@@ -398,9 +398,9 @@ RS_MySQL_closeConnection(Con_Handle *conHandle)
 
     RS_DBI_freeConnection(conHandle);
 
-    MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+    PROTECT(status = NEW_LOGICAL((int) 1));
     LGL_EL(status, 0) = TRUE;
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
 
     return status;
 }
@@ -420,7 +420,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
     MYSQL             *my_connection;
     MYSQL_RES         *my_result;
     int      num_fields, state;
-    Sint     res_id, is_select;
+    int     res_id, is_select;
     char     *dyn_statement;
 
     con = RS_DBI_getConnection(conHandle);
@@ -431,7 +431,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
     * MySQL only allows  one resultSet per connection.
     */
     if(con->num_res>0){
-        res_id = (Sint) con->resultSetIds[0]; /* recall, MySQL has only 1 res */
+        res_id = (int) con->resultSetIds[0]; /* recall, MySQL has only 1 res */
         rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle),
                        CON_ID(conHandle), res_id);
         result = RS_DBI_getResultSet(rsHandle);
@@ -467,7 +467,7 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
     my_result = (MYSQL_RES *) NULL;
 
     num_fields = (int) mysql_field_count(my_connection);
-    is_select = (Sint) TRUE;
+    is_select = (int) TRUE;
     if(!my_result){
         if(num_fields>0){
             free(dyn_statement);
@@ -482,14 +482,14 @@ RS_MySQL_exec(Con_Handle *conHandle, s_object *statement)
     result = RS_DBI_getResultSet(rsHandle);
     result->statement = RS_DBI_copyString(dyn_statement);
     result->drvResultSet = (void *) my_result;
-    result->rowCount = (Sint) 0;
+    result->rowCount = (int) 0;
     result->isSelect = is_select;
     if(!is_select){
-        result->rowsAffected = (Sint) mysql_affected_rows(my_connection);
+        result->rowsAffected = (int) mysql_affected_rows(my_connection);
         result->completed = 1;
     }
     else {
-        result->rowsAffected = (Sint) -1;
+        result->rowsAffected = (int) -1;
         result->completed = 0;
     }
 
@@ -556,7 +556,7 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
         case FIELD_TYPE_VAR_STRING:
         case FIELD_TYPE_STRING:
             flds->Sclass[j] = STRSXP;
-            flds->isVarLength[j] = (Sint) 1;
+            flds->isVarLength[j] = (int) 1;
             break;
         case FIELD_TYPE_TINY:            /* 1-byte TINYINT   */
         case FIELD_TYPE_SHORT:           /* 2-byte SMALLINT  */
@@ -570,7 +570,7 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
             break;
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID >= 50003 /* 5.0.3 */
         case FIELD_TYPE_BIT:
-            if(flds->precision[j] <= sizeof(Sint))   /* can R int hold the bytes? */
+            if(flds->precision[j] <= sizeof(int))   /* can R int hold the bytes? */
                 flds->Sclass[j] = INTSXP;
             else {
                 flds->Sclass[j] = STRSXP;
@@ -580,7 +580,7 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
             }
 #endif
         case FIELD_TYPE_LONGLONG:        /* TODO: can we fit these in R/S ints? */
-            if(sizeof(Sint)>=8)            /* Arg! this ain't pretty:-( */
+            if(sizeof(int)>=8)            /* Arg! this ain't pretty:-( */
                 flds->Sclass[j] = INTSXP;
             else
                 flds->Sclass[j] = REALSXP;
@@ -602,7 +602,7 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
         case FIELD_TYPE_MEDIUM_BLOB:
         case FIELD_TYPE_LONG_BLOB:
             flds->Sclass[j] = STRSXP;   /* Grr! Hate this! */
-            flds->isVarLength[j] = (Sint) 1;
+            flds->isVarLength[j] = (int) 1;
             break;
         case FIELD_TYPE_DATE:
         case FIELD_TYPE_TIME:
@@ -610,19 +610,19 @@ RS_MySQL_createDataMappings(Res_Handle *rsHandle)
         case FIELD_TYPE_YEAR:
         case FIELD_TYPE_NEWDATE:
             flds->Sclass[j] = STRSXP;
-            flds->isVarLength[j] = (Sint) 1;
+            flds->isVarLength[j] = (int) 1;
             break;
         case FIELD_TYPE_ENUM:
             flds->Sclass[j] = STRSXP;   /* see the MySQL ref. manual */
-            flds->isVarLength[j] = (Sint) 1;
+            flds->isVarLength[j] = (int) 1;
             break;
         case FIELD_TYPE_SET:
             flds->Sclass[j] = STRSXP;
-            flds->isVarLength[j] = (Sint) 0;
+            flds->isVarLength[j] = (int) 0;
             break;
         default:
             flds->Sclass[j] = STRSXP;
-            flds->isVarLength[j] = (Sint) 1;
+            flds->isVarLength[j] = (int) 1;
             (void) sprintf(errMsg,
                 "unrecognized MySQL field type %d in column %d imported as character",
                 internal_type, j);
@@ -647,9 +647,9 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
 
     unsigned long  *lens;
     int    i, j, null_item, expand;
-    Sint   *fld_nullOk, completed;
+    int   *fld_nullOk, completed;
     SEXPTYPE  *fld_Sclass;
-    Sint   num_rec;
+    int   num_rec;
     int    num_fields;
 
     result = RS_DBI_getResultSet(rsHandle);
@@ -664,14 +664,14 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
         num_rec = mgr->fetch_default_rec;
     }
     num_fields = flds->num_fields;
-    MEM_PROTECT(output = NEW_LIST((Sint) num_fields));
+    PROTECT(output = NEW_LIST((int) num_fields));
     RS_DBI_allocOutput(output, flds, num_rec, 0);
     fld_Sclass = flds->Sclass;
     fld_nullOk = flds->nullOk;
 
     /* actual fetching....*/
     my_result = (MYSQL_RES *) result->drvResultSet;
-    completed = (Sint) 0;
+    completed = (int) 0;
 
     for(i = 0; ; i++){
 
@@ -690,7 +690,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
             RS_DBI_connection   *con;
             con = RS_DBI_getConnection(rsHandle);
             err_no = mysql_errno((MYSQL *) con->drvConnection);
-            completed = (Sint) (err_no ? -1 : 1);
+            completed = (int) (err_no ? -1 : 1);
             break;
         }
         lens = mysql_fetch_lengths(my_result);
@@ -705,7 +705,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
                 if(null_item)
                     NA_SET(&(LST_INT_EL(output,j,i)), INTSXP);
                 else
-                    LST_INT_EL(output,j,i) = (Sint) atol(row[j]);
+                    LST_INT_EL(output,j,i) = (int) atol(row[j]);
                 break;
 
             case STRSXP:
@@ -757,9 +757,9 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
         /* adjust the length of each of the members in the output_list */
         for(j = 0; j<num_fields; j++){
         s_tmp = LST_EL(output,j);
-        MEM_PROTECT(SET_LENGTH(s_tmp, num_rec));
+        PROTECT(SET_LENGTH(s_tmp, num_rec));
         SET_ELEMENT(output, j, s_tmp);
-        MEM_UNPROTECT(1);
+        UNPROTECT(1);
         }
     }
     if(completed < 0)
@@ -768,7 +768,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
     result->rowCount += num_rec;
     result->completed = (int) completed;
 
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
     return output;
 }
 
@@ -783,10 +783,10 @@ RS_MySQL_getException(s_object *conHandle)
     MYSQL *my_connection;
     s_object  *output;
     RS_DBI_connection   *con;
-    Sint  n = 2;
+    int  n = 2;
     char *exDesc[] = {"errorNum", "errorMsg"};
     SEXPTYPE exType[] = {INTSXP, STRSXP};
-    Sint  exLen[]  = {1, 1};
+    int  exLen[]  = {1, 1};
 
     con = RS_DBI_getConnection(conHandle);
     if(!con->drvConnection)
@@ -795,7 +795,7 @@ RS_MySQL_getException(s_object *conHandle)
     output = RS_DBI_createNamedList(exDesc, exType, exLen, n);
 
     my_connection = (MYSQL *) con->drvConnection;
-    LST_INT_EL(output,0,0) = (Sint) mysql_errno(my_connection);
+    LST_INT_EL(output,0,0) = (int) mysql_errno(my_connection);
     SET_LST_CHR_EL(output,1,0,C_S_CPY(mysql_error(my_connection)));
 
     return output;
@@ -825,9 +825,9 @@ RS_MySQL_closeResultSet(s_object *resHandle)
     result->drvResultSet = (void *) NULL;
     RS_DBI_freeResultSet(resHandle);
 
-    MEM_PROTECT(status = NEW_LOGICAL((Sint) 1));
+    PROTECT(status = NEW_LOGICAL((int) 1));
     LGL_EL(status, 0) = TRUE;
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
 
     return status;
 }
@@ -839,32 +839,32 @@ RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
 
     RS_DBI_manager *mgr;
     s_object *output;
-    Sint i, num_con, max_con, *cons, ncon;
-    Sint j, n = 8;
+    int i, num_con, max_con, *cons, ncon;
+    int j, n = 8;
     char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
                         "managerId", "length",        "num_con",
                         "counter",   "clientVersion"};
     SEXPTYPE mgrType[] = {STRSXP, INTSXP, INTSXP,
       INTSXP,   INTSXP, INTSXP,
       INTSXP,   STRSXP};
-    Sint  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
+    int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
 
     mgr = RS_DBI_getManager(mgrHandle);
     if(!mgr)
         RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
-    num_con = (Sint) mgr->num_con;
-    max_con = (Sint) mgr->length;
+    num_con = (int) mgr->num_con;
+    max_con = (int) mgr->length;
     mgrLen[1] = num_con;
 
     output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
 
-    j = (Sint) 0;
+    j = (int) 0;
     if(mgr->drvName)
         SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
     else
         SET_LST_CHR_EL(output,j++,0,C_S_CPY(""));
 
-    cons = (Sint *) S_alloc((long)max_con, (int)sizeof(Sint));
+    cons = (int *) S_alloc((long)max_con, (int)sizeof(int));
     ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
     if(ncon != num_con){
         RS_DBI_errorMessage(
@@ -894,14 +894,14 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
     RS_MySQL_conParams *conParams;
     RS_DBI_connection  *con;
     s_object   *output;
-    Sint       i, n = 8, *res, nres;
+    int       i, n = 8, *res, nres;
     char *conDesc[] = {"host", "user", "dbname", "conType",
                         "serverVersion", "protocolVersion",
                         "threadId", "rsId"};
     SEXPTYPE conType[] = {STRSXP, STRSXP, STRSXP,
                           STRSXP, STRSXP, INTSXP,
                           INTSXP, INTSXP};
-    Sint  conLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
+    int  conLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
 	char *tmp;
 
     con = RS_DBI_getConnection(conHandle);
@@ -922,10 +922,10 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
     SET_LST_CHR_EL(output,3,0,C_S_CPY(mysql_get_host_info(my_con)));
     SET_LST_CHR_EL(output,4,0,C_S_CPY(mysql_get_server_info(my_con)));
 
-    LST_INT_EL(output,5,0) = (Sint) mysql_get_proto_info(my_con);
-    LST_INT_EL(output,6,0) = (Sint) mysql_thread_id(my_con);
+    LST_INT_EL(output,5,0) = (int) mysql_get_proto_info(my_con);
+    LST_INT_EL(output,6,0) = (int) mysql_thread_id(my_con);
 
-    res = (Sint *) S_alloc( (long) con->length, (int) sizeof(Sint));
+    res = (int *) S_alloc( (long) con->length, (int) sizeof(int));
     nres = RS_DBI_listEntries(con->resultSetIds, con->length, res);
     if(nres != con->num_res){
 	UNPROTECT(1);
@@ -934,7 +934,7 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
             RS_DBI_ERROR);
     }
     for( i = 0; i < con->num_res; i++){
-        LST_INT_EL(output,7,i) = (Sint) res[i];
+        LST_INT_EL(output,7,i) = (int) res[i];
     }
     UNPROTECT(1);
 
@@ -949,12 +949,12 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
 
     RS_DBI_resultSet   *result;
     s_object  *output, *flds;
-    Sint  n = 6;
+    int  n = 6;
     char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
                         "rowCount", "completed", "fieldDescription"};
     SEXPTYPE rsType[]  = {STRSXP, INTSXP, INTSXP,
       INTSXP,   INTSXP, VECSXP};
-    Sint  rsLen[]   = {1, 1, 1, 1, 1, 1};
+    int  rsLen[]   = {1, 1, 1, 1, 1, 1};
 
     result = RS_DBI_getResultSet(rsHandle);
     if(result->fields)
@@ -970,7 +970,7 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
     LST_INT_EL(output,3,0) = result->rowCount;
     LST_INT_EL(output,4,0) = result->completed;
     if(flds != S_NULL_ENTRY)
-        SET_ELEMENT(LST_EL(output, 5), (Sint) 0, flds);
+        SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
 
     return output;
 }
@@ -979,19 +979,19 @@ s_object *
 RS_MySQL_typeNames(s_object *type)
 {
     s_object *typeNames;
-    Sint n, *typeCodes;
+    int n, *typeCodes;
     int i;
 	char *tname;
 
     n = LENGTH(type);
     typeCodes = INTEGER_DATA(type);
-    MEM_PROTECT(typeNames = NEW_CHARACTER(n));
+    PROTECT(typeNames = NEW_CHARACTER(n));
     for(i = 0; i < n; i++) {
 		tname = RS_DBI_getTypeName(typeCodes[i], RS_MySQL_dataTypes);
 		if (!tname) tname = "";
 		SET_CHR_EL(typeNames, i, C_S_CPY(tname));
     }
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
     return typeNames;
 }
 
@@ -1032,12 +1032,12 @@ RS_MySQL_typeNames(s_object *type)
  *          then a handle_event() could conveniently handle all the events.
  */
 
-s_object    *expand_list(s_object *old, Sint new_len);
+s_object    *expand_list(s_object *old, int new_len);
 void         add_group(s_object *group_names, s_object *data,
-             SEXPTYPE *fld_Sclass, Sint group,
-           Sint ngroup, Sint i);
+             SEXPTYPE *fld_Sclass, int group,
+           int ngroup, int i);
 unsigned int check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[],
-                          Sint row, Sint col);
+                          int row, int col);
 
 /* The following are the masks for the events/states we recognize as we
  * bring rows from the result set/cursor
@@ -1067,13 +1067,13 @@ RS_DBI_invokeBeginGroup(s_object *callObj,      /* should be initialized */
     s_object *s_group_name, *val;
 
     /* make a copy of the argument */
-    MEM_PROTECT(s_group_name = NEW_CHARACTER((Sint) 1));
+    PROTECT(s_group_name = NEW_CHARACTER((int) 1));
     SET_CHR_EL(s_group_name, 0, C_S_CPY(group_name));
 
     /* and stick into call object */
     SETCADR(callObj, s_group_name);
     val = EVAL_IN_FRAME(callObj, rho);
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
 
     return S_NULL_ENTRY;
 }
@@ -1088,12 +1088,12 @@ RS_DBI_invokeNewRecord(s_object *callObj,   /* should be initialized already */
     s_object *df, *val;
 
     /* make a copy of the argument */
-    MEM_PROTECT(df = COPY_ALL(new_record));
+    PROTECT(df = duplicate(new_record));
 
     /* and stick it into the call object */
     SETCADR(callObj, df);
     val = EVAL_IN_FRAME(callObj, rho);
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
 
     return S_NULL_ENTRY;
 }
@@ -1108,9 +1108,9 @@ RS_DBI_invokeEndGroup(s_object *callObj, s_object *data,
     s_object *s_x, *s_group_name, *val;
 
     /* make copies of the arguments */
-    MEM_PROTECT(callObj = duplicate(callObj));
-    MEM_PROTECT(s_x = COPY_ALL(data));
-    MEM_PROTECT(s_group_name = NEW_CHARACTER((Sint) 1));
+    PROTECT(callObj = duplicate(callObj));
+    PROTECT(s_x = duplicate(data));
+    PROTECT(s_group_name = NEW_CHARACTER((int) 1));
     SET_CHR_EL(s_group_name, 0, C_S_CPY(group_name));
 
     /* stick copies of args into the call object */
@@ -1120,7 +1120,7 @@ RS_DBI_invokeEndGroup(s_object *callObj, s_object *data,
 
     val = EVAL_IN_FRAME(callObj, rho);
 
-    MEM_UNPROTECT(3);
+    UNPROTECT(3);
     return val;
 }
 
@@ -1144,16 +1144,16 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 
     unsigned long  *lens = (unsigned long *)0;
     SEXPTYPE  *fld_Sclass;
-    Sint   i, j, null_item, expand, *fld_nullOk, completed;
-    Sint   num_rec, num_groups;
+    int   i, j, null_item, expand, *fld_nullOk, completed;
+    int   num_rec, num_groups;
     int    num_fields;
-    Sint   max_rec = INT_EL(s_max_rec,0);     /* max rec per group */
-    Sint   ngroup = 0, group_field = INT_EL(s_group_field,0);
+    int   max_rec = INT_EL(s_max_rec,0);     /* max rec per group */
+    int   ngroup = 0, group_field = INT_EL(s_group_field,0);
     long   total_records;
-    Sint   pushed_back = FALSE;
+    int   pushed_back = FALSE;
 
     unsigned int event = NEVER;
-    int    np = 0;        /* keeps track of MEM_PROTECT()'s */
+    int    np = 0;        /* keeps track of PROTECT()'s */
     s_object    *beginGroupCall, *beginGroupFun = LST_EL(s_funs, 2);
     s_object    *endGroupCall,   *endGroupFun   = LST_EL(s_funs, 3);
     s_object    *newRecordCall,   *newRecordFun  = LST_EL(s_funs, 4);
@@ -1164,19 +1164,19 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     row = NULL;
     beginGroupCall = R_NilValue;    /* -Wall */
     if(invoke_beginGroup){
-        MEM_PROTECT(beginGroupCall=lang2(beginGroupFun, R_NilValue));
+        PROTECT(beginGroupCall=lang2(beginGroupFun, R_NilValue));
         ++np;
     }
     endGroupCall = R_NilValue;    /* -Wall */
     if(invoke_endGroup){
         /* TODO: append list(...) to the call object */
-        MEM_PROTECT(endGroupCall = lang4(endGroupFun, R_NilValue,
+        PROTECT(endGroupCall = lang4(endGroupFun, R_NilValue,
             R_NilValue, R_NilValue));
         ++np;
     }
     newRecordCall = R_NilValue;    /* -Wall */
     if(invoke_newRecord){
-        MEM_PROTECT(newRecordCall = lang2(newRecordFun, R_NilValue));
+        PROTECT(newRecordCall = lang2(newRecordFun, R_NilValue));
         ++np;
     }
 
@@ -1188,18 +1188,18 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     num_fields = flds->num_fields;
     fld_Sclass = flds->Sclass;
     fld_nullOk = flds->nullOk;
-    MEM_PROTECT(data = NEW_LIST((Sint) num_fields));     /* buffer records */
-    MEM_PROTECT(cur_rec = NEW_LIST((Sint) num_fields));  /* current record */
+    PROTECT(data = NEW_LIST((int) num_fields));     /* buffer records */
+    PROTECT(cur_rec = NEW_LIST((int) num_fields));  /* current record */
     np += 2;
 
-    RS_DBI_allocOutput(cur_rec, flds, (Sint) 1, 0);
+    RS_DBI_allocOutput(cur_rec, flds, (int) 1, 0);
     RS_DBI_makeDataFrame(cur_rec);
 
     num_rec = INT_EL(s_batch_size, 0);     /* this is num of rec per group! */
     max_rec = INT_EL(s_max_rec,0);         /* max rec **per group**         */
     num_groups = num_rec;
-    MEM_PROTECT(out_list = NEW_LIST(num_groups));
-    MEM_PROTECT(group_names = NEW_CHARACTER(num_groups));
+    PROTECT(out_list = NEW_LIST(num_groups));
+    PROTECT(group_names = NEW_CHARACTER(num_groups));
     np += 2;
 
     /* set conversion for group names */
@@ -1212,7 +1212,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     /* actual fetching.... */
 
     my_result = (MYSQL_RES *) result->drvResultSet;
-    completed = (Sint) 0;
+    completed = (int) 0;
 
     total_records = 0;
     expand = 0;                  /* expand or init each data vector? */
@@ -1237,7 +1237,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
             RS_DBI_connection   *con;
             con = RS_DBI_getConnection(rsHandle);
             err_no = mysql_errno((MYSQL *) con->drvConnection);
-            completed = (Sint) (err_no ? -1 : 1);
+            completed = (int) (err_no ? -1 : 1);
             break;
         }
 
@@ -1325,8 +1325,8 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 
             if(ngroup==num_groups){                  /* exhausted output list? */
                 num_groups = 2 * num_groups;
-                MEM_PROTECT(SET_LENGTH(out_list, num_groups));
-                MEM_PROTECT(SET_LENGTH(group_names, num_groups));
+                PROTECT(SET_LENGTH(out_list, num_groups));
+                PROTECT(SET_LENGTH(group_names, num_groups));
                 np += 2;
             }
 
@@ -1349,7 +1349,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
             /* set length of data to zero to force initialization
              * for next group
              */
-            RS_DBI_allocOutput(data, flds, (Sint) 0, (Sint) 1);
+            RS_DBI_allocOutput(data, flds, (int) 0, (int) 1);
             i = 0;                                  /* flush */
             ++ngroup;
             pushed_back = TRUE;
@@ -1396,8 +1396,8 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 
     /* set the correct length of output list */
     if(GET_LENGTH(out_list) != ngroup){
-        MEM_PROTECT(SET_LENGTH(out_list, ngroup));
-        MEM_PROTECT(SET_LENGTH(group_names, ngroup));
+        PROTECT(SET_LENGTH(out_list, ngroup));
+        PROTECT(SET_LENGTH(group_names, ngroup));
         np += 2;
     }
 
@@ -1406,12 +1406,12 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
 
     SET_NAMES(out_list, group_names);       /* do I need to PROTECT? */
 
-    MEM_UNPROTECT(np);
+    UNPROTECT(np);
     return out_list;
 }
 
 unsigned int
-check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[], Sint irow, Sint jcol)
+check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[], int irow, int jcol)
 {
     if(irow==0) /* Begin */
         return (BEGIN|BEGIN_GROUP);
@@ -1451,7 +1451,7 @@ check_groupEvents(s_object *data, SEXPTYPE fld_Sclass[], Sint irow, Sint jcol)
 /* append current group (as character) to the vector of group names */
 void
 add_group(s_object *group_names, s_object *data,
-          SEXPTYPE *fld_Sclass, Sint group_field, Sint ngroup, Sint i)
+          SEXPTYPE *fld_Sclass, int group_field, int ngroup, int i)
 {
     char  buff[1024];
 
@@ -1494,13 +1494,13 @@ RS_MySQL_insertid(Con_Handle *conHandle)
     s_object   *output;
     char *conDesc[] = {"iid"};
     SEXPTYPE conType[] = {INTSXP};    /* dj: are we sure an int will do? */
-    Sint  conLen[]  = {1};
+    int  conLen[]  = {1};
 
     con = RS_DBI_getConnection(conHandle);
     my_con = (MYSQL *) con->drvConnection;
     output = RS_DBI_createNamedList(conDesc, conType, conLen, 1);
 
-    LST_INT_EL(output,0,0) = (Sint) mysql_insert_id(my_con);
+    LST_INT_EL(output,0,0) = (int) mysql_insert_id(my_con);
 
     return output;
 
@@ -1520,7 +1520,7 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
     RS_DBI_connection *con;
     MYSQL             *my_connection;
     long len, old_len;
-    Sint i, nStrings;
+    int i, nStrings;
     char *str;
     char *escapedString;
     s_object  *output;
@@ -1529,7 +1529,7 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
     my_connection = (MYSQL *) con->drvConnection;
 
     nStrings = GET_LENGTH(strings);
-    MEM_PROTECT(output = NEW_CHARACTER(nStrings));
+    PROTECT(output = NEW_CHARACTER(nStrings));
 
     old_len = (long) 1;
     escapedString = (char *) S_alloc(old_len, (int) sizeof(char));
@@ -1555,7 +1555,7 @@ RS_MySQL_escapeStrings(Con_Handle *conHandle, s_object *strings)
         SET_CHR_EL(output, i, C_S_CPY(escapedString));
     }
 
-    MEM_UNPROTECT(1);
+    UNPROTECT(1);
     return output;
 }
 

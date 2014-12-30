@@ -30,21 +30,12 @@ extern "C" {
 #  include "S.h"
 #  define USE_RINTERNALS 1
 #  include "Rdefines.h"
-#  define singl double
-#  define Sint  int
-#  define charPtr SEXP *
-#  define CHAR_DEREF(x) CHAR(x)
 #  define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
-#  define MEM_PROTECT(x) PROTECT(x)
-#  define MEM_UNPROTECT(n) UNPROTECT(n)
-#  define MEM_UNPROTECT_PTR(x) UNPROTECT_PTR(x)
-
 
 /* The following are macros defined in the Green Book, but missing
  * in Rdefines.h.  The semantics are as close to S4's as possible (?).
  */
 #  define COPY(x) duplicate(x)
-#  define COPY_ALL(x) duplicate(x)
 #  define EVAL_IN_FRAME(expr,n)  eval(expr,n)
 #  define GET_FROM_FRAME(name,n) findVar(install(name),n)
 #  define ASSIGN_IN_FRAME(name,obj,n) defineVar(install(name),COPY(obj),n)
@@ -80,7 +71,7 @@ extern "C" {
 #define DBL_EL(x,i) NUM_EL((x),(i))
 #define RAW_EL(x,i) RAW_POINTER((x))[(i)]
 #define LST_EL(x,i) VECTOR_ELT((x),(i))
-#define CHR_EL(x,i) CHAR_DEREF(STRING_ELT((x),(i)))
+#define CHR_EL(x,i) CHAR(STRING_ELT((x),(i)))
 #define SET_CHR_EL(x,i,val)  SET_STRING_ELT((x),(i), (val))
 
 /* x[[i]][j] -- can be also assigned if x[[i]] is a numeric type */
