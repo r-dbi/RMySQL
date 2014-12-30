@@ -348,6 +348,8 @@ static struct data_types RS_MySQL_dataTypes[] = {
     { (char *) 0, -1 }
 };
 
+SEXP RS_DBI_copyfields(RS_DBI_fields *flds);
+
 SEXP RS_MySQL_typeNames(SEXP typeIds);
 extern const struct data_types RS_dataTypeTable[];
 
