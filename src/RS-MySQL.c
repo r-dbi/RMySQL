@@ -21,11 +21,6 @@
 
 #include "RS-MySQL.h"
 #include "R_ext/Rdynload.h"
-#ifndef USING_R
-#  error("the function RS_DBI_invokeBeginGroup() has not been implemented in S")
-#  error("the function RS_DBI_invokeEndGroup()   has not been implemented in S")
-#  error("the function RS_DBI_invokeNewRecord()  has not been implemented in S")
-#endif
 
 /* R and S DataBase Interface to MySQL
  *
@@ -649,9 +644,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
     MYSQL_RES *my_result;
     MYSQL_ROW  row;
     s_object  *output, *s_tmp;
-#ifndef USING_R
-    s_object  *raw_obj, *raw_container;
-#endif
+
     unsigned long  *lens;
     int    i, j, null_item, expand;
     Sint   *fld_nullOk, completed;
@@ -673,13 +666,6 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
     num_fields = flds->num_fields;
     MEM_PROTECT(output = NEW_LIST((Sint) num_fields));
     RS_DBI_allocOutput(output, flds, num_rec, 0);
-#ifndef USING_R
-    if(IS_LIST(output))
-        output = AS_LIST(output);
-    else
-        RS_DBI_errorMessage("internal error: could not alloc output list",
-        RS_DBI_ERROR);
-#endif
     fld_Sclass = flds->Sclass;
     fld_nullOk = flds->nullOk;
 
@@ -694,13 +680,6 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
             if(expand){    /* do we extend or return the records fetched so far*/
                 num_rec = 2 * num_rec;
                 RS_DBI_allocOutput(output, flds, num_rec, expand);
-#ifndef USING_R
-                if(IS_LIST(output))
-                output = AS_LIST(output);
-                else
-                RS_DBI_errorMessage("internal error: could not alloc output list",
-                    RS_DBI_ERROR);
-#endif
             }
             else
                 break;       /* okay, no more fetching for now */
@@ -736,11 +715,7 @@ RS_MySQL_fetch(s_object *rsHandle, s_object *max_rec)
                 * test is very gross.
                 */
                 if(null_item)
-#ifdef USING_R
                     SET_LST_CHR_EL(output,j,i,NA_STRING);
-#else
-                    NA_CHR_SET(LST_CHR_EL(output,j,i));
-#endif
                 else {
                     if((size_t) lens[j] != strlen(row[j])){
                         char warn[128];
@@ -818,13 +793,7 @@ RS_MySQL_getException(s_object *conHandle)
         RS_DBI_errorMessage("internal error: corrupt connection handle",
             RS_DBI_ERROR);
     output = RS_DBI_createNamedList(exDesc, exType, exLen, n);
-#ifndef USING_R
-    if(IS_LIST(output))
-        output = AS_LIST(output);
-    else
-        RS_DBI_errorMessage("internal error: could not allocate named list",
-            RS_DBI_ERROR);
-#endif
+
     my_connection = (MYSQL *) con->drvConnection;
     LST_INT_EL(output,0,0) = (Sint) mysql_errno(my_connection);
     SET_LST_CHR_EL(output,1,0,C_S_CPY(mysql_error(my_connection)));
@@ -888,13 +857,7 @@ RS_MySQL_managerInfo(Mgr_Handle *mgrHandle)
     mgrLen[1] = num_con;
 
     output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
-#ifndef USING_R
-    if(IS_LIST(output))
-        output = AS_LIST(output);
-    else
-        RS_DBI_errorMessage("internal error: could not alloc named list",
-            RS_DBI_ERROR);
-#endif
+
     j = (Sint) 0;
     if(mgr->drvName)
         SET_LST_CHR_EL(output,j++,0,C_S_CPY(mgr->drvName));
@@ -945,13 +908,7 @@ RS_MySQL_connectionInfo(Con_Handle *conHandle)
     conLen[7] = con->num_res;         /* num of open resultSets */
     my_con = (MYSQL *) con->drvConnection;
     output = RS_DBI_createNamedList(conDesc, conType, conLen, n);
-#ifndef USING_R
-    if(IS_LIST(output))
-        output = AS_LIST(output);
-    else
-        RS_DBI_errorMessage("internal error: could not alloc named list",
-            RS_DBI_ERROR);
-#endif
+
     conParams = (RS_MySQL_conParams *) con->conParams;
 
     PROTECT(output);
@@ -1006,13 +963,7 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
         flds = S_NULL_ENTRY;
 
     output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
-#ifndef USING_R
-    if(IS_LIST(output))
-        output = AS_LIST(output);
-    else
-        RS_DBI_errorMessage("internal error: could not alloc named list",
-            RS_DBI_ERROR);
-#endif
+
     SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
     LST_INT_EL(output,1,0) = result->isSelect;
     LST_INT_EL(output,2,0) = result->rowsAffected;
@@ -1190,9 +1141,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     MYSQL_ROW  row;
 
     s_object  *data, *cur_rec, *out_list, *group_names, *val;
-#ifndef USING_R
-    s_object  *raw_obj, *raw_container;
-#endif
+
     unsigned long  *lens = (unsigned long *)0;
     SEXPTYPE  *fld_Sclass;
     Sint   i, j, null_item, expand, *fld_nullOk, completed;
@@ -1321,11 +1270,7 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
                 * test is very gross.
                 */
                 if(null_item)
-#ifdef USING_R
                     SET_LST_CHR_EL(data,j,i,NA_STRING);
-#else
-                NA_CHR_SET(LST_CHR_EL(data,j,i));
-#endif
                 else {
                     if((size_t) lens[j] != strlen(row[j])){
                         char warn[128];
@@ -1347,23 +1292,9 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
                 LST_NUM_EL(cur_rec,j,0) = LST_NUM_EL(data,j,i);
                 break;
 
-#ifndef USING_R
-            case RAW_TYPE:           /* these are blob's */
-                raw_obj = NEW_RAW((Sint) lens[j]);
-                memcpy(RAW_DATA(raw_obj), row[j], lens[j]);
-                raw_container = LST_EL(data,j);    /* get list of raw objects*/
-                SET_ELEMENT(raw_container, (Sint) i, raw_obj);
-                SET_ELEMENT(data, (Sint) j, raw_container);
-                break;
-#endif
-
             default:  /* error, but we'll try the field as character (!)*/
                 if(null_item)
-#ifdef USING_R
                     SET_LST_CHR_EL(data,j,i, NA_STRING);
-#else
-                    NA_CHR_SET(LST_CHR_EL(data,j,i));
-#endif
                 else {
                     char warn[64];
                     (void) sprintf(warn,
@@ -1474,9 +1405,6 @@ RS_MySQL_dbApply(s_object *rsHandle,     /* resultset handle */
     result->completed = (int) completed;
 
     SET_NAMES(out_list, group_names);       /* do I need to PROTECT? */
-#ifndef USING_R
-    out_list = AS_LIST(out_list);           /* for S4/Splus[56]'s sake */
-#endif
 
     MEM_UNPROTECT(np);
     return out_list;
@@ -1571,13 +1499,7 @@ RS_MySQL_insertid(Con_Handle *conHandle)
     con = RS_DBI_getConnection(conHandle);
     my_con = (MYSQL *) con->drvConnection;
     output = RS_DBI_createNamedList(conDesc, conType, conLen, 1);
-#ifndef USING_R
-    if(IS_LIST(output))
-        output = AS_LIST(output);
-    else
-        RS_DBI_errorMessage("internal error: could not alloc named list",
-            RS_DBI_ERROR);
-#endif
+
     LST_INT_EL(output,0,0) = (Sint) mysql_insert_id(my_con);
 
     return output;
