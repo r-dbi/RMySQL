@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "RS-DBI.h"
+#include "RS-MySQL.h"
 
 /* TODO: monitor memory/object size consumption against S limits
  *       in $SHOME/include/options.h we find "max_memory". We then
@@ -31,8 +31,7 @@
 static RS_DBI_manager *dbManager = NULL;
 
 SEXP RS_DBI_allocManager(const char *drvName, int max_con,
-  int fetch_default_rec, int force_realloc)
-{
+  int fetch_default_rec, int force_realloc) {
   /* Currently, the dbManager is a singleton (therefore we don't
    * completly free all the space).  Here we alloc space
    * for the dbManager and return its mgrHandle.  force_realloc
