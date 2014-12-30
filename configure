@@ -43,8 +43,12 @@ if [ "$MYSQL_DIR" ]; then
   echo "PKG_CPPFLAGS= -I$MYSQL_DIR/include" > src/Makevars
 elif [ "$MYSQL_INC" ]; then
   echo "PKG_CPPFLAGS= -I$MYSQL_INC" > src/Makevars
-elif [ ! -r /usr/include/mysql/mysql.h ] && [ ! -r /usr/local/include/mysql/mysql.h ]; then
-  echo "File mysql.h not found. Make sure the mysql development library is installed, e.g. libmysqlclient-dev (deb) or mariadb-devel (rpm)."
+elif [ -r /usr/include/mysql/mysql.h ]; then
+  echo "PKG_CPPFLAGS= -I/usr/include/mysql/" > src/Makevars
+elif [ -r /usr/local/include/mysql/mysql.h ]; then
+  echo "PKG_CPPFLAGS= -I/usr/local/include/mysql/" > src/Makevars
+else
+  echo "File mysql.h not found. Please install mysql development library, e.g: libmysqlclient-dev (deb) or mariadb-devel (rpm)."
   exit 1
 fi
 
