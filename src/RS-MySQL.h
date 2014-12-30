@@ -178,7 +178,6 @@ int  RS_DBI_listEntries(int *table, int length, int *entries);
 void  RS_DBI_freeEntry(int *table, int indx);
 
 /* description of the fields in a result set */
-RS_DBI_fields *RS_DBI_allocFields(int num_fields);
 SEXP RS_DBI_getFieldDescriptions(RS_DBI_fields *flds);
 void           RS_DBI_freeFields(RS_DBI_fields *flds);
 
