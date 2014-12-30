@@ -211,7 +211,7 @@ SEXP
   {
 
     return RS_MySQL_createConnection(
-      RS_DBI_asMgrHandle(MGR_ID(conHandle)),
+      ScalarInteger(0),
       RS_MySQL_cloneConParams(RS_DBI_getConnection(conHandle)->conParams));
   }
 
@@ -465,3 +465,56 @@ SEXP
     return output;
 
   }
+
+SEXP RS_DBI_validHandle(SEXP handle) {
+  int  handleType = 0;
+
+  switch( (int) GET_LENGTH(handle)){
+  case MGR_HANDLE_TYPE:
+    handleType = MGR_HANDLE_TYPE;
+    break;
+  case CON_HANDLE_TYPE:
+    handleType = CON_HANDLE_TYPE;
+    break;
+  case RES_HANDLE_TYPE:
+    handleType = RES_HANDLE_TYPE;
+    break;
+  }
+
+  return ScalarLogical(is_validHandle(handle, handleType));
+}
+
+int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
+  int  mgr_id, len, indx;
+  MySQLDriver    *mgr = rmysql_driver();
+  RS_DBI_connection *con;
+
+  if(IS_INTEGER(handle))
+    handle = AS_INTEGER(handle);
+  else
+    return 0;       /* non handle object */
+
+    len = (int) GET_LENGTH(handle);
+    if(len<handleType || handleType<1 || handleType>3)
+      return 0;
+    mgr_id = MGR_ID(handle);
+
+    /* at least we have a potential valid dbManager */
+    if(!mgr || !mgr->connections)  return 0;   /* expired manager*/
+    if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
+
+    /* ... on to connections */
+    indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(handle));
+    if(indx<0) return 0;
+    con = mgr->connections[indx];
+    if(!con) return 0;
+    if(!con->resultSets) return 0;       /* un-initialized (invalid) */
+    if(handleType==CON_HANDLE_TYPE) return 1; /* valid connection id */
+
+    /* .. on to resultSets */
+    indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(handle));
+    if(indx < 0) return 0;
+    if(!con->resultSets[indx]) return 0;
+
+    return 1;
+}

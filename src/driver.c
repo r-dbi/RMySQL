@@ -6,8 +6,16 @@ MySQLDriver* rmysql_driver() {
   return dbManager;
 }
 
+SEXP rmysql_driver_valid() {
+  if(!dbManager || !dbManager->connections) {
+    return ScalarLogical(FALSE);
+  } else {
+    return ScalarLogical(TRUE);
+  }
+}
+
 SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_) {
-  SEXP mgrHandle = RS_DBI_asMgrHandle(0);
+  SEXP mgrHandle = ScalarInteger(0);
   if (dbManager) return mgrHandle;
 
   int max_con = asInteger(max_con_),
@@ -66,16 +74,6 @@ SEXP rmysql_driver_close() {
   return ScalarLogical(TRUE);
 }
 
-SEXP RS_DBI_asMgrHandle(int mgrId)
-{
-  SEXP mgrHandle;
-
-  PROTECT(mgrHandle = NEW_INTEGER((int) 1));
-  MGR_ID(mgrHandle) = mgrId;
-  UNPROTECT(1);
-  return mgrHandle;
-}
-
 SEXP         /* named list */
 RS_DBI_managerInfo(SEXP mgrHandle)
 {
@@ -110,59 +108,7 @@ RS_DBI_managerInfo(SEXP mgrHandle)
 return output;
 }
 
-SEXP RS_DBI_validHandle(SEXP handle) {
-  int  handleType = 0;
 
-  switch( (int) GET_LENGTH(handle)){
-  case MGR_HANDLE_TYPE:
-    handleType = MGR_HANDLE_TYPE;
-    break;
-  case CON_HANDLE_TYPE:
-    handleType = CON_HANDLE_TYPE;
-    break;
-  case RES_HANDLE_TYPE:
-    handleType = RES_HANDLE_TYPE;
-    break;
-  }
-
-  return ScalarLogical(is_validHandle(handle, handleType));
-}
-
-int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
-  int  mgr_id, len, indx;
-  MySQLDriver    *mgr;
-  RS_DBI_connection *con;
-
-  if(IS_INTEGER(handle))
-    handle = AS_INTEGER(handle);
-  else
-    return 0;       /* non handle object */
-
-  len = (int) GET_LENGTH(handle);
-  if(len<handleType || handleType<1 || handleType>3)
-    return 0;
-  mgr_id = MGR_ID(handle);
-
-  /* at least we have a potential valid dbManager */
-  mgr = dbManager;
-  if(!mgr || !mgr->connections)  return 0;   /* expired manager*/
-  if(handleType == MGR_HANDLE_TYPE) return 1;     /* valid manager id */
-
-  /* ... on to connections */
-  indx = RS_DBI_lookup(mgr->connectionIds, mgr->length, CON_ID(handle));
-  if(indx<0) return 0;
-  con = mgr->connections[indx];
-  if(!con) return 0;
-  if(!con->resultSets) return 0;       /* un-initialized (invalid) */
-  if(handleType==CON_HANDLE_TYPE) return 1; /* valid connection id */
-
-  /* .. on to resultSets */
-  indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(handle));
-  if(indx < 0) return 0;
-  if(!con->resultSets[indx]) return 0;
-
-  return 1;
-}
 
 
 SEXP

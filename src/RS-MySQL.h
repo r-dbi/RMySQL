@@ -150,7 +150,6 @@ RS_DBI_exception *exception;
 * to work with the various dbObjects.
 */
 void            RS_DBI_freeManager(SEXP mgrHandle);
-SEXP RS_DBI_asMgrHandle(int pid);
 SEXP RS_DBI_managerInfo(SEXP mgrHandle);
 
 /* dbConnection */
