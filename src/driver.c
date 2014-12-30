@@ -74,87 +74,36 @@ SEXP rmysql_driver_close() {
   return ScalarLogical(TRUE);
 }
 
-SEXP         /* named list */
-RS_DBI_managerInfo(SEXP mgrHandle)
-{
+SEXP rmysql_driver_info() {
+  MySQLDriver *mgr = rmysql_driver();
 
-  MySQLDriver *mgr;
-  SEXP output;
-  int  i, num_con;
-  int n = (int) 7;
-  char *mgrDesc[] = {"connectionIds", "fetch_default_rec","managerId",
-    "length", "num_con", "counter", "clientVersion"};
-  SEXPTYPE mgrType[] = {INTSXP, INTSXP, INTSXP,
-    INTSXP, INTSXP, INTSXP,
-    STRSXP};
-  int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1};
+  // Allocate output
+  SEXP output = PROTECT(allocVector(VECSXP, 6));
+  SEXP output_nms = PROTECT(allocVector(STRSXP, 6));
+  SET_NAMES(output, output_nms);
+  UNPROTECT(1);
 
-  mgr = rmysql_driver();
-  num_con = (int) mgr->num_con;
-  mgrLen[0] = num_con;
+  SET_CHR_EL(output_nms, 0, mkChar("connectionIds"));
+  SEXP cons = PROTECT(allocVector(INTSXP, mgr->num_con));
+  RS_DBI_listEntries(mgr->connectionIds, mgr->num_con, INTEGER(cons));
+  SET_VECTOR_ELT(output, 0, cons);
+  UNPROTECT(1);
 
-  output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
+  SET_CHR_EL(output_nms, 1, mkChar("fetch_default_rec"));
+  SET_VECTOR_ELT(output, 1, ScalarInteger(mgr->fetch_default_rec));
 
-  for(i = 0; i < num_con; i++)
-    LST_INT_EL(output,0,i) = (int) mgr->connectionIds[i];
+  SET_CHR_EL(output_nms, 2, mkChar("length"));
+  SET_VECTOR_ELT(output, 2, ScalarInteger(mgr->length));
 
-  LST_INT_EL(output,1,0) = (int) mgr->fetch_default_rec;
-  LST_INT_EL(output,2,0) = (int) mgr->managerId;
-  LST_INT_EL(output,3,0) = (int) mgr->length;
-  LST_INT_EL(output,4,0) = (int) mgr->num_con;
-  LST_INT_EL(output,5,0) = (int) mgr->counter;
-  SET_LST_CHR_EL(output,6,0,C_S_CPY("NA"));   /* client versions? */
+  SET_CHR_EL(output_nms, 3, mkChar("num_con"));
+  SET_VECTOR_ELT(output, 3, ScalarInteger(mgr->num_con));
 
-return output;
+  SET_CHR_EL(output_nms, 4, mkChar("counter"));
+  SET_VECTOR_ELT(output, 4, ScalarInteger(mgr->counter));
+
+  SET_CHR_EL(output_nms, 5, mkChar("clientVersion"));
+  SET_VECTOR_ELT(output, 5, mkString(mysql_get_client_info()));
+
+  UNPROTECT(1);
+  return output;
 }
-
-
-
-
-SEXP
-  RS_MySQL_managerInfo(SEXP mgrHandle)
-  {
-    MySQLDriver *mgr;
-    SEXP output;
-    int i, num_con, max_con, *cons, ncon;
-    int j, n = 8;
-    char *mgrDesc[] = {"drvName",   "connectionIds", "fetch_default_rec",
-      "managerId", "length",        "num_con",
-      "counter",   "clientVersion"};
-    SEXPTYPE mgrType[] = {STRSXP, INTSXP, INTSXP,
-      INTSXP,   INTSXP, INTSXP,
-      INTSXP,   STRSXP};
-    int  mgrLen[]  = {1, 1, 1, 1, 1, 1, 1, 1};
-
-    mgr = rmysql_driver();
-    if(!mgr)
-      RS_DBI_errorMessage("driver not loaded yet", RS_DBI_ERROR);
-    num_con = (int) mgr->num_con;
-    max_con = (int) mgr->length;
-    mgrLen[1] = num_con;
-
-    output = RS_DBI_createNamedList(mgrDesc, mgrType, mgrLen, n);
-
-    j = (int) 0;
-    SET_VECTOR_ELT(output, j++, mkChar("RMySQL"));
-
-    cons = (int *) S_alloc((long)max_con, (int)sizeof(int));
-    ncon = RS_DBI_listEntries(mgr->connectionIds, mgr->length, cons);
-    if(ncon != num_con){
-      RS_DBI_errorMessage(
-        "internal error: corrupt RS_DBI connection table",
-        RS_DBI_ERROR);
-    }
-
-    for(i = 0; i < num_con; i++)
-      LST_INT_EL(output, j, i) = cons[i];
-    j++;
-    LST_INT_EL(output,j++,0) = mgr->fetch_default_rec;
-    LST_INT_EL(output,j++,0) = mgr->managerId;
-    LST_INT_EL(output,j++,0) = mgr->length;
-    LST_INT_EL(output,j++,0) = mgr->num_con;
-    LST_INT_EL(output,j++,0) = mgr->counter;
-    SET_LST_CHR_EL(output,j++,0,C_S_CPY(mysql_get_client_info()));
-
-    return output;
-  }

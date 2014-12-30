@@ -83,11 +83,11 @@ setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
 #' dbGetInfo(db)
 #' dbListConnections(db)
 #' summary(db)
-#' @useDynLib RMySQL RS_MySQL_managerInfo
+#' @useDynLib RMySQL rmysql_driver_info
 setMethod("dbGetInfo", "MySQLDriver", function(dbObj, what="", ...) {
   checkValid(dbObj)
 
-  info <- .Call(RS_MySQL_managerInfo, dbObj@Id)
+  info <- .Call(rmysql_driver_info)
   info$connectionIds <- lapply(info$connectionIds, function(conId) {
     new("MySQLConnection", Id = c(dbObj@Id, conId))
   })

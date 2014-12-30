@@ -144,14 +144,6 @@ RS_DBI_exception *exception;
 
 /* All RS_DBI functions and their signatures */
 
-/* Note: the following alloc functions allocate the space for the
-* corresponding manager, connection, resultSet; they all
-* return handles.  All DBI functions (free/get/etc) use the handle
-* to work with the various dbObjects.
-*/
-void            RS_DBI_freeManager(SEXP mgrHandle);
-SEXP RS_DBI_managerInfo(SEXP mgrHandle);
-
 /* dbConnection */
 SEXP RS_DBI_allocConnection(SEXP mgrHandle,
   int max_res);
@@ -263,6 +255,7 @@ void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
 /* dbManager */
 MySQLDriver* rmysql_driver();
 SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_);
+SEXP rmysql_driver_info();
 
 /* dbConnection */
 SEXP RS_MySQL_newConnection(SEXP mgrHandle,
@@ -295,7 +288,6 @@ RS_DBI_fields *RS_MySQL_createDataMappings(SEXP resHandle);
 /* the following funs return named lists with meta-data for
  * the manager, connections, and  result sets, respectively.
  */
-SEXP RS_MySQL_managerInfo(SEXP mgrHandle);
 SEXP RS_MySQL_connectionInfo(SEXP conHandle);
 SEXP RS_MySQL_resultSetInfo(SEXP rsHandle);
 
