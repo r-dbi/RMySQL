@@ -1,7 +1,7 @@
 #include "RS-MySQL.h"
 
-static RS_DBI_manager *dbManager = NULL;
-RS_DBI_manager* mysql_driver() {
+static MySQLDriver* dbManager = NULL;
+MySQLDriver* mysql_driver() {
   if (!dbManager) error("Corrupt MySQL handle");
   return dbManager;
 }
@@ -20,12 +20,12 @@ SEXP mysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_, SEXP reload_) {
       reload = asLogical(reload_);
 
   SEXP mgrHandle = RS_DBI_asMgrHandle(0);
-  RS_DBI_manager* mgr;
+  MySQLDriver* mgr;
 
   int counter = 0;
   if (!dbManager) {                      /* alloc for the first time */
     counter = 0;                       /* connections handled so far */
-    mgr = (RS_DBI_manager*) malloc(sizeof(RS_DBI_manager));
+    mgr = (MySQLDriver*) malloc(sizeof(MySQLDriver));
     if (!mgr)
       error("Could not allocate memory for the MySQL driver");
   } else {                               /* we're re-entering */
@@ -77,7 +77,7 @@ SEXP mysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_, SEXP reload_) {
 void
   RS_DBI_freeManager(SEXP mgrHandle)
   {
-    RS_DBI_manager *mgr;
+    MySQLDriver *mgr;
 
     mgr = RS_DBI_getManager(mgrHandle);
     if(mgr->num_con > 0){
@@ -110,8 +110,8 @@ SEXP RS_DBI_asMgrHandle(int mgrId)
   return mgrHandle;
 }
 
-RS_DBI_manager* RS_DBI_getManager(SEXP  handle) {
-  RS_DBI_manager *mgr;
+MySQLDriver* RS_DBI_getManager(SEXP  handle) {
+  MySQLDriver *mgr;
 
   if(!is_validHandle(handle, MGR_HANDLE_TYPE))
     RS_DBI_errorMessage("invalid dbManager handle", RS_DBI_ERROR);
@@ -128,7 +128,7 @@ SEXP         /* named list */
 RS_DBI_managerInfo(SEXP mgrHandle)
 {
 
-  RS_DBI_manager *mgr;
+  MySQLDriver *mgr;
   SEXP output;
   int  i, num_con;
   int n = (int) 7;
@@ -178,7 +178,7 @@ SEXP RS_DBI_validHandle(SEXP handle) {
 
 int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
   int  mgr_id, len, indx;
-  RS_DBI_manager    *mgr;
+  MySQLDriver    *mgr;
   RS_DBI_connection *con;
 
   if(IS_INTEGER(handle))
@@ -216,7 +216,7 @@ int is_validHandle(SEXP handle, HANDLE_TYPE handleType) {
 SEXP
   RS_MySQL_closeManager(SEXP mgrHandle)
   {
-    RS_DBI_manager *mgr;
+    MySQLDriver *mgr;
 
     mgr = RS_DBI_getManager(mgrHandle);
     if(mgr->num_con)
@@ -233,7 +233,7 @@ SEXP
 SEXP
   RS_MySQL_managerInfo(SEXP mgrHandle)
   {
-    RS_DBI_manager *mgr;
+    MySQLDriver *mgr;
     SEXP output;
     int i, num_con, max_con, *cons, ncon;
     int j, n = 8;

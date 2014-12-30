@@ -304,7 +304,7 @@ SEXP
 SEXP     /* output is a named list */
     RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec)
     {
-      RS_DBI_manager   *mgr;
+      MySQLDriver   *mgr;
       RS_DBI_resultSet *result;
       RS_DBI_fields    *flds;
       MYSQL_RES *my_result;

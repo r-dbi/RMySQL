@@ -37,7 +37,7 @@ extern  "C" {
 #include <ctype.h> /* for isalpha */
 
 /* We now define 4 important data structures:
-* RS_DBI_manager, RS_DBI_connection, RS_DBI_resultSet, and
+* MySQLDriver, RS_DBI_connection, RS_DBI_resultSet, and
 * RS_DBI_fields, corresponding to dbManager, dbConnection,
 * dbResultSet, and list of field descriptions.
 */
@@ -133,7 +133,7 @@ RS_DBI_exception *exception;
 } RS_DBI_connection;
 
 /* dbManager */
-typedef struct st_sdbi_manager {
+typedef struct MySQLDriver {
 void *drvData;                    /* to be used by the drv implementation*/
 RS_DBI_connection **connections;  /* list of dbConnections */
 int *connectionIds;              /* array of connectionIds */
@@ -143,7 +143,7 @@ int counter;                     /* num of connections handled so far*/
 int fetch_default_rec;           /* default num of records per fetch */
 int managerId;                   /* typically, process id */
 RS_DBI_exception *exception;
-} RS_DBI_manager;
+} MySQLDriver;
 
 /* All RS_DBI functions and their signatures */
 
@@ -153,7 +153,7 @@ RS_DBI_exception *exception;
 * to work with the various dbObjects.
 */
 void            RS_DBI_freeManager(SEXP mgrHandle);
-RS_DBI_manager *RS_DBI_getManager(SEXP handle);
+MySQLDriver *RS_DBI_getManager(SEXP handle);
 SEXP RS_DBI_asMgrHandle(int pid);
 SEXP RS_DBI_managerInfo(SEXP mgrHandle);
 

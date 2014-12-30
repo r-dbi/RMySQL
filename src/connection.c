@@ -4,7 +4,7 @@
 SEXP
   RS_DBI_allocConnection(SEXP mgrHandle, int max_res)
   {
-    RS_DBI_manager    *mgr;
+    MySQLDriver    *mgr;
     RS_DBI_connection *con;
     SEXP conHandle;
     int  i, indx, con_id;
@@ -74,7 +74,7 @@ void
   RS_DBI_freeConnection(SEXP conHandle)
   {
     RS_DBI_connection *con;
-    RS_DBI_manager    *mgr;
+    MySQLDriver    *mgr;
     int indx;
 
     con = RS_DBI_getConnection(conHandle);
@@ -137,7 +137,7 @@ SEXP RS_DBI_asConHandle(int mgrId, int conId)
 }
 
 RS_DBI_connection* RS_DBI_getConnection(SEXP conHandle) {
-  RS_DBI_manager  *mgr;
+  MySQLDriver  *mgr;
   int indx;
 
   mgr = RS_DBI_getManager(conHandle);
