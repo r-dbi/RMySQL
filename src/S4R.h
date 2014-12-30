@@ -32,12 +32,6 @@ extern "C" {
 #  include "Rdefines.h"
 #  define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
 
-/* data types common to R and S4 */
-#  undef INTEGER_DATA
-#  define INTEGER_DATA(x) (INTEGER(x))
-#  undef S_NULL_ENTRY
-#  define S_NULL_ENTRY R_NilValue
-
 /* We simplify one- and two-level access to object and list
  * (mostly built on top of jmc's macros)
  *
@@ -87,12 +81,6 @@ extern "C" {
 #  define NA_SET(p,t)   RS_na_set((p),(t))
 #  define NA_CHR_SET(p) SET_CHR_EL(p, 0, NA_STRING)
 #  define IS_NA(p,t)    RS_is_na((p),(t))
-
-
-/* SET_ROWNAMES() and SET_CLASS_NAME() don't exist in S4 */
-#  define SET_ROWNAMES(df,n)  setAttrib(df, R_RowNamesSymbol, n)
-#  define GET_CLASS_NAME(x)   GET_CLASS(x)
-#  define SET_CLASS_NAME(x,n) SET_CLASS(x, n)
 
 /* end of RS-DBI macros */
 

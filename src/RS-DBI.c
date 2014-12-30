@@ -409,8 +409,8 @@ RS_DBI_makeDataFrame(s_object *data)
       SET_CHR_EL(row_names, i, C_S_CPY(buf));
    }
 
-   SET_ROWNAMES(data, row_names);
-   SET_CLASS_NAME(data, df_class_name);
+   setAttrib(data, R_RowNamesSymbol, row_names);
+   SET_CLASS(data, df_class_name);
 
    UNPROTECT(3);
    return;
@@ -636,7 +636,7 @@ s_object *
 RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
 {
   S_EVALUATOR
-  s_object *output, *output_names, *obj = S_NULL_ENTRY;
+  s_object *output, *output_names, *obj = R_NilValue;
   int  num_elem;
   int   j;
 
@@ -680,12 +680,12 @@ RS_DBI_SclassNames(s_object *type)
   int  i;
   char *s;
 
-  if(type==S_NULL_ENTRY)
+  if(type==R_NilValue)
      RS_DBI_errorMessage(
            "internal error in RS_DBI_SclassNames: input S types must be nonNULL",
            RS_DBI_ERROR);
   n = LENGTH(type);
-  typeCodes = INTEGER_DATA(type);
+  typeCodes = INTEGER(type);
   PROTECT(typeNames = NEW_CHARACTER(n));
   for(i = 0; i < n; i++) {
     s = RS_DBI_getTypeName(typeCodes[i], RS_dataTypeTable);
@@ -996,7 +996,7 @@ RS_DBI_resultSetInfo(Res_Handle *rsHandle)
   if(result->fields)
     flds = RS_DBI_copyfields(result->fields);
   else
-    flds = S_NULL_ENTRY;
+    flds = R_NilValue;
 
   output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 

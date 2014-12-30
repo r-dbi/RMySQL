@@ -960,7 +960,7 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
     if(result->fields)
         flds = RS_DBI_getFieldDescriptions(result->fields);
     else
-        flds = S_NULL_ENTRY;
+        flds = R_NilValue;
 
     output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 
@@ -969,7 +969,7 @@ RS_MySQL_resultSetInfo(Res_Handle *rsHandle)
     LST_INT_EL(output,2,0) = result->rowsAffected;
     LST_INT_EL(output,3,0) = result->rowCount;
     LST_INT_EL(output,4,0) = result->completed;
-    if(flds != S_NULL_ENTRY)
+    if(flds != R_NilValue)
         SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
 
     return output;
@@ -984,7 +984,7 @@ RS_MySQL_typeNames(s_object *type)
 	char *tname;
 
     n = LENGTH(type);
-    typeCodes = INTEGER_DATA(type);
+    typeCodes = INTEGER(type);
     PROTECT(typeNames = NEW_CHARACTER(n));
     for(i = 0; i < n; i++) {
 		tname = RS_DBI_getTypeName(typeCodes[i], RS_MySQL_dataTypes);
@@ -1075,7 +1075,7 @@ RS_DBI_invokeBeginGroup(s_object *callObj,      /* should be initialized */
     val = eval(callObj, rho);
     UNPROTECT(1);
 
-    return S_NULL_ENTRY;
+    return R_NilValue;
 }
 
 s_object *
@@ -1095,7 +1095,7 @@ RS_DBI_invokeNewRecord(s_object *callObj,   /* should be initialized already */
     val = eval(callObj, rho);
     UNPROTECT(1);
 
-    return S_NULL_ENTRY;
+    return R_NilValue;
 }
 
 /* endGroupFun takes two args: a data.frame and the group name */
@@ -1568,8 +1568,8 @@ RS_MySQL_clientLibraryVersions(void)
 	SET_STRING_ELT(name, 0, COPY_TO_USER_STRING(MYSQL_SERVER_VERSION));
 	SET_STRING_ELT(name, 1, COPY_TO_USER_STRING(mysql_get_client_info()));
 	PROTECT(ret=NEW_INTEGER(2));
-	INTEGER_DATA(ret)[0] = (int)MYSQL_VERSION_ID;
-	INTEGER_DATA(ret)[1] = (int)mysql_get_client_version();
+	INTEGER(ret)[0] = (int)MYSQL_VERSION_ID;
+	INTEGER(ret)[1] = (int)mysql_get_client_version();
 	SET_NAMES(ret,name);
 	UNPROTECT(2);
 	return ret;
