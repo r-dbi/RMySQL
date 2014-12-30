@@ -1,3 +1,21 @@
+# If $MYSQL_DIR is specified, use that
+if [ "$MYSQL_DIR" ]; then
+  echo "PKG_CPPFLAGS= -I$MYSQL_DIR/include" > src/Makevars
+  echo "PKG_LIBS= -L$MYSQL_DIR/lib -lmysqlclient -lz" >> src/Makevars
+  exit 0
+fi
+
+# Else if $MYSQL_INC is set, use that
+if [ "$MYSQL_INC" ]; then
+  echo "PKG_CPPFLAGS= -I$MYSQL_INC" > src/Makevars
+  if [ "$MYSQL_LIB" ]; then
+    echo "PKG_LIBS= -L$MYSQL_LIB -lmysqlclient -lz" >> src/Makevars
+  else
+    echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
+  fi
+  exit 0
+fi
+
 # Static link on OSX
 if [ $(echo "$OSTYPE" | grep "darwin") ]; then
 
@@ -38,12 +56,8 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
   exit 1
 fi
 
-# For backward compatibility with the old autoconf script
-if [ "$MYSQL_DIR" ]; then
-  echo "PKG_CPPFLAGS= -I$MYSQL_DIR/include" > src/Makevars
-elif [ "$MYSQL_INC" ]; then
-  echo "PKG_CPPFLAGS= -I$MYSQL_INC" > src/Makevars
-elif [ -r /usr/include/mysql/mysql.h ]; then
+# Check for presence of system libraires on Linux and friends:
+if [ -r /usr/include/mysql/mysql.h ]; then
   echo "PKG_CPPFLAGS= -I/usr/include/mysql/" > src/Makevars
 elif [ -r /usr/local/include/mysql/mysql.h ]; then
   echo "PKG_CPPFLAGS= -I/usr/local/include/mysql/" > src/Makevars
@@ -51,11 +65,4 @@ else
   echo "File mysql.h not found. Please install mysql development library, e.g: libmysqlclient-dev (deb) or mariadb-devel (rpm)."
   exit 1
 fi
-
-if [ "$MYSQL_DIR" ]; then
-  echo "PKG_LIBS= -L$MYSQL_DIR/lib -lmysqlclient -lz" >> src/Makevars
-elif [ "$MYSQL_LIB" ]; then
-  echo "PKG_LIBS= -L$MYSQL_LIB -lmysqlclient -lz" >> src/Makevars
-else
-  echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
-fi
+echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
