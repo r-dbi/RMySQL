@@ -19,6 +19,7 @@ src\/RCS
 ^\.Rproj\.user$
 .travis.yml
 ^windows$
+^homebrew$
 ^a\.out\.dSYM$
 ^NEWS\.md$
 ^revdep$
