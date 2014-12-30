@@ -71,7 +71,7 @@ SEXP rho)
 
     /* make a copy of the argument */
     PROTECT(s_group_name = NEW_CHARACTER((int) 1));
-    SET_CHR_EL(s_group_name, 0, C_S_CPY(group_name));
+    SET_CHR_EL(s_group_name, 0, mkChar(group_name));
 
     /* and stick into call object */
     SETCADR(callObj, s_group_name);
@@ -110,7 +110,7 @@ SEXP
     PROTECT(callObj = duplicate(callObj));
     PROTECT(s_x = duplicate(data));
     PROTECT(s_group_name = NEW_CHARACTER((int) 1));
-    SET_CHR_EL(s_group_name, 0, C_S_CPY(group_name));
+    SET_CHR_EL(s_group_name, 0, mkChar(group_name));
 
     /* stick copies of args into the call object */
     SETCADR(callObj, s_x);
@@ -275,9 +275,9 @@ SEXP                                /* output is a named list */
                   (long) i, (long) j);
                 RS_DBI_errorMessage(warn, RS_DBI_WARNING);
               }
-              SET_LST_CHR_EL(data,j,i,C_S_CPY(row[j]));
+              SET_LST_CHR_EL(data,j,i,mkChar(row[j]));
             }
-            SET_LST_CHR_EL(cur_rec, j, 0, C_S_CPY(LST_CHR_EL(data,j,i)));
+            SET_LST_CHR_EL(cur_rec, j, 0, mkChar(LST_CHR_EL(data,j,i)));
             break;
 
           case REALSXP:
@@ -297,9 +297,9 @@ SEXP                                /* output is a named list */
                 "unrecognized field type %d in column %d",
                 (int) fld_Sclass[j], (int) j);
               RS_DBI_errorMessage(warn, RS_DBI_WARNING);
-              SET_LST_CHR_EL(data,j,i,C_S_CPY(row[j]));
+              SET_LST_CHR_EL(data,j,i,mkChar(row[j]));
             }
-            SET_LST_CHR_EL(cur_rec,j,0, C_S_CPY(LST_CHR_EL(data,j,i)));
+            SET_LST_CHR_EL(cur_rec,j,0, mkChar(LST_CHR_EL(data,j,i)));
             break;
           }
         }
@@ -469,6 +469,6 @@ void
     break;
     }
 
-    SET_CHR_EL(group_names, ngroup, C_S_CPY(buff));
+    SET_CHR_EL(group_names, ngroup, mkChar(buff));
     return;
   }

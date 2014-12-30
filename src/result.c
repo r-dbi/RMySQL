@@ -124,7 +124,7 @@ SEXP RS_DBI_resultSetInfo(SEXP rsHandle) {
 
   output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 
-  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+  SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
   LST_INT_EL(output,1,0) = result->isSelect;
   LST_INT_EL(output,2,0) = result->rowsAffected;
   LST_INT_EL(output,3,0) = result->rowCount;
@@ -377,7 +377,7 @@ SEXP     /* output is a named list */
                 (long) i, (long) j);
               RS_DBI_errorMessage(warn, RS_DBI_WARNING);
             }
-            SET_LST_CHR_EL(output,j,i,C_S_CPY(row[j]));
+            SET_LST_CHR_EL(output,j,i,mkChar(row[j]));
           }
           break;
 
@@ -397,7 +397,7 @@ SEXP     /* output is a named list */
               "unrecognized field type %d in column %d",
               (int) fld_Sclass[j], (int) j);
             RS_DBI_errorMessage(warn, RS_DBI_WARNING);
-            SET_LST_CHR_EL(output,j,i,C_S_CPY(row[j]));
+            SET_LST_CHR_EL(output,j,i,mkChar(row[j]));
           }
           break;
         }
@@ -466,7 +466,7 @@ SEXP RS_MySQL_resultSetInfo(SEXP rsHandle) {
 
   output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
 
-  SET_LST_CHR_EL(output,0,0,C_S_CPY(result->statement));
+  SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
   LST_INT_EL(output,1,0) = result->isSelect;
   LST_INT_EL(output,2,0) = result->rowsAffected;
   LST_INT_EL(output,3,0) = result->rowCount;

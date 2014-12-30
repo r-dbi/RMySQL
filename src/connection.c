@@ -170,11 +170,11 @@ SEXP         /* return a named list */
     output = RS_DBI_createNamedList(conDesc, conType, conLen, n);
 
     /* dummy */
-    SET_LST_CHR_EL(output,0,0,C_S_CPY("NA"));        /* host */
-    SET_LST_CHR_EL(output,1,0,C_S_CPY("NA"));        /* dbname */
-    SET_LST_CHR_EL(output,2,0,C_S_CPY("NA"));        /* user */
-    SET_LST_CHR_EL(output,3,0,C_S_CPY("NA"));        /* conType */
-    SET_LST_CHR_EL(output,4,0,C_S_CPY("NA"));        /* serverVersion */
+    SET_LST_CHR_EL(output,0,0,mkChar("NA"));        /* host */
+    SET_LST_CHR_EL(output,1,0,mkChar("NA"));        /* dbname */
+    SET_LST_CHR_EL(output,2,0,mkChar("NA"));        /* user */
+    SET_LST_CHR_EL(output,3,0,mkChar("NA"));        /* conType */
+    SET_LST_CHR_EL(output,4,0,mkChar("NA"));        /* serverVersion */
 
     LST_INT_EL(output,5,0) = (int) -1;            /* protocolVersion */
     LST_INT_EL(output,6,0) = (int) -1;            /* threadId */
@@ -438,13 +438,13 @@ SEXP
     PROTECT(output);
 
     tmp = conParams->host? conParams->host : (my_con->host?my_con->host:"");
-    SET_LST_CHR_EL(output,0,0,C_S_CPY(tmp));
+    SET_LST_CHR_EL(output,0,0,mkChar(tmp));
     tmp = conParams->username? conParams->username : (my_con->user?my_con->user:"");
-    SET_LST_CHR_EL(output,1,0,C_S_CPY(tmp));
+    SET_LST_CHR_EL(output,1,0,mkChar(tmp));
     tmp = conParams->dbname? conParams->dbname : (my_con->db?my_con->db:"");
-    SET_LST_CHR_EL(output,2,0,C_S_CPY(tmp));
-    SET_LST_CHR_EL(output,3,0,C_S_CPY(mysql_get_host_info(my_con)));
-    SET_LST_CHR_EL(output,4,0,C_S_CPY(mysql_get_server_info(my_con)));
+    SET_LST_CHR_EL(output,2,0,mkChar(tmp));
+    SET_LST_CHR_EL(output,3,0,mkChar(mysql_get_host_info(my_con)));
+    SET_LST_CHR_EL(output,4,0,mkChar(mysql_get_server_info(my_con)));
 
     LST_INT_EL(output,5,0) = (int) mysql_get_proto_info(my_con);
     LST_INT_EL(output,6,0) = (int) mysql_thread_id(my_con);

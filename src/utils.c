@@ -12,14 +12,14 @@ void RS_DBI_makeDataFrame(SEXP data) {
 
   PROTECT(data);
   PROTECT(df_class_name = NEW_CHARACTER((int) 1));
-  SET_CHR_EL(df_class_name, 0, C_S_CPY("data.frame"));
+  SET_CHR_EL(df_class_name, 0, mkChar("data.frame"));
 
   /* row.names */
   n = GET_LENGTH(LST_EL(data,0));            /* length(data[[1]]) */
   PROTECT(row_names = NEW_CHARACTER(n));
   for(i=0; i<n; i++){
     (void) sprintf(buf, "%d", i+1);
-    SET_CHR_EL(row_names, i, C_S_CPY(buf));
+    SET_CHR_EL(row_names, i, mkChar(buf));
   }
 
   setAttrib(data, R_RowNamesSymbol, row_names);
@@ -75,7 +75,7 @@ void RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds, int num_rec, int  expa
 
   PROTECT(names = NEW_CHARACTER((int) num_fields));
   for(j = 0; j< (int) num_fields; j++){
-    SET_CHR_EL(names,j, C_S_CPY(flds->name[j]));
+    SET_CHR_EL(names,j, mkChar(flds->name[j]));
   }
   SET_NAMES(output, names);
 
@@ -158,7 +158,7 @@ SEXP RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
       RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
     }
     SET_ELEMENT(output, (int)j, obj);
-    SET_CHR_EL(output_names, j, C_S_CPY(names[j]));
+    SET_CHR_EL(output_names, j, mkChar(names[j]));
   }
   SET_NAMES(output, output_names);
   UNPROTECT(n+2);
@@ -310,7 +310,7 @@ SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP strings)
 
     mysql_real_escape_string(my_connection, escapedString, str, len);
 
-    SET_CHR_EL(output, i, C_S_CPY(escapedString));
+    SET_CHR_EL(output, i, mkChar(escapedString));
   }
 
   UNPROTECT(1);

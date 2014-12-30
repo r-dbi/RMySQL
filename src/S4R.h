@@ -29,7 +29,6 @@ extern "C" {
 
 #  include "S.h"
 #  include "Rdefines.h"
-#  define C_S_CPY(p)    COPY_TO_USER_STRING(p)    /* cpy C string to R */
 
 /* We simplify one- and two-level access to object and list
  * (mostly built on top of jmc's macros)
