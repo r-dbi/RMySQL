@@ -134,7 +134,6 @@ RS_DBI_exception *exception;
 
 /* dbManager */
 typedef struct st_sdbi_manager {
-  char *drvName;                    /* what driver are we implementing?*/
 void *drvData;                    /* to be used by the drv implementation*/
 RS_DBI_connection **connections;  /* list of dbConnections */
 int *connectionIds;              /* array of connectionIds */
@@ -153,9 +152,6 @@ RS_DBI_exception *exception;
 * return handles.  All DBI functions (free/get/etc) use the handle
 * to work with the various dbObjects.
 */
-SEXP RS_DBI_allocManager(const char *drvName, int max_con,
-  int fetch_default_rec,
-  int force_realloc);
 void            RS_DBI_freeManager(SEXP mgrHandle);
 RS_DBI_manager *RS_DBI_getManager(SEXP handle);
 SEXP RS_DBI_asMgrHandle(int pid);
@@ -209,15 +205,7 @@ void  RS_DBI_allocOutput(SEXP output,
   int expand);
 void RS_DBI_makeDataFrame(SEXP data);
 
-/* TODO: We need to elevate RS_DBI_errorMessage to either
-* dbManager and/or dbConnection methods.  I still need to
-* go back and re-code the error-handling throughout, darn!
-*/
 void  RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exceptionType);
-void  RS_DBI_setException(SEXP handle,
-  DBI_EXCEPTION exceptionType,
-  int errorNum,
-  const char *errorMsg);
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 char     *RS_DBI_nCopyString(const char *str, size_t len, int del_blanks);
@@ -278,8 +266,8 @@ void                RS_MySQL_freeConParams(RS_MySQL_conParams *conParams);
  */
 
 /* dbManager */
-SEXP RS_MySQL_init(SEXP config_params, SEXP reload);
-SEXP    RS_MySQL_close(SEXP mgrHandle);
+SEXP mysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_, SEXP reload_);
+SEXP RS_MySQL_close(SEXP mgrHandle);
 
 /* dbConnection */
 SEXP RS_MySQL_newConnection(SEXP mgrHandle,
@@ -295,7 +283,7 @@ SEXP RS_MySQL_newConnection(SEXP mgrHandle,
 SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams);
 SEXP RS_MySQL_cloneConnection(SEXP conHandle);
 SEXP RS_MySQL_closeConnection(SEXP conHandle);
-SEXP RS_MySQL_getException(SEXP conHandle);    /* err No, Msg */
+SEXP rmysql_exception_info(SEXP conHandle);
 
 /* dbResultSet */
 SEXP RS_MySQL_exec(SEXP conHandle, SEXP statement);

@@ -49,16 +49,13 @@ setClass("MySQLDriver",
 #' dbRemoveTable(con, "USArrests")
 #' dbDisconnect(con)
 #' }
-#' @useDynLib RMySQL RS_MySQL_init
+#' @useDynLib RMySQL mysql_driver_init
 MySQL <- function(max.con=16, fetch.default.rec = 500, force.reload=FALSE) {
   if (fetch.default.rec <= 0) {
     stop("default num of records per fetch must be positive")
   }
 
-  config.params <- as.integer(c(max.con, fetch.default.rec))
-  force <- as.logical(force.reload)
-
-  drvId <- .Call(RS_MySQL_init, config.params, force)
+  drvId <- .Call(mysql_driver_init, max.con, fetch.default.rec, force)
   new("MySQLDriver", Id = drvId)
 }
 

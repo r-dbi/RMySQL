@@ -475,3 +475,25 @@ SEXP
     UNPROTECT(2);
     return ret;
   }
+
+
+void RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type) {
+  char *driver = "RS-DBI";   /* TODO: use the actual driver name */
+
+switch(exception_type) {
+case RS_DBI_MESSAGE:
+  warning("%s driver message: (%s)", driver, msg);
+  break;
+case RS_DBI_WARNING:
+  warning("%s driver warning: (%s)", driver, msg);
+  break;
+case RS_DBI_ERROR:
+  error("%s driver: (%s)", driver, msg);
+  break;
+case RS_DBI_TERMINATE:
+  error("%s driver fatal: (%s)", driver, msg); /* was TERMINATE */
+break;
+}
+return;
+}
+

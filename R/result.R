@@ -200,9 +200,9 @@ setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
 
 #' @export
 #' @rdname result-meta
-#' @useDynLib RMySQL RS_MySQL_getException
+#' @useDynLib RMySQL rmysql_exception_info
 setMethod("dbGetException", "MySQLResult", function(conn, ...) {
-  .Call(RS_MySQL_getException, conn@Id[1:2])
+  .Call(rmysql_exception_info, conn@Id[1:2])
 })
 
 #' @export
