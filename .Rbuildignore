@@ -21,3 +21,4 @@ src\/RCS
 ^windows$
 ^a\.out\.dSYM$
 ^NEWS\.md$
+^revdep$
