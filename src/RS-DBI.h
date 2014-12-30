@@ -61,9 +61,9 @@ typedef enum enum_handle_type {
   RES_HANDLE_TYPE = 3      /* dbResult handle */
 } HANDLE_TYPE;
 
-#define MGR_ID(handle) INT_EL((handle),0)  /* the actual scalar mgr id */
-#define CON_ID(handle) INT_EL((handle),1)
-#define RES_ID(handle) INT_EL((handle),2)
+#define MGR_ID(handle) INTEGER(handle)[0]  /* the actual scalar mgr id */
+#define CON_ID(handle) INTEGER(handle)[1]
+#define RES_ID(handle) INTEGER(handle)[2]
 
 /* First, the following fully describes the field output by a select
  * (or select-like) statement, and the mappings from the internal

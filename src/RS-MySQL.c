@@ -51,8 +51,6 @@
 SEXP
 RS_MySQL_init(SEXP config_params, SEXP reload)
 {
-    S_EVALUATOR
-
     /* Currently we can specify the defaults for 2 parameters, max num of
      * connections, and max of records per fetch (this can be over-ridden
      * explicitly in the S call to fetch).
@@ -61,9 +59,9 @@ RS_MySQL_init(SEXP config_params, SEXP reload)
     int  fetch_default_rec, force_reload, max_con;
     const char *drvName = "MySQL";
 
-    max_con = INT_EL(config_params,0);
-    fetch_default_rec = INT_EL(config_params,1);
-    force_reload = LGL_EL(reload,0);
+    max_con = INTEGER(config_params)[0];
+    fetch_default_rec = INTEGER(config_params)[1];
+    force_reload = LOGICAL(reload)[0];
 
     mgrHandle = RS_DBI_allocManager(drvName, max_con, fetch_default_rec,
         force_reload);
@@ -73,10 +71,7 @@ RS_MySQL_init(SEXP config_params, SEXP reload)
 SEXP
 RS_MySQL_closeManager(SEXP mgrHandle)
 {
-    S_EVALUATOR
-
     RS_DBI_manager *mgr;
-    SEXP status;
 
     mgr = RS_DBI_getManager(mgrHandle);
     if(mgr->num_con)
@@ -86,10 +81,7 @@ RS_MySQL_closeManager(SEXP mgrHandle)
 
     RS_DBI_freeManager(mgrHandle);
 
-    PROTECT(status = NEW_LOGICAL((int) 1));
-    LGL_EL(status,0) = TRUE;
-    UNPROTECT(1);
-    return status;
+    return ScalarLogical(TRUE);
 }
 
 /* Are there more results on this connection (as in multi results or
@@ -99,33 +91,20 @@ RS_MySQL_closeManager(SEXP mgrHandle)
 SEXP  /* boolean */
 RS_MySQL_moreResultSets(SEXP conHandle)
 {
-    S_EVALUATOR
-
     RS_DBI_connection *con;
     MYSQL             *my_connection;
     my_bool           tmp;
-    SEXP status;            /* boolean */
 
     con = RS_DBI_getConnection(conHandle);
     my_connection = (MYSQL *) con->drvConnection;
 
     tmp = mysql_more_results(my_connection);
-    PROTECT(status = NEW_LOGICAL((int) 1));
-    if(tmp)
-       LGL_EL(status, 0) = TRUE;
-    else
-       LGL_EL(status, 0) = FALSE;
-
-    UNPROTECT(1);
-
-    return status;
+    return ScalarLogical(tmp);
 }
 
 SEXP
 RS_MySQL_nextResultSet(SEXP conHandle)
 {
-    S_EVALUATOR
-
     RS_DBI_connection *con;
     RS_DBI_resultSet  *result;
     SEXP rsHandle;
@@ -186,7 +165,6 @@ RS_MySQL_nextResultSet(SEXP conHandle)
 SEXP
 RS_MySQL_cloneConnection(SEXP conHandle)
 {
-    S_EVALUATOR
 
     return RS_MySQL_createConnection(
 			RS_DBI_asMgrHandle(MGR_ID(conHandle)),
@@ -248,49 +226,40 @@ RS_MySQL_freeConParams(RS_MySQL_conParams *conParams)
     return;
 }
 
-SEXP
-RS_MySQL_newConnection(SEXP mgrHandle,
-  SEXP s_dbname,
-  SEXP s_username,
-  SEXP s_password,
-  SEXP s_myhost,
-  SEXP s_unix_socket,
-  SEXP s_port,
-  SEXP s_client_flag,
-  SEXP s_groups,
-  SEXP s_default_file)
-{
-    S_EVALUATOR
+SEXP RS_MySQL_newConnection(SEXP mgrHandle, SEXP s_dbname, SEXP s_username,
+                            SEXP s_password, SEXP s_myhost, SEXP s_unix_socket,
+                            SEXP s_port, SEXP s_client_flag, SEXP s_groups,
+                            SEXP s_default_file) {
 
-	RS_MySQL_conParams *conParams;
+  RS_MySQL_conParams *conParams;
 
-    if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
-        RS_DBI_errorMessage("invalid MySQLManager", RS_DBI_ERROR);
+  if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
+    RS_DBI_errorMessage("invalid MySQLManager", RS_DBI_ERROR);
 
-    /* Create connection parameters structure and initialize */
-    conParams = RS_MySQL_allocConParams();
+  /* Create connection parameters structure and initialize */
+  conParams = RS_MySQL_allocConParams();
 
-	/* Arguments override defaults in config file */
-    if(s_dbname != R_NilValue && IS_CHARACTER(s_dbname))
-        conParams->dbname = RS_DBI_copyString((char *) CHR_EL(s_dbname,0));
-    if(s_username != R_NilValue && IS_CHARACTER(s_username))
-        conParams->username = RS_DBI_copyString((char *) CHR_EL(s_username,0));
-    if(s_password != R_NilValue && IS_CHARACTER(s_password))
-        conParams->password = RS_DBI_copyString((char *) CHR_EL(s_password,0));
-    if(s_myhost != R_NilValue && IS_CHARACTER(s_myhost))
-        conParams->host = RS_DBI_copyString((char *) CHR_EL(s_myhost,0));
-    if(s_unix_socket != R_NilValue && IS_CHARACTER(s_unix_socket))
-        conParams->unix_socket = RS_DBI_copyString((char *) CHR_EL(s_unix_socket,0));
-	if (s_port != R_NilValue && IS_INTEGER(s_port) && INT_EL(s_port,0) > 0)
-		conParams->port = (unsigned int) INT_EL(s_port,0);
-	if (s_client_flag != R_NilValue && IS_INTEGER(s_client_flag))
-		conParams->client_flag = (unsigned int) INT_EL(s_client_flag,0);
-    if(s_groups != R_NilValue && IS_CHARACTER(s_groups))
-        conParams->groups = RS_DBI_copyString((char *) CHR_EL(s_groups,0));
-    if(s_default_file != R_NilValue && IS_CHARACTER(s_default_file))
-        conParams->default_file = RS_DBI_copyString((char *) CHR_EL(s_default_file,0));
+  /* Arguments override defaults in config file */
+  if(s_dbname != R_NilValue)
+    conParams->dbname = RS_DBI_copyString(CHAR(asChar(s_dbname)));
+  if(s_username != R_NilValue)
+    conParams->username = RS_DBI_copyString(CHAR(asChar(s_username)));
+  if(s_password != R_NilValue)
+    conParams->password = RS_DBI_copyString(CHAR(asChar(s_password)));
+  if(s_myhost != R_NilValue)
+    conParams->host = RS_DBI_copyString(CHAR(asChar(s_myhost)));
+  if(s_unix_socket != R_NilValue)
+    conParams->unix_socket = RS_DBI_copyString(CHAR(asChar(s_unix_socket)));
+  if (s_port != R_NilValue)
+    conParams->port = asInteger(s_port);
+  if (s_client_flag != R_NilValue)
+    conParams->client_flag = asInteger(s_client_flag);
+  if(s_groups != R_NilValue)
+    conParams->groups = RS_DBI_copyString(CHAR(asChar(s_groups)));
+  if(s_default_file != R_NilValue)
+    conParams->default_file = RS_DBI_copyString(CHAR(asChar(s_default_file)));
 
-    return RS_MySQL_createConnection(mgrHandle,conParams);
+  return RS_MySQL_createConnection(mgrHandle, conParams);
 }
 
 /* RS_MySQL_createConnection - internal function
@@ -301,8 +270,6 @@ RS_MySQL_newConnection(SEXP mgrHandle,
 SEXP
 RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams)
 {
-    S_EVALUATOR
-
     RS_DBI_connection  *con;
   SEXP conHandle;
     MYSQL     *my_connection;
@@ -373,11 +340,8 @@ RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams)
 SEXP
 RS_MySQL_closeConnection(SEXP conHandle)
 {
-    S_EVALUATOR
-
     RS_DBI_connection *con;
     MYSQL *my_connection;
-    SEXP status;
 
     con = RS_DBI_getConnection(conHandle);
     if(con->num_res>0){
@@ -398,11 +362,7 @@ RS_MySQL_closeConnection(SEXP conHandle)
 
     RS_DBI_freeConnection(conHandle);
 
-    PROTECT(status = NEW_LOGICAL((int) 1));
-    LGL_EL(status, 0) = TRUE;
-    UNPROTECT(1);
-
-    return status;
+    return ScalarLogical(TRUE);
 }
 
 /* Execute (currently) one sql statement (INSERT, DELETE, SELECT, etc.),
@@ -412,8 +372,6 @@ RS_MySQL_closeConnection(SEXP conHandle)
 SEXP
 RS_MySQL_exec(SEXP conHandle, SEXP statement)
 {
-    S_EVALUATOR
-
     RS_DBI_connection *con;
     SEXP rsHandle;
     RS_DBI_resultSet  *result;
@@ -636,8 +594,6 @@ RS_MySQL_createDataMappings(SEXP rsHandle)
 SEXP     /* output is a named list */
 RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec)
 {
-    S_EVALUATOR
-
     RS_DBI_manager   *mgr;
     RS_DBI_resultSet *result;
     RS_DBI_fields    *flds;
@@ -657,7 +613,7 @@ RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec)
     if(!flds)
         RS_DBI_errorMessage("corrupt resultSet, missing fieldDescription",
            RS_DBI_ERROR);
-    num_rec = INT_EL(max_rec,0);
+    num_rec = asInteger(max_rec);
     expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
     if(expand || num_rec == 0){
         mgr = RS_DBI_getManager(rsHandle);
@@ -778,8 +734,6 @@ RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec)
 SEXP
 RS_MySQL_getException(SEXP conHandle)
 {
-    S_EVALUATOR
-
     MYSQL *my_connection;
     SEXP output;
     RS_DBI_connection   *con;
@@ -804,11 +758,8 @@ RS_MySQL_getException(SEXP conHandle)
 SEXP
 RS_MySQL_closeResultSet(SEXP resHandle)
 {
-    S_EVALUATOR
-
     RS_DBI_resultSet *result;
     MYSQL_RES        *my_result;
-    SEXP status;
 
     result = RS_DBI_getResultSet(resHandle);
 
@@ -825,18 +776,12 @@ RS_MySQL_closeResultSet(SEXP resHandle)
     result->drvResultSet = (void *) NULL;
     RS_DBI_freeResultSet(resHandle);
 
-    PROTECT(status = NEW_LOGICAL((int) 1));
-    LGL_EL(status, 0) = TRUE;
-    UNPROTECT(1);
-
-    return status;
+    return ScalarLogical(TRUE);
 }
 
 SEXP
 RS_MySQL_managerInfo(SEXP mgrHandle)
 {
-    S_EVALUATOR
-
     RS_DBI_manager *mgr;
     SEXP output;
     int i, num_con, max_con, *cons, ncon;
@@ -888,8 +833,6 @@ RS_MySQL_managerInfo(SEXP mgrHandle)
 SEXP
 RS_MySQL_connectionInfo(SEXP conHandle)
 {
-    S_EVALUATOR
-
     MYSQL   *my_con;
     RS_MySQL_conParams *conParams;
     RS_DBI_connection  *con;
@@ -945,8 +888,6 @@ RS_MySQL_connectionInfo(SEXP conHandle)
 SEXP
 RS_MySQL_resultSetInfo(SEXP rsHandle)
 {
-    S_EVALUATOR
-
     RS_DBI_resultSet   *result;
     SEXP output, flds;
     int  n = 6;
@@ -1062,8 +1003,6 @@ RS_DBI_invokeBeginGroup(SEXP callObj,      /* should be initialized */
                         const char *group_name, /* one string */
                         SEXP rho)
 {
-    S_EVALUATOR
-
     SEXP s_group_name, val;
 
     /* make a copy of the argument */
@@ -1083,8 +1022,6 @@ RS_DBI_invokeNewRecord(SEXP callObj,   /* should be initialized already */
     SEXP new_record,/* a 1-row data.frame */
     SEXP rho)
 {
-    S_EVALUATOR
-
     SEXP df, val;
 
     /* make a copy of the argument */
@@ -1103,8 +1040,6 @@ SEXP
 RS_DBI_invokeEndGroup(SEXP callObj, SEXP data,
                       const char *group_name, SEXP rho)
 {
-    S_EVALUATOR
-
     SEXP s_x, s_group_name, val;
 
     /* make copies of the arguments */
@@ -1132,8 +1067,6 @@ RS_MySQL_dbApply(SEXP rsHandle,     /* resultset handle */
     SEXP s_batch_size, /* alloc these many rows */
     SEXP s_max_rec)    /* max rows per group */
 {
-    S_EVALUATOR
-
     RS_DBI_resultSet *result;
     RS_DBI_fields    *flds;
 
@@ -1414,33 +1347,30 @@ unsigned int
 check_groupEvents(SEXP data, SEXPTYPE fld_Sclass[], int irow, int jcol)
 {
     if(irow==0) /* Begin */
-        return (BEGIN|BEGIN_GROUP);
+      return (BEGIN|BEGIN_GROUP);
 
-    switch(fld_Sclass[jcol]){
+    SEXP col = VECTOR_ELT(data, jcol);
 
-    case LGLSXP:
-        if(LST_LGL_EL(data,jcol,irow)!=LST_LGL_EL(data,jcol,irow-1))
-            return (END_GROUP|BEGIN_GROUP);
+    switch(fld_Sclass[jcol]) {
+      case LGLSXP:
+        if (LOGICAL(col)[irow] == LOGICAL(col)[irow - 1])
+          return (END_GROUP|BEGIN_GROUP);
         break;
-
-    case INTSXP:
-        if(LST_INT_EL(data,jcol,irow)!=LST_INT_EL(data,jcol,irow-1))
-            return (END_GROUP|BEGIN_GROUP);
+      case INTSXP:
+        if (INTEGER(col)[irow] == INTEGER(col)[irow - 1])
+          return (END_GROUP|BEGIN_GROUP);
         break;
-
-    case REALSXP:
-        if(LST_NUM_EL(data,jcol,irow)!=LST_NUM_EL(data,jcol,irow-1))
-            return (END_GROUP|BEGIN_GROUP);
+      case REALSXP:
+        if (REAL(col)[irow] == REAL(col)[irow - 1])
+          return (END_GROUP|BEGIN_GROUP);
         break;
-
-    case STRSXP:
-        if(strcmp(LST_CHR_EL(data,jcol,irow), LST_CHR_EL(data,jcol,irow-1)))
-            return (END_GROUP|BEGIN_GROUP);
+      case STRSXP:
+        if (STRING_ELT(col, irow) == STRING_ELT(col, irow - 1))
+          return (END_GROUP|BEGIN_GROUP);
         break;
-
-    default:
+      default:
         PROBLEM
-           "un-regongnized R/S data type %d", fld_Sclass[jcol]
+        "un-regongnized R/S data type %d", fld_Sclass[jcol]
         ERROR;
         break;
     }
@@ -1455,19 +1385,21 @@ add_group(SEXP group_names, SEXP data,
 {
     char  buff[1024];
 
+    SEXP col = VECTOR_ELT(data, group_field);
+
     switch((int) fld_Sclass[group_field]){
 
     case LGLSXP:
-        (void) sprintf(buff, "%ld", (long) LST_LGL_EL(data,group_field,i));
+        (void) sprintf(buff, "%ld", (long) LOGICAL(col)[i]);
         break;
     case INTSXP:
-        (void) sprintf(buff, "%ld", (long) LST_INT_EL(data,group_field,i));
+        (void) sprintf(buff, "%ld", (long) INTEGER(col)[i]);
         break;
     case REALSXP:
-        (void) sprintf(buff, "%f", (double) LST_NUM_EL(data,group_field,i));
+        (void) sprintf(buff, "%f", (double) REAL(col)[i]);
         break;
     case STRSXP:
-        strcpy(buff, LST_CHR_EL(data,group_field,i));
+        strcpy(buff, CHAR(STRING_ELT(col, i)));
         break;
     default:
         RS_DBI_errorMessage("unrecognized R/S type for group", RS_DBI_ERROR);
@@ -1487,8 +1419,6 @@ add_group(SEXP group_names, SEXP data,
 SEXP
 RS_MySQL_insertid(SEXP conHandle)
 {
-    S_EVALUATOR
-
     MYSQL   *my_con;
     RS_DBI_connection  *con;
     SEXP output;

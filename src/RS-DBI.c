@@ -390,9 +390,7 @@ RS_DBI_freeFields(RS_DBI_fields *flds)
 void
 RS_DBI_makeDataFrame(SEXP data)
 {
-   S_EVALUATOR
-
-   SEXP row_names, df_class_name;
+  SEXP row_names, df_class_name;
    int   i, n;
    char   buf[1024];
 
@@ -476,8 +474,6 @@ RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds,
 SEXP  		/* boolean */
 RS_DBI_validHandle(SEXP handle)
 {
-   S_EVALUATOR
-   SEXP valid;
    int  handleType = 0;
 
    switch( (int) GET_LENGTH(handle)){
@@ -491,10 +487,8 @@ RS_DBI_validHandle(SEXP handle)
      handleType = RES_HANDLE_TYPE;
      break;
    }
-   PROTECT(valid = NEW_LOGICAL((int) 1));
-   LGL_EL(valid,0) = (int) is_validHandle(handle, handleType);
-   UNPROTECT(1);
-   return valid;
+
+   return ScalarLogical(is_validHandle(handle, handleType));
 }
 
 void
@@ -599,7 +593,6 @@ RS_DBI_nCopyString(const char *str, size_t len, int del_blanks)
 SEXP
 RS_DBI_copyfields(RS_DBI_fields *flds)
 {
-  S_EVALUATOR
 
   SEXP S_fields;
   int  n = (int) 8;
@@ -634,7 +627,6 @@ RS_DBI_copyfields(RS_DBI_fields *flds)
 SEXP
 RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
 {
-  S_EVALUATOR
   SEXP output, output_names, obj = R_NilValue;
   int  num_elem;
   int   j;
@@ -903,7 +895,6 @@ is_validHandle(SEXP handle, HANDLE_TYPE handleType)
 SEXP         /* named list */
 RS_DBI_managerInfo(SEXP mgrHandle)
 {
-  S_EVALUATOR
 
   RS_DBI_manager *mgr;
   SEXP output;
@@ -942,7 +933,6 @@ RS_DBI_managerInfo(SEXP mgrHandle)
 SEXP         /* return a named list */
 RS_DBI_connectionInfo(SEXP conHandle)
 {
-  S_EVALUATOR
 
   RS_DBI_connection  *con;
   SEXP output;
@@ -980,8 +970,6 @@ RS_DBI_connectionInfo(SEXP conHandle)
 SEXP        /* return a named list */
 RS_DBI_resultSetInfo(SEXP rsHandle)
 {
-  S_EVALUATOR
-
   RS_DBI_resultSet       *result;
   SEXP output, flds;
   int  n = (int) 6;
@@ -1012,7 +1000,6 @@ RS_DBI_resultSetInfo(SEXP rsHandle)
 SEXP     /* named list */
 RS_DBI_getFieldDescriptions(RS_DBI_fields *flds)
 {
-  S_EVALUATOR
 
   SEXP S_fields;
   int  n = (int) 7;
@@ -1080,7 +1067,6 @@ RS_DBI_getTypeName(int t, const struct data_types table[])
 SEXP
 RS_DBI_makeSQLNames(SEXP snames)
 {
-   S_EVALUATOR
    long     nstrings;
    char     *name, c;
    char     errMsg[128];
