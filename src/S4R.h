@@ -28,17 +28,8 @@ extern "C" {
 #endif
 
 #  include "S.h"
-#  include "Rversion.h"
-#  if defined(R_VERSION) && R_VERSION >= R_Version(1,2,0)
-#    define USE_RINTERNALS 1           /* buggy Rdefines.h in 1.2.0/1.2.1 */
-#    include "Rdefines.h"
-#    ifdef SET_ELEMENT                 /* workaround for bug in Rdefines.h */
-#      undef SET_ELEMENT
-#      define SET_ELEMENT(x,i,val) SET_VECTOR_ELT((x),(i),(val))
-#    endif   /* SET_ELEMENT */
-#  else
-#    include "Rdefines.h"
-#  endif
+#  define USE_RINTERNALS 1
+#  include "Rdefines.h"
 #  define singl double
 #  define Sint  int
 #  define charPtr SEXP *
@@ -88,15 +79,9 @@ extern "C" {
 #define NUM_EL(x,i) NUMERIC_POINTER((x))[(i)]
 #define DBL_EL(x,i) NUM_EL((x),(i))
 #define RAW_EL(x,i) RAW_POINTER((x))[(i)]
-#if defined(R_VERSION) && R_VERSION >= R_Version(1,2,0)
-#  define LST_EL(x,i) VECTOR_ELT((x),(i))
-#  define CHR_EL(x,i) CHAR_DEREF(STRING_ELT((x),(i)))
-#  define SET_CHR_EL(x,i,val)  SET_STRING_ELT((x),(i), (val))
-#else     /* the following are valid for S4/Splus5 and R < 1.2.0 */
-#  define LST_EL(x,i) LIST_POINTER((x))[(i)]
-#  define CHR_EL(x,i) CHAR_DEREF(CHARACTER_POINTER((x))[(i)])
-#  define SET_CHR_EL(x,i,val)  (CHR_EL(x,i)=val)
-#endif
+#define LST_EL(x,i) VECTOR_ELT((x),(i))
+#define CHR_EL(x,i) CHAR_DEREF(STRING_ELT((x),(i)))
+#define SET_CHR_EL(x,i,val)  SET_STRING_ELT((x),(i), (val))
 
 /* x[[i]][j] -- can be also assigned if x[[i]] is a numeric type */
 #define LST_CHR_EL(x,i,j) CHR_EL(LST_EL((x),(i)), (j))
@@ -110,11 +95,7 @@ extern "C" {
 #define LST_LST_EL(x,i,j) LST_EL(LST_EL((x),(i)), (j))
 
 /* x[[i]][j] -- for the case when x[[i]] is a character type */
-#if defined(R_VERSION) && R_VERSION >= R_Version(1,2,0)
-#  define SET_LST_CHR_EL(x,i,j,val) SET_STRING_ELT(LST_EL(x,i), j, val)
-#else
-#  define SET_LST_CHR_EL(x,i,j,val) (CHR_EL(LST_EL(x,i),j)=val)
-#endif
+#define SET_LST_CHR_EL(x,i,j,val) SET_STRING_ELT(LST_EL(x,i), j, val)
 
 /* setting and querying NA's -- in the case of R, we need to
  * use our own RS_na_set and RS_is_na functions (these need work!)
