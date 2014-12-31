@@ -45,12 +45,6 @@ extern  "C" {
 * of 1, 2 or 3 integers.  In the C implementation we use these
 * R/S vectors as handles (we could have used pointers).
 */
-typedef enum enum_dbi_exception {
-  RS_DBI_MESSAGE,
-  RS_DBI_WARNING,
-  RS_DBI_ERROR,
-  RS_DBI_TERMINATE
-} DBI_EXCEPTION;
 
 /* The integer value for the following enum's needs to equal
 * GET_LENGTH(handle) for the various handles.
@@ -87,12 +81,6 @@ SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
 /* TODO: Need a table of fun pointers to converters */
 } RMySQLFields;
 
-typedef struct st_sdbi_exception {
-  DBI_EXCEPTION  exceptionType; /* one of RS_DBI_WARN, RS_RBI_ERROR, etc */
-int  errorNum;            /* SQL error number (possibly driver-dependent*/
-char *errorMsg;           /* SQL error message */
-} RS_DBI_exception;
-
 /* The RS-DBI resultSet consists of a pointer to the actual DBMS
 * resultSet (e.g., MySQL, Oracle) possibly NULL,  plus the fields
 * defined by the RS-DBI implementation.
@@ -127,7 +115,6 @@ int   num_res;                    /* num of open resultSets */
 int   counter;                    /* total number of queries */
 int   managerId;
 int   connectionId;
-RS_DBI_exception *exception;
 } RS_DBI_connection;
 
 /* dbManager */
@@ -139,7 +126,6 @@ int num_con;                     /* num of opened connections */
 int counter;                     /* num of connections handled so far*/
 int fetch_default_rec;           /* default num of records per fetch */
 int managerId;                   /* typically, process id */
-RS_DBI_exception *exception;
 } MySQLDriver;
 
 /* All RS_DBI functions and their signatures */
