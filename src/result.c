@@ -1,29 +1,22 @@
 #include "RS-MySQL.h"
 
 SEXP RS_DBI_allocResultSet(SEXP conHandle) {
-  RS_DBI_connection *con = NULL;
-  RS_DBI_resultSet  *result = NULL;
-  SEXP rsHandle;
-  int indx, res_id;
+  RS_DBI_connection *con = RS_DBI_getConnection(conHandle);
 
-  con = RS_DBI_getConnection(conHandle);
-  indx = RS_DBI_newEntry(con->resultSetIds, con->length);
-  if(indx < 0){
-    char msg[128], fmt[128];
-    (void) strcpy(fmt, "cannot allocate a new resultSet -- ");
-    (void) strcat(fmt, "maximum of %d resultSets already reached");
-    (void) sprintf(msg, fmt, con->length);
-    error(msg);
+  int indx = RS_DBI_newEntry(con->resultSetIds, con->length);
+  if (indx < 0) {
+    error(
+      "cannot allocate a new resultSet -- maximum of %d resultSets already reached",
+      con->length
+    );
   }
-
-  result = (RS_DBI_resultSet *) malloc(sizeof(RS_DBI_resultSet));
-  if(!result){
+  RS_DBI_resultSet* result = malloc(sizeof(RS_DBI_resultSet));
+  if (!result) {
     RS_DBI_freeEntry(con->resultSetIds, indx);
     error("could not malloc dbResultSet");
   }
   result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
   result->statement = (char *) NULL;
-  result->managerId = MGR_ID(conHandle);
   result->connectionId = CON_ID(conHandle);
   result->resultSetId = con->counter;
   result->isSelect = (int) -1;
@@ -33,65 +26,54 @@ SEXP RS_DBI_allocResultSet(SEXP conHandle) {
   result->fields = NULL;
 
   /* update connection's resultSet table */
-  res_id = con->counter;
+  int res_id = con->counter;
   con->num_res += (int) 1;
   con->counter += (int) 1;
   con->resultSets[indx] = result;
   con->resultSetIds[indx] = res_id;
 
-  rsHandle = RS_DBI_asResHandle(MGR_ID(conHandle),CON_ID(conHandle),res_id);
-  return rsHandle;
+  return RS_DBI_asResHandle(MGR_ID(conHandle), CON_ID(conHandle), res_id);
 }
 
 void RS_DBI_freeResultSet(SEXP rsHandle) {
-  RS_DBI_resultSet  *result;
-  RS_DBI_connection *con;
-  int indx;
-
-  con = RS_DBI_getConnection(rsHandle);
-  result = RS_DBI_getResultSet(rsHandle);
+  RS_DBI_connection* con = RS_DBI_getConnection(rsHandle);
+  RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
 
   if(result->drvResultSet) {
     error("internal error in RS_DBI_freeResultSet: non-freed result->drvResultSet (some memory leaked)");
   }
 
-  if(result->statement)
+  if (result->statement)
     free(result->statement);
-  if(result->fields)
+  if (result->fields)
     rmysql_fields_free(result->fields);
   free(result);
-  result = (RS_DBI_resultSet *) NULL;
+  result = NULL;
 
   /* update connection's resultSet table */
-  indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
+  int indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
   RS_DBI_freeEntry(con->resultSetIds, indx);
-  con->resultSets[indx] = (RS_DBI_resultSet *) NULL;
-  con->num_res -= (int) 1;
-
-  return;
+  con->resultSets[indx] = NULL;
+  con->num_res -= 1;
 }
 
 SEXP RS_DBI_asResHandle(int mgrId, int conId, int resId) {
-  SEXP resHandle;
-
-  PROTECT(resHandle = NEW_INTEGER((int) 3));
-  MGR_ID(resHandle) = mgrId;
+  SEXP resHandle = PROTECT(allocVector(INTSXP, 3));
   CON_ID(resHandle) = conId;
   RES_ID(resHandle) = resId;
   UNPROTECT(1);
+
   return resHandle;
 }
 
 RS_DBI_resultSet* RS_DBI_getResultSet(SEXP rsHandle) {
-  RS_DBI_connection *con;
-  int indx;
-
-  con = RS_DBI_getConnection(rsHandle);
-  indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
-  if(indx<0)
+  RS_DBI_connection* con = RS_DBI_getConnection(rsHandle);
+  int indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
+  if (indx < 0)
     error("internal error in RS_DBI_getResultSet: could not find resultSet in connection");
-  if(!con->resultSets[indx])
+  if (!con->resultSets[indx])
     error("internal error in RS_DBI_getResultSet: missing resultSet");
+
   return con->resultSets[indx];
 }
 
@@ -120,40 +102,34 @@ SEXP RS_DBI_resultSetInfo(SEXP rsHandle) {
   return output;
 }
 
-
 SEXP RS_MySQL_nextResultSet(SEXP conHandle) {
-  RS_DBI_connection *con;
   RS_DBI_resultSet  *result;
   SEXP rsHandle;
-  MYSQL_RES         *my_result;
-  MYSQL             *my_connection;
-  int              rc, num_fields, is_select;
+  int num_fields, is_select;
 
-  con = RS_DBI_getConnection(conHandle);
-  my_connection = (MYSQL *) con->drvConnection;
+  RS_DBI_connection* con = RS_DBI_getConnection(conHandle);
+  MYSQL* my_connection = con->drvConnection;
 
-  rc = (int) mysql_next_result(my_connection);
-
-  if(rc<0){
+  int rc = mysql_next_result(my_connection);
+  if (rc < 0) {
     error("no more result sets");
-  }
-  else if(rc>0){
+  } else if (rc > 0){
     error("error in getting next result set");
   }
 
   /* the following comes verbatim from RS_MySQL_exec() */
-  my_result = mysql_use_result(my_connection);
-  if(!my_result)
-    my_result = (MYSQL_RES *) NULL;
+  MYSQL_RES* my_result = mysql_use_result(my_connection);
+  if (!my_result)
+    my_result = NULL;
 
-  num_fields = (int) mysql_field_count(my_connection);
-  is_select = (int) TRUE;
-  if(!my_result){
-    if(num_fields>0){
+  num_fields = mysql_field_count(my_connection);
+  is_select = TRUE;
+  if (!my_result) {
+    if (num_fields > 0) {
       error("error in getting next result set");
-    }
-    else
+    } else {
       is_select = FALSE;
+    }
   }
 
   /* we now create the wrapper and copy values */
@@ -163,16 +139,15 @@ SEXP RS_MySQL_nextResultSet(SEXP conHandle) {
   result->drvResultSet = (void *) my_result;
   result->rowCount = (int) 0;
   result->isSelect = is_select;
-  if(!is_select){
+  if (!is_select){
     result->rowsAffected = (int) mysql_affected_rows(my_connection);
     result->completed = 1;
-  }
-  else {
+  } else {
     result->rowsAffected = (int) -1;
     result->completed = 0;
   }
 
-  if(is_select)
+  if (is_select)
     result->fields = RS_MySQL_createDataMappings(rsHandle);
 
   return rsHandle;
