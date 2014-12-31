@@ -180,8 +180,7 @@ SEXP                                /* output is a named list */
       result = RS_DBI_getResultSet(rsHandle);
       flds = result->fields;
       if(!flds)
-        RS_DBI_errorMessage("corrupt resultSet, missing fieldDescription",
-          RS_DBI_ERROR);
+        error("corrupt resultSet, missing fieldDescription");
       num_fields = flds->num_fields;
       fld_Sclass = flds->Sclass;
       PROTECT(data = NEW_LIST((int) num_fields));     /* buffer records */
@@ -269,11 +268,7 @@ SEXP                                /* output is a named list */
               SET_LST_CHR_EL(data,j,i,NA_STRING);
             else {
               if((size_t) lens[j] != strlen(row[j])){
-                char warn[128];
-                (void) sprintf(warn,
-                  "internal error: row %ld field %ld truncated",
-                  (long) i, (long) j);
-                RS_DBI_errorMessage(warn, RS_DBI_WARNING);
+                warning("internal error: row %ld field %ld truncated", i, j);
               }
               SET_LST_CHR_EL(data,j,i,mkChar(row[j]));
             }
@@ -292,11 +287,7 @@ SEXP                                /* output is a named list */
             if(null_item)
               SET_LST_CHR_EL(data,j,i, NA_STRING);
             else {
-              char warn[64];
-              (void) sprintf(warn,
-                "unrecognized field type %d in column %d",
-                (int) fld_Sclass[j], (int) j);
-              RS_DBI_errorMessage(warn, RS_DBI_WARNING);
+              warning("unrecognized field type %d in column %d", fld_Sclass[j], j);
               SET_LST_CHR_EL(data,j,i,mkChar(row[j]));
             }
             SET_LST_CHR_EL(cur_rec,j,0, mkChar(LST_CHR_EL(data,j,i)));
@@ -360,7 +351,7 @@ SEXP                                /* output is a named list */
       * TODO: What should we return in the case of partial groups???
       */
       if(completed < 0)
-        RS_DBI_errorMessage("error while fetching rows", RS_DBI_WARNING);
+        warning("error while fetching rows");
       else if(completed)
         event = (END_GROUP|END);
       else
@@ -386,7 +377,7 @@ SEXP                                /* output is a named list */
           (void) strcat(buf, "output group was computed with partial data. ");
           (void) strcat(buf, "The remaining data were left un-read in the ");
           (void) strcat(buf, "result set.");
-          RS_DBI_errorMessage(buf, RS_DBI_WARNING);
+          warning(buf);
         }
       }
 
@@ -465,7 +456,7 @@ void
       strcpy(buff, CHAR(STRING_ELT(col, i)));
       break;
     default:
-      RS_DBI_errorMessage("unrecognized R/S type for group", RS_DBI_ERROR);
+      error("unrecognized R/S type for group");
     break;
     }
 

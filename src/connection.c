@@ -11,7 +11,7 @@ SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams) {
   MYSQL     *my_connection;
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
-    RS_DBI_errorMessage("invalid MySQLManager", RS_DBI_ERROR);
+    error("invalid MySQLManager");
 
   /* Initialize MySQL connection */
   my_connection = mysql_init(NULL);
@@ -43,9 +43,10 @@ SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams) {
 
     RS_MySQL_freeConParams(conParams);
 
-    char buf[2048];
-    sprintf(buf, "Failed to connect to database: Error: %s\n", mysql_error(my_connection));
-    RS_DBI_errorMessage(buf, RS_DBI_ERROR);
+    error(
+      "Failed to connect to database: Error: %s\n",
+      mysql_error(my_connection)
+    );
   }
 
   /* MySQL connections can only have 1 result set open at a time */
@@ -54,8 +55,7 @@ SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams) {
   if(!con){
     mysql_close(my_connection);
     RS_MySQL_freeConParams(conParams);
-    RS_DBI_errorMessage("could not alloc space for connection object",
-      RS_DBI_ERROR);
+    error("could not alloc space for connection object");
   }
 
   con->conParams = (void *) conParams;
@@ -124,7 +124,6 @@ void RS_DBI_freeConnection(SEXP conHandle) {
 
   /* Are there open resultSets? If so, free them first */
   if (con->num_res > 0) {
-    char *errMsg = "opened resultSet(s) forcebly closed";
     int  i;
     SEXP rsHandle;
 
@@ -134,17 +133,13 @@ void RS_DBI_freeConnection(SEXP conHandle) {
         (int) con->resultSetIds[i]);
       RS_DBI_freeResultSet(rsHandle);
     }
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+    warning("opened resultSet(s) forcebly closed");
   }
   if(con->drvConnection) {
-    char *errMsg =
-      "internal error in RS_DBI_freeConnection: driver might have left open its connection on the server";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+    error("internal error in RS_DBI_freeConnection: driver might have left open its connection on the server");
   }
   if(con->conParams){
-    char *errMsg =
-      "internal error in RS_DBI_freeConnection: non-freed con->conParams (tiny memory leaked)";
-    RS_DBI_errorMessage(errMsg, RS_DBI_WARNING);
+    error("internal error in RS_DBI_freeConnection: non-freed con->conParams (tiny memory leaked)");
   }
   /* delete this connection from manager's connection table */
   if(con->resultSets) free(con->resultSets);
@@ -253,8 +248,7 @@ RS_MySQL_conParams* RS_MySQL_allocConParams(void) {
 
   conParams = (RS_MySQL_conParams *) malloc(sizeof(RS_MySQL_conParams));
   if(!conParams){
-    RS_DBI_errorMessage("could not malloc space for connection params",
-      RS_DBI_ERROR);
+    error("could not malloc space for connection params");
   }
   conParams->dbname = NULL;
   conParams->username = NULL;
@@ -305,7 +299,7 @@ SEXP RS_MySQL_newConnection(SEXP mgrHandle, SEXP s_dbname, SEXP s_username,
   RS_MySQL_conParams *conParams;
 
   if(!is_validHandle(mgrHandle, MGR_HANDLE_TYPE))
-    RS_DBI_errorMessage("invalid MySQLManager", RS_DBI_ERROR);
+    error("invalid MySQLManager");
 
   /* Create connection parameters structure and initialize */
   conParams = RS_MySQL_allocConParams();
@@ -339,9 +333,7 @@ SEXP RS_MySQL_closeConnection(SEXP conHandle) {
 
   con = RS_DBI_getConnection(conHandle);
   if(con->num_res>0){
-    RS_DBI_errorMessage(
-      "close the pending result sets before closing this connection",
-      RS_DBI_ERROR);
+    error("close the pending result sets before closing this connection");
   }
   /* make sure we first free the conParams and mysql connection from
    * the RS-RBI connection object.
@@ -399,9 +391,7 @@ SEXP RS_MySQL_connectionInfo(SEXP conHandle) {
   nres = RS_DBI_listEntries(con->resultSetIds, con->length, res);
   if(nres != con->num_res){
     UNPROTECT(1);
-    RS_DBI_errorMessage(
-      "internal error: corrupt RS_DBI resultSet table",
-      RS_DBI_ERROR);
+    error("internal error: corrupt RS_DBI resultSet table");
   }
   for( i = 0; i < con->num_res; i++){
     LST_INT_EL(output,7,i) = (int) res[i];

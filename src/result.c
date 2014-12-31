@@ -16,14 +16,13 @@ SEXP
       (void) strcpy(fmt, "cannot allocate a new resultSet -- ");
       (void) strcat(fmt, "maximum of %d resultSets already reached");
       (void) sprintf(msg, fmt, con->length);
-      RS_DBI_errorMessage(msg, RS_DBI_ERROR);
+      error(msg);
     }
 
     result = (RS_DBI_resultSet *) malloc(sizeof(RS_DBI_resultSet));
     if(!result){
-      char *errMsg = "could not malloc dbResultSet";
       RS_DBI_freeEntry(con->resultSetIds, indx);
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+      error("could not malloc dbResultSet");
     }
     result->drvResultSet = (void *) NULL; /* driver's own resultSet (cursor)*/
     result->statement = (char *) NULL;
@@ -58,9 +57,7 @@ void
     result = RS_DBI_getResultSet(rsHandle);
 
     if(result->drvResultSet) {
-      char *errMsg =
-        "internal error in RS_DBI_freeResultSet: non-freed result->drvResultSet (some memory leaked)";
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+      error("internal error in RS_DBI_freeResultSet: non-freed result->drvResultSet (some memory leaked)");
     }
 
     if(result->statement)
@@ -98,13 +95,9 @@ RS_DBI_resultSet* RS_DBI_getResultSet(SEXP rsHandle) {
   con = RS_DBI_getConnection(rsHandle);
   indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(rsHandle));
   if(indx<0)
-    RS_DBI_errorMessage(
-      "internal error in RS_DBI_getResultSet: could not find resultSet in connection",
-      RS_DBI_ERROR);
+    error("internal error in RS_DBI_getResultSet: could not find resultSet in connection");
   if(!con->resultSets[indx])
-    RS_DBI_errorMessage(
-      "internal error in RS_DBI_getResultSet: missing resultSet",
-      RS_DBI_ERROR);
+    error("internal error in RS_DBI_getResultSet: missing resultSet");
   return con->resultSets[indx];
 }
 
@@ -151,10 +144,10 @@ SEXP
     rc = (int) mysql_next_result(my_connection);
 
     if(rc<0){
-      RS_DBI_errorMessage("no more result sets", RS_DBI_ERROR);
+      error("no more result sets");
     }
     else if(rc>0){
-      RS_DBI_errorMessage("error in getting next result set", RS_DBI_ERROR);
+      error("error in getting next result set");
     }
 
     /* the following comes verbatim from RS_MySQL_exec() */
@@ -166,7 +159,7 @@ SEXP
     is_select = (int) TRUE;
     if(!my_result){
       if(num_fields>0){
-        RS_DBI_errorMessage("error in getting next result set", RS_DBI_ERROR);
+        error("error in getting next result set");
       }
       else
         is_select = FALSE;
@@ -225,9 +218,7 @@ SEXP
     result = RS_DBI_getResultSet(rsHandle);
     if(result->completed == 0){
       free(dyn_statement);
-      RS_DBI_errorMessage(
-        "connection with pending rows, close resultSet before continuing",
-        RS_DBI_ERROR);
+      error("connection with pending rows, close resultSet before continuing");
     }
     else
       RS_MySQL_closeResultSet(rsHandle);
@@ -236,11 +227,7 @@ SEXP
     /* Here is where we actually run the query */
     state = mysql_query(my_connection, dyn_statement);
     if(state) {
-      char errMsg[256];
-      free(dyn_statement);
-      (void) sprintf(errMsg, "could not run statement: %s",
-        mysql_error(my_connection));
-      RS_DBI_errorMessage(errMsg, RS_DBI_ERROR);
+      error("could not run statement: %s", mysql_error(my_connection));
     }
 
     /* Do we need output column/field descriptors?  Only for SELECT-like
@@ -259,7 +246,7 @@ SEXP
     if(!my_result){
       if(num_fields>0){
         free(dyn_statement);
-        RS_DBI_errorMessage("error in select/select-like", RS_DBI_ERROR);
+        error("error in select/select-like");
       }
       else
         is_select = FALSE;
@@ -309,8 +296,7 @@ SEXP     /* output is a named list */
       result = RS_DBI_getResultSet(rsHandle);
       flds = result->fields;
       if(!flds)
-        RS_DBI_errorMessage("corrupt resultSet, missing fieldDescription",
-          RS_DBI_ERROR);
+        error("corrupt resultSet, missing fieldDescription");
       num_rec = asInteger(max_rec);
       expand = (num_rec < 0);   /* dyn expand output to accommodate all rows*/
     if(expand || num_rec == 0){
@@ -371,11 +357,7 @@ SEXP     /* output is a named list */
             SET_LST_CHR_EL(output,j,i,NA_STRING);
           else {
             if((size_t) lens[j] != strlen(row[j])){
-              char warn[128];
-              (void) sprintf(warn,
-                "internal error: row %ld field %ld truncated",
-                (long) i, (long) j);
-              RS_DBI_errorMessage(warn, RS_DBI_WARNING);
+              warning("internal error: row %d field %d truncated", i, j);
             }
             SET_LST_CHR_EL(output,j,i,mkChar(row[j]));
           }
@@ -392,11 +374,7 @@ SEXP     /* output is a named list */
           if(null_item)
             SET_LST_CHR_EL(output,j,i, NA_STRING);
           else {
-            char warn[64];
-            (void) sprintf(warn,
-              "unrecognized field type %d in column %d",
-              (int) fld_Sclass[j], (int) j);
-            RS_DBI_errorMessage(warn, RS_DBI_WARNING);
+            warning("unrecognized field type %d in column %d", fld_Sclass[j], j);
             SET_LST_CHR_EL(output,j,i,mkChar(row[j]));
           }
           break;
@@ -416,7 +394,7 @@ SEXP     /* output is a named list */
       }
     }
     if(completed < 0)
-      RS_DBI_errorMessage("error while fetching rows", RS_DBI_WARNING);
+      warning("error while fetching rows");
 
     result->rowCount += num_rec;
     result->completed = (int) completed;

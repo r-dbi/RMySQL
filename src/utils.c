@@ -69,7 +69,7 @@ void RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds, int num_rec, int  expa
       SET_ELEMENT(output, j, NEW_LIST(num_rec));
       break;
     default:
-      RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
+      error("unsupported data type");
     }
   }
 
@@ -91,9 +91,7 @@ char* RS_DBI_copyString(const char *str) {
 
   buffer = (char *) malloc((size_t) strlen(str)+1);
   if(!buffer)
-    RS_DBI_errorMessage(
-      "internal error in RS_DBI_copyString: could not alloc string space",
-      RS_DBI_ERROR);
+    error("internal error in RS_DBI_copyString: could not alloc string space");
   return strcpy(buffer, str);
 }
 
@@ -125,7 +123,7 @@ SEXP RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
       PROTECT(obj = NEW_LIST(num_elem));
       break;
     default:
-      RS_DBI_errorMessage("unsupported data type", RS_DBI_ERROR);
+      error("unsupported data type");
     }
     SET_ELEMENT(output, (int)j, obj);
     SET_CHR_EL(output_names, j, mkChar(names[j]));
@@ -284,22 +282,3 @@ SEXP rmysql_version() {
   return output;
 }
 
-void RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type) {
-  char *driver = "RS-DBI";   /* TODO: use the actual driver name */
-
-switch(exception_type) {
-case RS_DBI_MESSAGE:
-  warning("%s driver message: (%s)", driver, msg);
-  break;
-case RS_DBI_WARNING:
-  warning("%s driver warning: (%s)", driver, msg);
-  break;
-case RS_DBI_ERROR:
-  error("%s driver: (%s)", driver, msg);
-  break;
-case RS_DBI_TERMINATE:
-  error("%s driver fatal: (%s)", driver, msg); /* was TERMINATE */
-break;
-}
-return;
-}

@@ -190,7 +190,6 @@ void  RS_DBI_allocOutput(SEXP output,
   int expand);
 void RS_DBI_makeDataFrame(SEXP data);
 
-void  RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exceptionType);
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);
 
