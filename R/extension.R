@@ -2,11 +2,11 @@
 NULL
 
 ## the following code was kindly provided ny J. T. Lindgren.
-#' @useDynLib RMySQL RS_MySQL_escapeStrings
+#' @useDynLib RMySQL rmysql_escape_strings
 mysqlEscapeStrings <- function(con, strings) {
   checkValid(con)
 
-  out <- .Call(RS_MySQL_escapeStrings, con@Id, as.character(strings))
+  out <- .Call(rmysql_escape_strings, con@Id, as.character(strings))
   names(out) <- names(strings)
   out
 }

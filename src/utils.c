@@ -243,45 +243,26 @@ int
 *   we protect against potentially deadly requests?
 */
 
-SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP strings)
-{
-  RS_DBI_connection *con;
-  MYSQL             *my_connection;
-  long len, old_len;
-  int i, nStrings;
-  char *str;
-  char *escapedString;
-  SEXP output;
+SEXP rmysql_escape_strings(SEXP conHandle, SEXP strings) {
+  MYSQL* con = RS_DBI_getConnection(conHandle)->drvConnection;
 
-  con = RS_DBI_getConnection(conHandle);
-  my_connection = (MYSQL *) con->drvConnection;
+  int n = length(strings);
+  SEXP output = PROTECT(allocVector(STRSXP, n));
 
-  nStrings = GET_LENGTH(strings);
-  PROTECT(output = NEW_CHARACTER(nStrings));
+  char* escaped = NULL;
+  for(int i = 0; i < n; i++){
+    const char* string = CHAR(STRING_ELT(strings, i));
 
-  old_len = (long) 1;
-  escapedString = (char *) S_alloc(old_len, (int) sizeof(char));
-  if(!escapedString){
-    RS_DBI_errorMessage(
-      "(RS_MySQL_escapeStrings) could not allocate memory",
-      RS_DBI_ERROR);
-  }
-
-  for(i=0; i<nStrings; i++){
-    str = RS_DBI_copyString(CHR_EL(strings,i));
-    len = (long) strlen(str);
-    escapedString = (char *) S_realloc(escapedString,
-      (long) 2*len+1, old_len, (int)sizeof(char));
-    if(!escapedString){
-      RS_DBI_errorMessage(
-        "(RS_MySQL_escapeStrings) could not (re)allocate memory",
-        RS_DBI_ERROR);
+    size_t len = strlen(string);
+    escaped = realloc(escaped, (2 * len + 1) * sizeof(char));
+    if (!escaped) {
+      error("Could not allocate memory to escape string");
     }
 
-    mysql_real_escape_string(my_connection, escapedString, str, len);
-
-    SET_CHR_EL(output, i, mkChar(escapedString));
+    mysql_real_escape_string(con, escaped, string, len);
+    SET_STRING_ELT(output, i, mkChar(escaped));
   }
+  free(escaped);
 
   UNPROTECT(1);
   return output;

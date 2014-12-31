@@ -274,7 +274,7 @@ RS_DBI_fields *RS_MySQL_createDataMappings(SEXP resHandle);
 SEXP RS_MySQL_connectionInfo(SEXP conHandle);
 SEXP RS_MySQL_resultSetInfo(SEXP rsHandle);
 
-SEXP RS_MySQL_escapeStrings(SEXP conHandle, SEXP statement);
+SEXP rmysql_escape_strings(SEXP conHandle, SEXP statement);
 
 SEXP RS_MySQL_versionId(void);
 
