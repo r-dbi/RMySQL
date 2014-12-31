@@ -34,8 +34,6 @@ extern  "C" {
 #include <mysql_com.h>
 #include <string.h>
 
-#include <ctype.h> /* for isalpha */
-
 /* We now define 4 important data structures:
 * MySQLDriver, RS_DBI_connection, RS_DBI_resultSet, and
 * RMySQLFields, corresponding to dbManager, dbConnection,
