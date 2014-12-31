@@ -188,7 +188,7 @@ SEXP                                /* output is a named list */
       np += 2;
 
       RS_DBI_allocOutput(cur_rec, flds, (int) 1, 0);
-      RS_DBI_makeDataFrame(cur_rec);
+      make_data_frame(cur_rec);
 
       num_rec = INT_EL(s_batch_size, 0);     /* this is num of rec per group! */
       max_rec = INT_EL(s_max_rec,0);         /* max rec **per group**         */
@@ -327,7 +327,7 @@ SEXP                                /* output is a named list */
           add_group(group_names, data, fld_Sclass, group_field, ngroup, i-1);
 
           RS_DBI_allocOutput(data, flds, i, expand++);
-          RS_DBI_makeDataFrame(data);
+          make_data_frame(data);
 
           val = RS_DBI_invokeEndGroup(endGroupCall, data,
             CHR_EL(group_names, ngroup), rho);
@@ -364,7 +364,7 @@ SEXP                                /* output is a named list */
 
         if(i<num_rec){
           RS_DBI_allocOutput(data, flds, i, expand++);
-          RS_DBI_makeDataFrame(data);
+          make_data_frame(data);
         }
         if(invoke_endGroup){
           val = RS_DBI_invokeEndGroup(endGroupCall, data,

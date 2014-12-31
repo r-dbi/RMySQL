@@ -188,7 +188,7 @@ void  RS_DBI_allocOutput(SEXP output,
   RS_DBI_fields *flds,
   int num_rec,
   int expand);
-void RS_DBI_makeDataFrame(SEXP data);
+void make_data_frame(SEXP data);
 
 /* utility funs (copy strings, convert from R/S types to string, etc.*/
 char     *RS_DBI_copyString(const char *str);

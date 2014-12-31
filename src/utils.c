@@ -1,31 +1,17 @@
 #include "RS-MySQL.h"
 
+// Turn a list in to a data frame, in place
+void make_data_frame(SEXP data) {
+  int n = length(VECTOR_ELT(data, 0));
 
-/* Make a data.frame from a named list by adding row.names, and class
-* attribute.  Use "1", "2", .. as row.names.
-* NOTE: Only tested  under R (not tested at all under S4 or Splus5+).
-*/
-void RS_DBI_makeDataFrame(SEXP data) {
-  SEXP row_names, df_class_name;
-  int   i, n;
-  char   buf[1024];
+  SEXP rownames = PROTECT(allocVector(REALSXP, 2));
+  REAL(rownames)[0] = NA_REAL;
+  REAL(rownames)[1] = -n;
 
-  PROTECT(data);
-  PROTECT(df_class_name = NEW_CHARACTER((int) 1));
-  SET_CHR_EL(df_class_name, 0, mkChar("data.frame"));
+  setAttrib(data, R_RowNamesSymbol, rownames);
+  setAttrib(data, R_ClassSymbol, mkString("data.frame"));
 
-  /* row.names */
-  n = GET_LENGTH(LST_EL(data,0));            /* length(data[[1]]) */
-  PROTECT(row_names = NEW_CHARACTER(n));
-  for(i=0; i<n; i++){
-    (void) sprintf(buf, "%d", i+1);
-    SET_CHR_EL(row_names, i, mkChar(buf));
-  }
-
-  setAttrib(data, R_RowNamesSymbol, row_names);
-  SET_CLASS(data, df_class_name);
-
-  UNPROTECT(3);
+  UNPROTECT(1);
   return;
 }
 
@@ -83,7 +69,6 @@ void RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds, int num_rec, int  expa
 
   return;
 }
-
 
 /* wrapper to strcpy */
 char* RS_DBI_copyString(const char *str) {
@@ -177,7 +162,7 @@ int RS_DBI_listEntries(int *table, int length, int *entries)   {
   return n;
 }
 void RS_DBI_freeEntry(int *table, int indx) { /* no error checking!!! */
-int empty_val = (int) -1;
+  int empty_val = (int) -1;
   table[indx] = empty_val;
   return;
 }
