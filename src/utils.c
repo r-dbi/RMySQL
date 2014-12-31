@@ -268,21 +268,21 @@ SEXP rmysql_escape_strings(SEXP conHandle, SEXP strings) {
   return output;
 }
 
-SEXP
-  RS_MySQL_clientLibraryVersions(void)
-  {
-    SEXP ret, name;
+SEXP rmysql_version() {
+  SEXP output = PROTECT(allocVector(INTSXP, 2));
+  SEXP output_nms = PROTECT(allocVector(STRSXP, 2));
+  SET_NAMES(output, output_nms);
+  UNPROTECT(1);
 
-    PROTECT(name=NEW_CHARACTER(2));
-    SET_STRING_ELT(name, 0, COPY_TO_USER_STRING(MYSQL_SERVER_VERSION));
-    SET_STRING_ELT(name, 1, COPY_TO_USER_STRING(mysql_get_client_info()));
-    PROTECT(ret=NEW_INTEGER(2));
-    INTEGER(ret)[0] = (int)MYSQL_VERSION_ID;
-    INTEGER(ret)[1] = (int)mysql_get_client_version();
-    SET_NAMES(ret,name);
-    UNPROTECT(2);
-    return ret;
-  }
+  SET_STRING_ELT(output_nms, 0, mkChar(MYSQL_SERVER_VERSION));
+  INTEGER(output)[0] = MYSQL_VERSION_ID;
+
+  SET_STRING_ELT(output_nms, 1, mkChar(mysql_get_client_info()));
+  INTEGER(output)[1] = mysql_get_client_version();
+
+  UNPROTECT(1);
+  return output;
+}
 
 void RS_DBI_errorMessage(char *msg, DBI_EXCEPTION exception_type) {
   char *driver = "RS-DBI";   /* TODO: use the actual driver name */

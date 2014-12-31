@@ -351,9 +351,9 @@ safe.write <- function(value, file, batch, ...) {
 #' @export
 #' @examples
 #' mysqlClientLibraryVersions()
-#' @useDynLib RMySQL RS_MySQL_clientLibraryVersions
+#' @useDynLib RMySQL rmysql_version
 mysqlClientLibraryVersions <- function() {
-  .Call(RS_MySQL_clientLibraryVersions)
+  .Call(rmysql_version)
 }
 
 #' Quote method for MySQL identifiers
