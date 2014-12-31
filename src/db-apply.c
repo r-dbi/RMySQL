@@ -132,7 +132,7 @@ SEXP                                /* output is a named list */
     SEXP s_max_rec)    /* max rows per group */
     {
       RS_DBI_resultSet *result;
-      RS_DBI_fields    *flds;
+      RMySQLFields* flds;
 
       MYSQL_RES *my_result;
       MYSQL_ROW  row;

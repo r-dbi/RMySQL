@@ -15,7 +15,7 @@ void make_data_frame(SEXP data) {
   return;
 }
 
-void RS_DBI_allocOutput(SEXP output, RS_DBI_fields *flds, int num_rec, int  expand) {
+void RS_DBI_allocOutput(SEXP output, RMySQLFields* flds, int num_rec, int  expand) {
   SEXP names, s_tmp;
   int   j;
   int    num_fields;

@@ -33,7 +33,7 @@ SEXP
     result->rowsAffected = (int) -1;
     result->rowCount = (int) 0;
     result->completed = (int) -1;
-    result->fields = (RS_DBI_fields *) NULL;
+    result->fields = NULL;
 
     /* update connection's resultSet table */
     res_id = con->counter;
@@ -63,7 +63,7 @@ void
     if(result->statement)
       free(result->statement);
     if(result->fields)
-      RS_DBI_freeFields(result->fields);
+      rmysql_fields_free(result->fields);
     free(result);
     result = (RS_DBI_resultSet *) NULL;
 
@@ -281,7 +281,7 @@ SEXP     /* output is a named list */
     {
       MySQLDriver   *mgr;
       RS_DBI_resultSet *result;
-      RS_DBI_fields    *flds;
+      RMySQLFields* flds;
       MYSQL_RES *my_result;
       MYSQL_ROW  row;
       SEXP output, s_tmp;

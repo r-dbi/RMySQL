@@ -38,7 +38,7 @@ extern  "C" {
 
 /* We now define 4 important data structures:
 * MySQLDriver, RS_DBI_connection, RS_DBI_resultSet, and
-* RS_DBI_fields, corresponding to dbManager, dbConnection,
+* RMySQLFields, corresponding to dbManager, dbConnection,
 * dbResultSet, and list of field descriptions.
 */
 /* In R/S a dbObject is a foreign reference consisting of a vector
@@ -74,7 +74,7 @@ RES_HANDLE_TYPE = 3      /* dbResult handle */
 * Each element is an array of num_fields, this flds->Sclass[3] stores
 * the S class for the 4th output fields.
 */
-typedef struct st_sdbi_fields {
+typedef struct RMySQLFields {
   int num_fields;
   char  **name;         /* DBMS field names */
 int  *type;          /* DBMS internal types */
@@ -85,7 +85,7 @@ int  *nullOk;        /* DBMS indicator for DBMS'  NULL type */
 int  *isVarLength;   /* DBMS variable-length char type */
 SEXPTYPE *Sclass;        /* R/S class (type) -- may be overriden */
 /* TODO: Need a table of fun pointers to converters */
-} RS_DBI_fields;
+} RMySQLFields;
 
 typedef struct st_sdbi_exception {
   DBI_EXCEPTION  exceptionType; /* one of RS_DBI_WARN, RS_RBI_ERROR, etc */
@@ -107,7 +107,7 @@ char  *statement;      /* SQL statement */
 int  rowsAffected;    /* used by non-SELECT statements */
 int  rowCount;        /* rows fetched so far (SELECT-types)*/
 int  completed;       /* have we fetched all rows? */
-RS_DBI_fields *fields;
+RMySQLFields* fields;
 } RS_DBI_resultSet;
 
 /* A dbConnection consists of a pointer to the actual implementation
@@ -178,14 +178,14 @@ int  RS_DBI_listEntries(int *table, int length, int *entries);
 void  RS_DBI_freeEntry(int *table, int indx);
 
 /* description of the fields in a result set */
-void           RS_DBI_freeFields(RS_DBI_fields *flds);
+void           rmysql_fields_free(RMySQLFields* flds);
 
 /* we (re)allocate the actual output list in here (with the help of
-* RS_DBI_fields).  This should be some kind of R/S "relation"
+* RMySQLFields).  This should be some kind of R/S "relation"
 * table, not a dataframe nor a list.
 */
 void  RS_DBI_allocOutput(SEXP output,
-  RS_DBI_fields *flds,
+  RMySQLFields* flds,
   int num_rec,
   int expand);
 void make_data_frame(SEXP data);
@@ -198,7 +198,7 @@ SEXP RS_DBI_createNamedList(char  **names,
   SEXPTYPE *types,
   int  *lengths,
   int  n);
-SEXP RS_DBI_copyFields(RS_DBI_fields *flds);
+SEXP RS_DBI_copyFields(RMySQLFields* flds);
 
 void RS_na_set(void *ptr, SEXPTYPE type);
 int  RS_is_na(void *ptr, SEXPTYPE type);
@@ -266,7 +266,7 @@ SEXP RS_MySQL_moreResultSets(SEXP conHandle);  /* boolean */
 
 SEXP RS_MySQL_validHandle(SEXP handle);      /* boolean */
 
-RS_DBI_fields *RS_MySQL_createDataMappings(SEXP resHandle);
+RMySQLFields* RS_MySQL_createDataMappings(SEXP resHandle);
 /* the following funs return named lists with meta-data for
  * the manager, connections, and  result sets, respectively.
  */

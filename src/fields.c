@@ -1,6 +1,6 @@
 #include "RS-MySQL.h"
 
-void RS_DBI_freeFields(RS_DBI_fields *flds) {
+void rmysql_fields_free(RMySQLFields* flds) {
   int i;
   if (flds->name) {
     for(i = 0; i < flds->num_fields; i++) {
@@ -21,7 +21,7 @@ void RS_DBI_freeFields(RS_DBI_fields *flds) {
   return;
 }
 
-RS_DBI_fields* RS_MySQL_createDataMappings(SEXP rsHandle) {
+RMySQLFields* RS_MySQL_createDataMappings(SEXP rsHandle) {
   // Fetch MySQL field descriptions
   RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
   MYSQL_RES* my_result = result->drvResultSet;
@@ -29,7 +29,7 @@ RS_DBI_fields* RS_MySQL_createDataMappings(SEXP rsHandle) {
   int num_fields = mysql_num_fields(my_result);
 
   // Allocate memory for output object
-  RS_DBI_fields* flds = malloc(sizeof(RS_DBI_fields));
+  RMySQLFields* flds = malloc(sizeof(RMySQLFields));
   if (!flds) {
     error("Could not allocate memory for database fields");
   }
@@ -193,7 +193,7 @@ char* rmysql_type(int type) {
 
 SEXP rmysql_fields_info(SEXP rsHandle) {
   RS_DBI_resultSet* result = RS_DBI_getResultSet(rsHandle);
-  RS_DBI_fields* flds = result->fields;
+  RMySQLFields* flds = result->fields;
   int n = flds->num_fields;
 
   // Allocate output
