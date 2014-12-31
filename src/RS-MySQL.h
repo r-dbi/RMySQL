@@ -49,12 +49,6 @@ extern  "C" {
 /* The integer value for the following enum's needs to equal
 * GET_LENGTH(handle) for the various handles.
 */
-typedef enum enum_handle_type {
-  MGR_HANDLE_TYPE = 1,     /* dbManager handle */
-CON_HANDLE_TYPE = 2,     /* dbConnection handle */
-RES_HANDLE_TYPE = 3      /* dbResult handle */
-} HANDLE_TYPE;
-
 #define MGR_ID(handle) INTEGER(handle)[0]  /* the actual scalar mgr id */
 #define CON_ID(handle) INTEGER(handle)[1]
 #define RES_ID(handle) INTEGER(handle)[2]
@@ -144,10 +138,6 @@ void               RS_DBI_freeResultSet(SEXP rsHandle);
 RS_DBI_resultSet  *RS_DBI_getResultSet(SEXP rsHandle);
 SEXP RS_DBI_asResHandle(int pid, int conId, int resId);
 SEXP RS_DBI_resultSetInfo(SEXP rsHandle);
-
-/* utility funs */
-SEXP RS_DBI_validHandle(SEXP handle); /* callable from S/R */
-int       is_validHandle(SEXP handle, HANDLE_TYPE handleType);
 
 /* a simple object database (mapping table) -- it uses simple linear
 * search (we don't expect to have more than a handful of simultaneous

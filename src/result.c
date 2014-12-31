@@ -413,3 +413,15 @@ SEXP RS_MySQL_resultSetInfo(SEXP rsHandle) {
 
   return output;
 }
+
+SEXP rmysql_result_valid(SEXP res_) {
+  RS_DBI_connection* con = RS_DBI_getConnection(res_);
+  int indx = RS_DBI_lookup(con->resultSetIds, con->length, RES_ID(res_));
+  if (indx < 0)
+    return ScalarLogical(0);
+
+  if (!con->resultSets[indx])
+    return ScalarLogical(0);
+
+  return ScalarLogical(1);
+}

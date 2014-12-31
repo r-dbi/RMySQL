@@ -20,9 +20,8 @@ NULL
 #' @export
 #' @examples
 #' dbIsValid(MySQL())
-#' @useDynLib RMySQL RS_DBI_validHandle
 isIdCurrent <- function(obj)  {
-  .Call(RS_DBI_validHandle, obj@Id)
+  dbIsValid(obj)
 }
 
 checkValid <- function(obj) {
@@ -40,12 +39,14 @@ setMethod("dbIsValid", "MySQLDriver", function(dbObj) {
 
 #' @export
 #' @rdname isIdCurrent
+#' @useDynLib RMySQL rmysql_connection_valid
 setMethod("dbIsValid", "MySQLConnection", function(dbObj) {
-  .Call(RS_DBI_validHandle, dbObj@Id)
+  .Call(rmysql_connection_valid, dbObj@Id)
 })
 
 #' @export
 #' @rdname isIdCurrent
+#' @useDynLib RMySQL rmysql_result_valid
 setMethod("dbIsValid", "MySQLResult", function(dbObj) {
-  .Call(RS_DBI_validHandle, dbObj@Id)
+  .Call(rmysql_result_valid, dbObj@Id)
 })
