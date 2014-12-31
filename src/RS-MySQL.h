@@ -20,12 +20,12 @@
 extern  "C" {
 #endif
 
-#include "S4R.h"
-
 #if defined WIN32
 # include <windows.h>
 # undef ERROR
 #endif
+
+#include "S4R.h"
 
 #include <mysql.h>
 #include <mysql_version.h>
