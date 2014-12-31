@@ -232,20 +232,26 @@ SEXP rmysql_escape_strings(SEXP conHandle, SEXP strings) {
   int n = length(strings);
   SEXP output = PROTECT(allocVector(STRSXP, n));
 
-  char* escaped = NULL;
+  long size = 100;
+  char* escaped = S_alloc(size, sizeof(escaped));
+
   for(int i = 0; i < n; i++){
     const char* string = CHAR(STRING_ELT(strings, i));
 
     size_t len = strlen(string);
-    escaped = realloc(escaped, (2 * len + 1) * sizeof(char));
-    if (!escaped) {
+    if (size <= 2 * len + 1) {
+      escaped = S_realloc(escaped, (2 * len + 1), size, sizeof(escaped));
+      size = 2 * len + 1;
+    }
+
+    if (escaped == NULL) {
+      UNPROTECT(1);
       error("Could not allocate memory to escape string");
     }
 
     mysql_real_escape_string(con, escaped, string, len);
     SET_STRING_ELT(output, i, mkChar(escaped));
   }
-  free(escaped);
 
   UNPROTECT(1);
   return output;
