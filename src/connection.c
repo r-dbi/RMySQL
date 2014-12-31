@@ -15,6 +15,8 @@ SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams) {
 
   /* Initialize MySQL connection */
   my_connection = mysql_init(NULL);
+  // Always enable INFILE option, since needed for dbWriteTable
+  mysql_options(my_connection, MYSQL_OPT_LOCAL_INFILE, 0);
 
   /* Load MySQL default connection values from a group.
   *
