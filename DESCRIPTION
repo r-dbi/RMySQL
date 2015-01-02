@@ -16,9 +16,10 @@ Depends:
 Imports:
     methods
 License: GPL-2
-URL: https://github.com/rstats-db/rmysql
+URL: https://github.com/rstats-db/rmysql, https://mariadb.org
 BugReports: https://github.com/rstats-db/rmysql/issues
-SystemRequirements: libmysqlclient-dev (deb), mariadb-devel (rpm)
+SystemRequirements: MySQL/MariaDB client headers and libraries, except on Windows.
+    E.g. libmysqlclient-dev (Debian/Ubuntu), mariadb-devel (Fedora).
 NeedsCompilation: yes
 Collate:
     'mysql.R'
