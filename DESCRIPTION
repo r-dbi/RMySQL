@@ -16,7 +16,7 @@ Depends:
 Imports:
     methods
 License: GPL-2
-URL: https://github.com/rstats-db/rmysql, https://mariadb.org
+URL: https://github.com/rstats-db/rmysql, https://downloads.mariadb.org/client-native/
 BugReports: https://github.com/rstats-db/rmysql/issues
 SystemRequirements: MySQL/MariaDB client headers and libraries, except on Windows.
     E.g. libmysqlclient-dev (Debian/Ubuntu), mariadb-devel (Fedora).
