@@ -32,5 +32,6 @@ Collate:
     'is-valid.R'
     'table.R'
     'transaction.R'
+    'zzz_compatibility.R'
 Suggests:
     testthat
