@@ -8,7 +8,7 @@ NULL
 #' It returns a singleton that allows you to connect to MySQL.
 #'
 #' @export
-#' @aliases RMySQL-package
+#' @aliases RMySQL-package RMySQL
 setClass("MySQLDriver",
   contains = "DBIDriver",
   slots = list(Id = "integer")

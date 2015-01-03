@@ -4,6 +4,7 @@
 \name{MySQLDriver-class}
 \alias{MySQL}
 \alias{MySQLDriver-class}
+\alias{RMySQL}
 \alias{RMySQL-package}
 \title{Class MySQLDriver with constructor MySQL.}
 \usage{
