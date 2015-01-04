@@ -13,7 +13,7 @@
 #' }
 mysqlHasDefault <- function() {
   tryCatch({
-    dbConnect(MySQL())
+    dbConnect(MySQL(), dbname="rmysql_test")
     TRUE
   }, error = function(...) {
     message(
