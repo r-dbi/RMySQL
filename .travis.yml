@@ -34,8 +34,8 @@ install:
   - ./travis-tool.sh install_deps
 
 before_script:
-# - mysql -e 'create database test;'
-  - printf "[rs-dbi]\nusername=root\npassword=\n" > ~/.my.cnf
+  - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';"
+  - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
 
 script: ./travis-tool.sh run_tests
 
