@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.10.99
+Version: 0.10
 Title: Database Interface and MySQL Driver for R
 Description: Implements DBI-compliant Interface to MySQL and MariaDB Databases.
 Authors@R: as.person(c(
