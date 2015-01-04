@@ -12,7 +12,7 @@ NULL
 #' @param ... Unused.
 #' @examples
 #' if (mysqlHasDefault()) {
-#' con <- dbConnect(RMySQL::MySQL())
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #' df <- data.frame(id = 1:5)
 #'
 #' dbWriteTable(con, "df", df)

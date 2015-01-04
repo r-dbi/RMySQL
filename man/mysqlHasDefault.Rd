@@ -13,7 +13,7 @@ database is available, and if not, displays an informative message.
 }
 \examples{
 if (mysqlHasDefault()) {
-  db <- dbConnect(RMySQL::MySQL())
+  db <- dbConnect(RMySQL::MySQL(), dbname = "test")
   dbListTables(db)
   dbDisconnect(db)
 }

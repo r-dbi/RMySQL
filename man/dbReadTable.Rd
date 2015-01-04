@@ -51,7 +51,7 @@ primitive data, e.g., it does not coerce character data to factors.
 }
 \examples{
 if (mysqlHasDefault()) {
-con <- dbConnect(RMySQL::MySQL())
+con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 
 # By default, row names are written in a column to row_names, and
 # automatically read back into the row.names()

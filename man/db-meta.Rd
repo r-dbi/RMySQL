@@ -35,7 +35,7 @@ Database interface meta-data
 }
 \examples{
 if (mysqlHasDefault()) {
-  con <- dbConnect(RMySQL::MySQL())
+  con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 
   summary(con)
 

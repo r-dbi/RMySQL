@@ -62,7 +62,7 @@ fetches and clears for you.
 }
 \examples{
 if (mysqlHasDefault()) {
-con <- dbConnect(RMySQL::MySQL())
+con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 dbWriteTable(con, "arrests", datasets::USArrests, overwrite = TRUE)
 
 # Run query to get results as dataframe

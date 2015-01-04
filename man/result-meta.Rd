@@ -38,7 +38,7 @@ See documentation of generics for more details.
 }
 \examples{
 if (mysqlHasDefault()) {
-con <- dbConnect(RMySQL::MySQL())
+con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 dbWriteTable(con, "t1", datasets::USArrests, overwrite = TRUE)
 
 rs <- dbSendQuery(con, "SELECT * FROM t1 WHERE UrbanPop >= 80")

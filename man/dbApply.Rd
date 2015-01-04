@@ -73,7 +73,7 @@ all the groups at the same time.
 }
 \examples{
 if (mysqlHasDefault()) {
-con <- dbConnect(RMySQL::MySQL())
+con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 
 dbWriteTable(con, "mtcars", mtcars, overwrite = TRUE)
 res <- dbSendQuery(con, "SELECT * FROM mtcars ORDER BY cyl")

@@ -7,13 +7,13 @@
 #' @export
 #' @examples
 #' if (mysqlHasDefault()) {
-#'   db <- dbConnect(RMySQL::MySQL())
+#'   db <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #'   dbListTables(db)
 #'   dbDisconnect(db)
 #' }
 mysqlHasDefault <- function() {
   tryCatch({
-    dbConnect(MySQL(), dbname="rmysql_test")
+    dbConnect(MySQL(), dbname = "test")
     TRUE
   }, error = function(...) {
     message(

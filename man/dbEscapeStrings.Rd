@@ -28,7 +28,7 @@ Escape SQL-special characters in strings.
 }
 \examples{
 if (mysqlHasDefault()) {
-con <- dbConnect(RMySQL::MySQL())
+con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 
 tmp <- sprintf("SELECT * FROM emp WHERE lname = \%s", "O'Reilly")
 dbEscapeStrings(con, tmp)

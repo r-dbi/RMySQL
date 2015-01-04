@@ -30,7 +30,7 @@ It returns a singleton that allows you to connect to MySQL.
 \examples{
 if (mysqlHasDefault()) {
 # connect to a database and load some data
-con <- dbConnect(RMySQL::MySQL())
+con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 dbWriteTable(con, "USArrests", datasets::USArrests, overwrite = TRUE)
 
 # query

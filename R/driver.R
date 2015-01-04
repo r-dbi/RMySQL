@@ -30,7 +30,7 @@ setClass("MySQLDriver",
 #' @examples
 #' if (mysqlHasDefault()) {
 #' # connect to a database and load some data
-#' con <- dbConnect(RMySQL::MySQL())
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #' dbWriteTable(con, "USArrests", datasets::USArrests, overwrite = TRUE)
 #'
 #' # query

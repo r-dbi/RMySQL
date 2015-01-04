@@ -47,7 +47,7 @@ mysqlFetch <- function(res, n, ...) {
 #' @export
 #' @examples
 #' if (mysqlHasDefault()) {
-#' con <- dbConnect(RMySQL::MySQL())
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #' dbWriteTable(con, "arrests", datasets::USArrests, overwrite = TRUE)
 #'
 #' # Run query to get results as dataframe
@@ -147,7 +147,7 @@ setMethod("dbListFields", c("MySQLResult", "missing"), function(conn, name, ...)
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' if (mysqlHasDefault()) {
-#' con <- dbConnect(RMySQL::MySQL())
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #' dbWriteTable(con, "t1", datasets::USArrests, overwrite = TRUE)
 #'
 #' rs <- dbSendQuery(con, "SELECT * FROM t1 WHERE UrbanPop >= 80")

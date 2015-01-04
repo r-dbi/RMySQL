@@ -57,7 +57,7 @@ setClass("MySQLConnection",
 #'
 #' # All examples use the rs-dbi group by default.
 #' if (mysqlHasDefault()) {
-#'   con <- dbConnect(RMySQL::MySQL())
+#'   con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #'   summary(con)
 #'   dbDisconnect(con)
 #' }
@@ -135,7 +135,7 @@ setMethod("dbDisconnect", "MySQLConnection", function(conn, ...) {
 #' @param ... Other arguments for compatibility with generic.
 #' @examples
 #' if (mysqlHasDefault()) {
-#'   con <- dbConnect(RMySQL::MySQL())
+#'   con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #'
 #'   summary(con)
 #'

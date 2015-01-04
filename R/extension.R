@@ -20,7 +20,7 @@ mysqlEscapeStrings <- function(con, strings) {
 #' @export
 #' @examples
 #' if (mysqlHasDefault()) {
-#' con <- dbConnect(RMySQL::MySQL())
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #'
 #' tmp <- sprintf("SELECT * FROM emp WHERE lname = %s", "O'Reilly")
 #' dbEscapeStrings(con, tmp)
@@ -102,7 +102,7 @@ setGeneric("dbApply", function(res, ...) {
 #' @rdname dbApply
 #' @examples
 #' if (mysqlHasDefault()) {
-#' con <- dbConnect(RMySQL::MySQL())
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #'
 #' dbWriteTable(con, "mtcars", mtcars, overwrite = TRUE)
 #' res <- dbSendQuery(con, "SELECT * FROM mtcars ORDER BY cyl")
@@ -211,7 +211,7 @@ setMethod("dbApply", "MySQLResult",
 #' @export
 #' @examples
 #' if (mysqlHasDefault()) {
-#' con <- dbConnect(RMySQL::MySQL(), client.flag = CLIENT_MULTI_STATEMENTS)
+#' con <- dbConnect(RMySQL::MySQL(), dbname = "test", client.flag = CLIENT_MULTI_STATEMENTS)
 #' dbWriteTable(con, "mtcars", datasets::mtcars, overwrite = TRUE)
 #'
 #' sql <- "SELECT cyl FROM mtcars LIMIT 5; SELECT vs FROM mtcars LIMIT 5"

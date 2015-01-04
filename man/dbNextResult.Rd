@@ -37,7 +37,7 @@ additional results to process.
 }
 \examples{
 if (mysqlHasDefault()) {
-con <- dbConnect(RMySQL::MySQL(), client.flag = CLIENT_MULTI_STATEMENTS)
+con <- dbConnect(RMySQL::MySQL(), dbname = "test", client.flag = CLIENT_MULTI_STATEMENTS)
 dbWriteTable(con, "mtcars", datasets::mtcars, overwrite = TRUE)
 
 sql <- "SELECT cyl FROM mtcars LIMIT 5; SELECT vs FROM mtcars LIMIT 5"

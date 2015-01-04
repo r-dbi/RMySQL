@@ -69,7 +69,7 @@ dbDisconnect(con)
 
 # All examples use the rs-dbi group by default.
 if (mysqlHasDefault()) {
-  con <- dbConnect(RMySQL::MySQL())
+  con <- dbConnect(RMySQL::MySQL(), dbname = "test")
   summary(con)
   dbDisconnect(con)
 }
