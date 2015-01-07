@@ -131,7 +131,7 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
     if (nrow(value) == 0) return(TRUE)
 
     ## Save file to disk, then use LOAD DATA command
-    fn <- normalizePath(tempfile("rsdbi"), mustWork = FALSE)
+    fn <- normalizePath(tempfile("rsdbi"), winslash = "/", mustWork = FALSE)
     safe.write(value, file = fn)
     on.exit(unlink(fn), add = TRUE)
 
