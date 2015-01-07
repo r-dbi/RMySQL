@@ -85,8 +85,10 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
     exit 0;
   fi
   echo "Failed to install mysql-connector-c."
-  echo "Please install brew and run: brew install mysql-connector-c."
-  exit 1
+
+  #Fall through on failure (needed on osx 10.6)
+  #echo "Please install brew and run: brew install mysql-connector-c."
+  #exit 1
 fi
 
 # Check for presence of system libraires on Linux and friends:
@@ -103,6 +105,8 @@ if [ -r /usr/lib/mysql ]; then
   echo "PKG_LIBS= -L/usr/lib/mysql -lmysqlclient -lz" >> src/Makevars
 elif [ -r /usr/lib64/mysql ]; then
   echo "PKG_LIBS= -L/usr/lib64/mysql -lmysqlclient -lz" >> src/Makevars
+elif [ -r /usr/local/mysql/lib ]; then
+  echo "PKG_LIBS= -L/usr/local/mysql/lib -lmysqlclient -lz" >> src/Makevars
 else
   echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
 fi
