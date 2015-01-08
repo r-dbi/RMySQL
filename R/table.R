@@ -175,7 +175,7 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
       dbGetQuery(conn, sql)
     }
 
-    path <- normalizePath(value, mustWork = TRUE)
+    path <- normalizePath(value, winslash = "/", mustWork = TRUE)
     sql <- paste0(
       "LOAD DATA LOCAL INFILE ", dbQuoteString(conn, path), "\n",
       "INTO TABLE ", dbQuoteIdentifier(conn, name), "\n",
