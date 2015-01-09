@@ -1,3 +1,7 @@
+# Version 0.11
+
+ *  Issue in `dbWriteTable()` with temporary files on Windows fixed.
+
 # Version 0.10
 
  *  New maintainer: Jeroen Ooms
