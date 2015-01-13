@@ -86,9 +86,12 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
   fi
   echo "Failed to install mysql-connector-c."
 
-  #Fall through on failure (needed on osx 10.6)
-  #echo "Please install brew and run: brew install mysql-connector-c."
-  #exit 1
+  # Fix for CRAN OSX 10.6
+  if [ -r /usr/local/mysql/include/mysql.h ]; then
+    echo "PKG_CPPFLAGS= -I/usr/local/mysql/include/" > src/Makevars
+    echo "PKG_LIBS= -L/usr/local/mysql/lib -lmysqlclient -lz" >> src/Makevars
+  fi
+  # Fall through on general methods
 fi
 
 # Check for presence of system libraires on Linux and friends:
@@ -96,6 +99,8 @@ if [ -r /usr/include/mysql/mysql.h ]; then
   echo "PKG_CPPFLAGS= -I/usr/include/mysql/" > src/Makevars
 elif [ -r /usr/local/include/mysql/mysql.h ]; then
   echo "PKG_CPPFLAGS= -I/usr/local/include/mysql/" > src/Makevars
+elif [ -r /usr/local/mysql/include/mysql.h ]; then
+  echo "PKG_CPPFLAGS= -I/usr/local/mysql/include/" > src/Makevars
 else
   echo "File mysql.h not found. Please install mysql development library, e.g: libmysqlclient-dev (deb) or mariadb-devel (rpm)."
   exit 1
