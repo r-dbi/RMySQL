@@ -1,5 +1,7 @@
-# Version 0.11
+# Version 0.10.1
 
+ *  Fix configure script for OSX 10.6 Snow Leopard
+ 
  *  Issue in `dbWriteTable()` with temporary files on Windows fixed.
 
 # Version 0.10
