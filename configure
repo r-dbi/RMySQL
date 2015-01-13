@@ -88,6 +88,7 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
 
   # Fix for CRAN OSX 10.6
   if [ -r /usr/local/mysql/include/mysql.h ]; then
+    echo "Found mysql /usr/local/mysql. Lets try that then."
     echo "PKG_CPPFLAGS= -I/usr/local/mysql/include/" > src/Makevars
     echo "PKG_LIBS= -L/usr/local/mysql/lib -lmysqlclient" >> src/Makevars
     exit 0
