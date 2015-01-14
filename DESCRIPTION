@@ -2,14 +2,12 @@ Package: RMySQL
 Version: 0.10.1
 Title: Database Interface and MySQL Driver for R
 Description: Implements DBI-compliant Interface to MySQL and MariaDB Databases.
-Authors@R: as.person(c(
-    "Jeroen Ooms <jeroen.ooms@stat.ucla.edu> [aut, cre]",
-    "David A. James [aut]",
-    "Saikat DebRoy [aut]",
-    "Hadley Wickham <hadley@rstudio.com> [aut]",
-    "Jeffrey Horner [aut]",
-    "RStudio [cph]"
-    ))
+Authors@R: c(person("Jeroen", "Ooms", email = "jeroen.ooms@stat.ucla.edu", role = c("aut", "cre")),
+    person("David", "James", role = "aut"),
+    person("Saikat", "DebRoy", role = "aut"),
+    person("Hadley", "Wickham", email = "hadley@rstudio.com", role = "aut"),
+    person("Jeffrey", "Horner", role = "aut"),
+    person("RStudio", role = "cph"))
 Depends:
     R (>= 2.8.0),
     DBI (>= 0.3.1)
