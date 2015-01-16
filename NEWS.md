@@ -1,3 +1,7 @@
+# Version 0.11
+
+ *  Add SSL support on Windows 64bit.
+
 # Version 0.10.1
 
  *  Fix configure script for OSX 10.6 Snow Leopard
