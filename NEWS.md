@@ -1,6 +1,6 @@
 # Version 0.11
 
- *  Add SSL support on Windows 64bit.
+ *  Add SSL support on Windows.
 
 # Version 0.10.1
 
