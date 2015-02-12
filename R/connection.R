@@ -17,6 +17,33 @@ setClass("MySQLConnection",
   )
 )
 
+#' @export
+#' @rdname dbConnect-MySQLDriver-method
+setMethod("dbDisconnect", "MySQLConnection", function(conn, ...) {
+  connection_release(conn@ptr)
+  TRUE
+})
+
+#' @export
+#' @rdname dbConnect-MySQLDriver-method
+setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
+  connection_info(dbObj@ptr)
+})
+
+#' @export
+#' @rdname dbConnect-MySQLDriver-method
+setMethod("show", "MySQLConnection", function(object) {
+  info <- dbGetInfo(object)
+  cat("<MySQLConnection>\n")
+  if (dbIsValid(object)) {
+    cat("  Host:   ", info$host, "\n", sep = "")
+    cat("  Server: ", info$server, "\n", sep = "")
+  } else {
+    cat("  DISCONNECTED\n")
+  }
+})
+
+
 #' Connect/disconnect to a MySQL DBMS
 #'
 #' These methods are straight-forward implementations of the corresponding
@@ -90,52 +117,4 @@ setMethod("dbConnect", "MySQLConnection", function(drv, ...) {
 
   newId <- .Call(RS_MySQL_cloneConnection, drv@Id)
   new("MySQLConnection", Id = newId)
-})
-
-#' @export
-#' @rdname dbConnect-MySQLDriver-method
-#' @useDynLib RMySQL RS_MySQL_closeConnection
-setMethod("dbDisconnect", "MySQLConnection", function(conn, ...) {
-  connection_release(conn@ptr)
-  TRUE
-})
-
-#' Database interface meta-data
-#'
-#' @name db-meta
-#' @param conn,dbObj,object MySQLConnection object.
-#' @param ... Other arguments for compatibility with generic.
-#' @examples
-#' if (mysqlHasDefault()) {
-#'   con <- dbConnect(RMySQL::MySQL(), dbname = "test")
-#'
-#'   summary(con)
-#'
-#'   dbGetInfo(con)
-#'   dbListResults(con)
-#'   dbListTables(con)
-#'
-#'   dbDisconnect(con)
-#' }
-NULL
-
-#' @rdname db-meta
-#' @param what optional
-#' @export
-#' @useDynLib RMySQL RS_MySQL_connectionInfo
-setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
-  connection_info(dbObj@ptr)
-})
-
-#' @rdname db-meta
-#' @export
-setMethod("show", "MySQLConnection", function(object) {
-  info <- dbGetInfo(object)
-  cat("<MySQLConnection>\n")
-  if (dbIsValid(object)) {
-    cat("  Host:   ", info$host, "\n", sep = "")
-    cat("  Server: ", info$server, "\n", sep = "")
-  } else {
-    cat("  DISCONNECTED\n")
-  }
 })
