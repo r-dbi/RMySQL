@@ -15,7 +15,7 @@ setClass("MySQLDriver",
 )
 
 #' @param max.con maximum number of connections that can be open
-#'   at one time. There's no intrinic limit, since strictly speaking this limit
+#'   at one time. There's no intrinsic limit, since strictly speaking this limit
 #'   applies to MySQL \emph{servers}, but clients can have (at least in theory)
 #'   more than this.  Typically there are at most a handful of open connections,
 #'   thus the internal \code{RMySQL} code uses a very simple linear search
