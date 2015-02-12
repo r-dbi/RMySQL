@@ -10,7 +10,11 @@ NULL
 #' @keywords internal
 setClass("MySQLConnection",
   contains = "DBIConnection",
-  slots = list(Id = "integer")
+  slots = list(
+    ptr = "externalptr",
+    host = "character",
+    db = "character"
+  )
 )
 
 #' Connect/disconnect to a MySQL DBMS
@@ -63,45 +67,20 @@ setClass("MySQLConnection",
 #' }
 #' @export
 #' @useDynLib RMySQL RS_MySQL_newConnection
-setMethod("dbConnect", "MySQLDriver", function(drv, dbname=NULL, username=NULL,
-          password=NULL, host=NULL,
-          unix.socket=NULL, port = 0, client.flag = 0,
-          groups = 'rs-dbi', default.file = NULL, ...) {
-    checkValid(drv)
+setMethod("dbConnect", "MySQLDriver",
+  function(drv, dbname = "", username = "", password = "", host = "",
+           unix.socket = "", port = 0, client.flag = 0,
+           groups = "rs-dbi", default.file = "", ...) {
 
-    if (!is.null(dbname) && !is.character(dbname))
-      stop("Argument dbname must be a string or NULL")
-    if (!is.null(username) && !is.character(username))
-      stop("Argument username must be a string or NULL")
-    if (!is.null(password) && !is.character(password))
-      stop("Argument password must be a string or NULL")
-    if (!is.null(host) && !is.character(host))
-      stop("Argument host must be a string or NULL")
-    if (!is.null(unix.socket) && !is.character(unix.socket))
-      stop("Argument unix.socket must be a string or NULL")
+  ptr <- connection_create(host, username, password, dbname, port, unix.socket,
+    client.flag, groups, default.file)
 
-    if (is.null(port) || !is.numeric(port))
-      stop("Argument port must be an integer value")
-    if (is.null(client.flag) || !is.numeric(client.flag))
-      stop("Argument client.flag must be an integer value")
-
-    if (!is.null(groups) && !is.character(groups))
-      stop("Argument groups must be a string or NULL")
-
-    if(!is.null(default.file) && !is.character(default.file))
-      stop("Argument default.file must be a string")
-
-    if(!is.null(default.file) && !file.exists(default.file[1]))
-      stop(sprintf("mysql default file %s does not exist", default.file))
-
-    conId <- .Call(RS_MySQL_newConnection, drv@Id,
-      dbname, username, password, host, unix.socket,
-      as.integer(port), as.integer(client.flag),
-      groups, default.file[1])
-
-    new("MySQLConnection", Id = conId)
-  }
-)
+  new("MySQLConnection",
+    ptr = ptr,
+    host = host,
+    db = dbname
+  )
+})
 
 #' @export
 #' @rdname dbConnect-MySQLDriver-method
@@ -117,15 +96,8 @@ setMethod("dbConnect", "MySQLConnection", function(drv, ...) {
 #' @rdname dbConnect-MySQLDriver-method
 #' @useDynLib RMySQL RS_MySQL_closeConnection
 setMethod("dbDisconnect", "MySQLConnection", function(conn, ...) {
-  if (!dbIsValid(conn)) return(TRUE)
-
-  rs <- dbListResults(conn)
-  if (length(rs) > 0) {
-    warning("Closing open result sets", call. = FALSE)
-    lapply(rs, dbClearResult)
-  }
-
-  .Call(RS_MySQL_closeConnection, conn@Id)
+  connection_release(conn@ptr)
+  TRUE
 })
 
 #' Database interface meta-data
@@ -152,69 +124,18 @@ NULL
 #' @export
 #' @useDynLib RMySQL RS_MySQL_connectionInfo
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
-  checkValid(dbObj)
-
-  info <- .Call(RS_MySQL_connectionInfo, dbObj@Id)
-  info$rsId <- lapply(info$rsId, function(id) {
-    new("MySQLResult", Id = c(dbObj@Id, id))
-  })
-
-  if (!missing(what)) {
-    info[what]
-  } else {
-    info
-  }
+  connection_info(dbObj@ptr)
 })
 
 #' @rdname db-meta
 #' @export
-setMethod("dbListResults", "MySQLConnection",
-  def = function(conn, ...) dbGetInfo(conn)$rsId
-)
-
-#' @rdname db-meta
-#' @param verbose If \code{TRUE}, add extra info.
-#' @export
-setMethod("summary", "MySQLConnection",
-  function(object, verbose = FALSE, ...) {
-    print(object)
-
-    info <- dbGetInfo(object)
-    cat("  User:  ", info$user, "\n")
-    cat("  Host:  ", info$host, "\n")
-    cat("  Dbname:", info$dbname, "\n")
-    cat("  Connection type:", info$conType, "\n")
-    if(verbose){
-      cat("  MySQL server version:  ", info$serverVersion, "\n")
-      cat("  MySQL client version:  ", dbGetInfo(MySQL())$clientVersion, "\n")
-      cat("  MySQL protocol version:", info$protocolVersion, "\n")
-      cat("  MySQL server thread id:", info$threadId, "\n")
-    }
-
-    cat("\nResults:\n")
-    lapply(info$rsId, function(x) print(summary(x)))
-
-    invisible(NULL)
-  }
-)
-
-
-#' @rdname db-meta
-#' @export
-#' @useDynLib RMySQL rmysql_exception_info
-setMethod("dbGetException", "MySQLConnection",
-  def = function(conn, ...) {
-    checkValid(conn)
-
-    .Call(rmysql_exception_info, conn@Id)
-  }
-)
-
-#' @rdname db-meta
-#' @export
 setMethod("show", "MySQLConnection", function(object) {
-  expired <- if(dbIsValid(object)) "" else "Expired "
-  cat("<", expired, "MySQLConnection:", paste(object@Id, collapse = ","), ">\n",
-    sep = "")
-  invisible(NULL)
+  info <- dbGetInfo(object)
+  cat("<MySQLConnection>\n")
+  if (dbIsValid(object)) {
+    cat("  Host:   ", info$host, "\n", sep = "")
+    cat("  Server: ", info$server, "\n", sep = "")
+  } else {
+    cat("  DISCONNECTED\n")
+  }
 })

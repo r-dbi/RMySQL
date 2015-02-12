@@ -7,9 +7,9 @@
 \alias{dbDisconnect,MySQLConnection-method}
 \title{Connect/disconnect to a MySQL DBMS}
 \usage{
-\S4method{dbConnect}{MySQLDriver}(drv, dbname = NULL, username = NULL,
-  password = NULL, host = NULL, unix.socket = NULL, port = 0,
-  client.flag = 0, groups = "rs-dbi", default.file = NULL, ...)
+\S4method{dbConnect}{MySQLDriver}(drv, dbname = "", username = "",
+  password = "", host = "", unix.socket = "", port = 0,
+  client.flag = 0, groups = "rs-dbi", default.file = "", ...)
 
 \S4method{dbConnect}{MySQLConnection}(drv, ...)
 

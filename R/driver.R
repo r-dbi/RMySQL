@@ -25,6 +25,7 @@ setClass("MySQLDriver",
 #'   default.)
 #' @export
 #' @import methods DBI
+#' @importFrom Rcpp sourceCpp
 #' @useDynLib RMySQL
 #' @rdname MySQLDriver-class
 #' @examples

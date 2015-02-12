@@ -41,7 +41,7 @@ setMethod("dbIsValid", "MySQLDriver", function(dbObj) {
 #' @rdname isIdCurrent
 #' @useDynLib RMySQL rmysql_connection_valid
 setMethod("dbIsValid", "MySQLConnection", function(dbObj) {
-  .Call(rmysql_connection_valid, dbObj@Id)
+  connection_valid(dbObj@ptr)
 })
 
 #' @export

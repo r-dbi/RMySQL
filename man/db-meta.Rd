@@ -3,21 +3,12 @@
 \docType{methods}
 \name{db-meta}
 \alias{db-meta}
-\alias{dbGetException,MySQLConnection-method}
 \alias{dbGetInfo,MySQLConnection-method}
-\alias{dbListResults,MySQLConnection-method}
 \alias{dbObjectId-class}
 \alias{show,MySQLConnection-method}
-\alias{summary,MySQLConnection-method}
 \title{Database interface meta-data}
 \usage{
 \S4method{dbGetInfo}{MySQLConnection}(dbObj, what = "", ...)
-
-\S4method{dbListResults}{MySQLConnection}(conn, ...)
-
-\S4method{summary}{MySQLConnection}(object, verbose = FALSE, ...)
-
-\S4method{dbGetException}{MySQLConnection}(conn, ...)
 
 \S4method{show}{MySQLConnection}(object)
 }
@@ -27,8 +18,6 @@
 \item{...}{Other arguments for compatibility with generic.}
 
 \item{conn,dbObj,object}{MySQLConnection object.}
-
-\item{verbose}{If \code{TRUE}, add extra info.}
 }
 \description{
 Database interface meta-data
