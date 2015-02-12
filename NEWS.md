@@ -1,5 +1,8 @@
 # Version 0.10.1.9000
 
+ *  `dbApply()`, `dbMoreResults()` and `dbNextResults()` have been removed.
+    These were always flagged as experimental, and now the experiment is over.
+
  *  `dbEscapeStrings()` has been deprecated. Please use `dbQuoteStrings()`
     instead.
 
