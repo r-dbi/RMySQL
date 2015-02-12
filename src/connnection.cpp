@@ -33,3 +33,17 @@ List connection_info(XPtr<MyConnectionPtr> con) {
 bool connection_valid(XPtr<MyConnectionPtr> con) {
   return con.get() != NULL;
 }
+
+// [[Rcpp::export]]
+CharacterVector connection_quote_string(XPtr<MyConnectionPtr> con,
+                                         CharacterVector input) {
+  int n = input.size();
+  CharacterVector output(n);
+
+  for (int i = 0; i < n; ++i) {
+    String x = input[i];
+    output[i] = (*con)->quoteString(x);
+  }
+
+  return output;
+}

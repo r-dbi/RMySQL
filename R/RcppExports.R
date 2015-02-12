@@ -17,3 +17,7 @@ connection_valid <- function(con) {
     .Call('RMySQL_connection_valid', PACKAGE = 'RMySQL', con)
 }
 
+connection_quote_string <- function(con, input) {
+    .Call('RMySQL_connection_quote_string', PACKAGE = 'RMySQL', con, input)
+}
+

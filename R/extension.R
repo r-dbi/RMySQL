@@ -1,52 +1,16 @@
 #' @include mysql.R result.R
 NULL
 
-## the following code was kindly provided ny J. T. Lindgren.
-#' @useDynLib RMySQL rmysql_escape_strings
-mysqlEscapeStrings <- function(con, strings) {
-  checkValid(con)
-
-  out <- .Call(rmysql_escape_strings, con@Id, as.character(strings))
-  names(out) <- names(strings)
-  out
-}
-
 #' Escape SQL-special characters in strings.
 #'
-#' @param con a connection object (see \code{\link[DBI]{dbConnect}}).
-#' @param strings a character vector.
-#' @param ... any additional arguments to be passed to the dispatched method.
-#' @return A character vector with SQL special characters properly escaped.
+#' DEPRECATED: Please use \code{dbQuoteString} instead.
+#'
 #' @export
-#' @examples
-#' if (mysqlHasDefault()) {
-#' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
-#'
-#' tmp <- sprintf("SELECT * FROM emp WHERE lname = %s", "O'Reilly")
-#' dbEscapeStrings(con, tmp)
-#'
-#' dbDisconnect(con)
-#' }
+#' @keywords internal
 setGeneric("dbEscapeStrings", function(con, strings, ...) {
-  standardGeneric("dbEscapeStrings")
+  .Deprecated("dbQuoteString")
+  dbQuoteString(con, strings, ..)
 })
-
-#' @rdname dbEscapeStrings
-#' @export
-setMethod("dbEscapeStrings",
-  sig = signature(con = "MySQLConnection", strings = "character"),
-  def = mysqlEscapeStrings,
-  valueClass = "character"
-)
-
-#' @rdname dbEscapeStrings
-#' @export
-setMethod("dbEscapeStrings",
-  sig = signature(con = "MySQLResult", strings = "character"),
-  def = function(con, strings, ...)
-    mysqlEscapeStrings(as(con, "MySQLConnection"), strings),
-  valueClass = "character"
-)
 
 #' Apply R/S-Plus functions to remote groups of DBMS rows (experimental)
 #'
@@ -355,16 +319,3 @@ safe.write <- function(value, file, batch, ...) {
 mysqlClientLibraryVersions <- function() {
   .Call(rmysql_version)
 }
-
-#' Quote method for MySQL identifiers
-#'
-#' In MySQL, identifiers are enclosed in backticks, e.g. \code{`x`}.
-#'
-#' @export
-#' @keywords internal
-setMethod("dbQuoteIdentifier", c("MySQLConnection", "character"),
-  function(conn, x, ...) {
-    x <- gsub('`', '``', x, fixed = TRUE)
-    SQL(paste('`', x, '`', sep = ""))
-  }
-)

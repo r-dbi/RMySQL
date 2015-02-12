@@ -1,6 +1,9 @@
 # Version 0.10.1.9000
 
- * dbObjectId compatibility shim removed
+ *  `dbEscapeStrings()` has been deprecated. Please use `dbQuoteStrings()`
+    instead.
+
+ *  dbObjectId compatibility shim removed
 
  *  Add SSL support on Windows.
 

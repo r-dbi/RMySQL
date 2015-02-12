@@ -32,6 +32,7 @@ Collate:
     'result.R'
     'extension.R'
     'is-valid.R'
+    'quote.R'
     'table.R'
     'transaction.R'
 Suggests:

@@ -57,3 +57,15 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// connection_quote_string
+CharacterVector connection_quote_string(XPtr<MyConnectionPtr> con, CharacterVector input);
+RcppExport SEXP RMySQL_connection_quote_string(SEXP conSEXP, SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyConnectionPtr> >::type con(conSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type input(inputSEXP);
+    __result = Rcpp::wrap(connection_quote_string(con, input));
+    return __result;
+END_RCPP
+}
