@@ -3,14 +3,11 @@
 \docType{methods}
 \name{isIdCurrent}
 \alias{dbIsValid,MySQLConnection-method}
-\alias{dbIsValid,MySQLDriver-method}
 \alias{dbIsValid,MySQLResult-method}
 \alias{isIdCurrent}
 \title{Check if a database object is valid.}
 \usage{
 isIdCurrent(obj)
-
-\S4method{dbIsValid}{MySQLDriver}(dbObj)
 
 \S4method{dbIsValid}{MySQLConnection}(dbObj)
 
