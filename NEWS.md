@@ -1,5 +1,7 @@
 # Version 0.10.1.9000
 
+ * dbObjectId compatibility shim removed
+
  *  Add SSL support on Windows.
 
 # Version 0.10.1
