@@ -14,7 +14,7 @@ class MyRow : boost::noncopyable {
   std::vector<MYSQL_BIND> bindings_;
 
   std::vector<MyFieldType> types_;
-  std::vector< std::vector<unsigned char>* > buffers_;
+  std::vector<std::vector<unsigned char> > buffers_;
   std::vector<unsigned long> lengths_;
   std::vector<my_bool> nulls_, errors_;
 
@@ -26,6 +26,7 @@ public:
     n_ = types_.size();
 
     bindings_.resize(n_);
+    buffers_.resize(n_);
     lengths_.resize(n_);
     nulls_.resize(n_);
     errors_.resize(n_);
@@ -35,39 +36,38 @@ public:
       switch(types_[i]) {
       case MY_INT32:
         bindings_[i].buffer_type = MYSQL_TYPE_LONG;
-        buffers_.push_back(new std::vector<unsigned char>(4));
+        buffers_[i].resize(4);
         break;
       case MY_INT64:
         bindings_[i].buffer_type = MYSQL_TYPE_LONGLONG;
-        buffers_.push_back(new std::vector<unsigned char>(8));
+        buffers_[i].resize(8);
         break;
       case MY_DBL:
         bindings_[i].buffer_type = MYSQL_TYPE_DOUBLE;
-        buffers_.push_back(new std::vector<unsigned char>(8));
+        buffers_[i].resize(8);
         break;
       case MY_DATE:
         bindings_[i].buffer_type = MYSQL_TYPE_DATE;
-        buffers_.push_back(new std::vector<unsigned char>(sizeof(MYSQL_TIME)));
+        buffers_[i].resize(sizeof(MYSQL_TIME));
         break;
       case MY_DATE_TIME:
         bindings_[i].buffer_type = MYSQL_TYPE_TIME;
-        buffers_.push_back(new std::vector<unsigned char>(sizeof(MYSQL_TIME)));
+        buffers_[i].resize(sizeof(MYSQL_TIME));
         break;
       case MY_TIME:
         bindings_[i].buffer_type = MYSQL_TYPE_DATETIME;
-        buffers_.push_back(new std::vector<unsigned char>(sizeof(MYSQL_TIME)));
+        buffers_[i].resize(sizeof(MYSQL_TIME));
         break;
       case MY_STR:
       case MY_RAW:
         bindings_[i].buffer_type = MYSQL_TYPE_STRING;
         // buffers might be arbitrary length, so leave size and use
         // alternative strategy 0
-        buffers_.push_back(new std::vector<unsigned char>);
         break;
       }
 
       bindings_[i].buffer = &buffers_[i][0];
-      bindings_[i].buffer_length = buffers_[i]->size();
+      bindings_[i].buffer_length = buffers_[i].size();
       bindings_[i].length = &lengths_[i];
       bindings_[i].is_null = &nulls_[i];
       bindings_[i].is_unsigned = true;
@@ -75,7 +75,7 @@ public:
     }
 
     if (mysql_stmt_bind_result(pStatement, &bindings_[0]) != 0)
-      Rcpp::stop("%s", mysql_stmt_error(pStatement));
+      Rcpp::stop(mysql_stmt_error(pStatement));
 
   }
 
@@ -100,10 +100,8 @@ public:
     if (isNull(j))
       return NA_STRING;
 
-    Rcpp::Rcout << j << " size: " << buffers_[j]->size() << "\n";
     fetchBuffer(j);
-    Rcpp::Rcout << j << " size: " << buffers_[j]->size() << "\n";
-    buffers_[j]->push_back('\0');  // ensure string is null terminated
+    buffers_[j].push_back('\0');  // ensure string is null terminated
     char* val = (char*) &buffers_[j][0];
 
     return Rf_mkCharCE(val, CE_UTF8);
@@ -178,12 +176,12 @@ private:
     if (length == 0)
       return;
 
-    Rcpp::Rcout << j << " size: " << buffers_[j]->size() << "\n";
-    buffers_[j]->resize(length);
-    Rcpp::Rcout << j << " size: " << buffers_[j]->size() << "\n";
+    buffers_[j].resize(length);
     bindings_[j].buffer = &buffers_[j][0]; // might have moved
     bindings_[j].buffer_length = length;
-    mysql_stmt_fetch_column(pStatement_, &bindings_[j], j, 0);
+
+    if (mysql_stmt_fetch_column(pStatement_, &bindings_[j], j, 0) != 0)
+      Rcpp::stop(mysql_stmt_error(pStatement_));
 
     // Reset buffer length to zero for next row
     bindings_[j].buffer_length = 0;
