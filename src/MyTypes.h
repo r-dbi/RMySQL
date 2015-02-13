@@ -2,7 +2,6 @@
 #define __RMYSQL_MY_TYPES__
 
 enum MyFieldType {
-  MY_LGL,
   MY_INT32,
   MY_INT64,
   MY_DBL,
@@ -32,7 +31,7 @@ inline MyFieldType variableType(enum_field_types type) {
   case MYSQL_TYPE_DOUBLE:
     return MY_DBL;
   case MYSQL_TYPE_BIT:
-    return MY_LGL;
+    return MY_STR;
   case MYSQL_TYPE_TIMESTAMP:
   case MYSQL_TYPE_DATETIME:
   case MYSQL_TYPE_NEWDATE:
@@ -59,13 +58,12 @@ inline MyFieldType variableType(enum_field_types type) {
   case MYSQL_TYPE_GEOMETRY:
     return MY_RAW;
   case MYSQL_TYPE_NULL:
-    return MY_LGL;
+    return MY_INT32;
   }
 }
 
 inline std::string typeName(MyFieldType type) {
   switch(type) {
-  case MY_LGL:         return "logical";
   case MY_INT32:       return "integer";
   case MY_INT64:       return "integer64";
   case MY_DBL:         return "double";
@@ -80,7 +78,6 @@ inline std::string typeName(MyFieldType type) {
 
 inline SEXPTYPE typeSEXP(MyFieldType type) {
   switch(type) {
-  case MY_LGL:         return LGLSXP;
   case MY_INT32:       return INTSXP;
   case MY_INT64:       return STRSXP;
   case MY_DBL:         return REALSXP;
