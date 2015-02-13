@@ -92,3 +92,15 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// result_fetch
+List result_fetch(XPtr<MyResult> rs, int n);
+RcppExport SEXP RMySQL_result_fetch(SEXP rsSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    __result = Rcpp::wrap(result_fetch(rs, n));
+    return __result;
+END_RCPP
+}

@@ -12,3 +12,8 @@ XPtr<MyResult> result_create(XPtr<MyConnectionPtr> con, std::string sql) {
 List result_column_info(XPtr<MyResult> rs) {
   return rs->columnInfo();
 }
+
+// [[Rcpp::export]]
+List result_fetch(XPtr<MyResult> rs, int n) {
+  return rs->fetch(n);
+}

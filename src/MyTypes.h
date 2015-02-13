@@ -78,4 +78,20 @@ inline std::string typeName(MyFieldType type) {
   }
 }
 
+inline SEXPTYPE typeSEXP(MyFieldType type) {
+  switch(type) {
+  case MY_LGL:         return LGLSXP;
+  case MY_INT32:       return INTSXP;
+  case MY_INT64:       return STRSXP;
+  case MY_DBL:         return REALSXP;
+  case MY_STR:         return STRSXP;
+  case MY_DATE:        return INTSXP;
+  case MY_DATE_TIME:   return REALSXP;
+  case MY_TIME:        return INTSXP;
+  case MY_RAW:         return VECSXP;
+  case MY_FACTOR:      return INTSXP;
+  }
+}
+
+
 #endif

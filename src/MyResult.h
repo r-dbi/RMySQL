@@ -5,6 +5,7 @@
 #include <mysql.h>
 #include <boost/noncopyable.hpp>
 #include "MyTypes.h"
+#include "MyUtils.h"
 
 class MyResult : boost::noncopyable {
   MYSQL_STMT* pStatement_;
@@ -30,9 +31,6 @@ public:
     pSpec_ = mysql_stmt_result_metadata(pStatement_);
     if (pSpec_ != NULL)
       cacheMetadata();
-
-
-
   }
 
   Rcpp::List columnInfo() {
@@ -46,6 +44,45 @@ public:
     out.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -nCols_);
     out.attr("class") = "data.frame";
     out.attr("names") = Rcpp::CharacterVector::create("name", "type");
+
+    return out;
+  }
+
+  Rcpp::List fetch(int n_max = -1) {
+//     if (!bound_)
+//       Rcpp::stop("Query needs to be bound before fetching");
+//     if (!active())
+//       Rcpp::stop("Inactive result set");
+
+    int n = (n_max < 0) ? 100 : n_max;
+    Rcpp::List out = dfCreate(types_, names_, n);
+
+//     int i = 0;
+//     fetchRowIfNeeded();
+//     while(pNextRow_->hasData()) {
+//       if (i >= n) {
+//         if (n_max < 0) {
+//           n *= 2;
+//           out = dfResize(out, n);
+//         } else {
+//           break;
+//         }
+//       }
+//
+//       for (int j = 0; j < ncols_; ++j) {
+//         pNextRow_->setListValue(out[j], i, j);
+//       }
+//       fetchRow();
+//       ++i;
+//
+//       if (i % 1000 == 0)
+//         Rcpp::checkUserInterrupt();
+//     }
+//
+//     // Trim back to what we actually used
+//     if (i < n) {
+//       out = dfResize(out, i);
+//     }
 
     return out;
   }

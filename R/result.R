@@ -29,20 +29,6 @@ setMethod("show", "MySQLResult", function(object) {
   invisible(NULL)
 })
 
-mysqlFetch <- function(res, n, ...) {
-  rel <- .Call(RS_MySQL_fetch, res@Id, nrec = as.integer(n))
-
-  if (length(rel) > 0) {
-    n <- length(rel[[1]])
-  } else {
-    n <- 0
-  }
-
-  attr(rel, "row.names") <- .set_row_names(n)
-  class(rel) <- "data.frame"
-  rel
-}
-
 #' Execute a SQL statement on a database connection.
 #'
 #' To retrieve results a chunk at a time, use \code{dbSendQuery},
@@ -81,25 +67,14 @@ mysqlFetch <- function(res, n, ...) {
 #' }
 #' @rdname query
 #' @useDynLib RMySQL RS_MySQL_fetch
-setMethod("dbFetch", c("MySQLResult", "numeric"), mysqlFetch)
-
-#' @export
-#' @rdname query
-setMethod("fetch", c("MySQLResult", "numeric"), mysqlFetch)
-
-#' @param n maximum number of records to retrieve per fetch. Use \code{-1} to
-#'    retrieve all pending records; use \code{0} for to fetch the default
-#'    number of rows as defined in \code{\link{MySQL}}
-#' @rdname query
-#' @export
-setMethod("dbFetch", c("MySQLResult", "missing"), function(res, n, ...) {
-  mysqlFetch(res, n = 0, ...)
+setMethod("dbFetch", c("MySQLResult", "numeric"), function(res, n) {
+  result_fetch(res@ptr, n)
 })
 
-#' @rdname query
 #' @export
-setMethod("fetch", c("MySQLResult", "missing"), function(res, n, ...) {
-  mysqlFetch(res, n = 0, ...)
+#' @rdname query
+setMethod("fetch", c("MySQLResult", "numeric"), function(res, n) {
+  result_fetch(res@ptr, n)
 })
 
 #' @rdname query
@@ -109,6 +84,17 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
     new("MySQLResult",
       ptr = result_create(conn@ptr, statement),
       sql = statement)
+  }
+)
+
+#' @export
+#' @rdname query
+setMethod("dbGetQuery", signature("MyConnection", "character"),
+  function(conn, statement, ..., params = NULL, row.names = NA) {
+    rs <- dbSendQuery(conn, statement, params = params, ...)
+    on.exit(dbClearResult(rs))
+
+    dbFetch(rs, n = -1, ..., row.names = row.names)
   }
 )
 

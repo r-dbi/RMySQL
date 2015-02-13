@@ -29,3 +29,7 @@ result_column_info <- function(rs) {
     .Call('RMySQL_result_column_info', PACKAGE = 'RMySQL', rs)
 }
 
+result_fetch <- function(rs, n) {
+    .Call('RMySQL_result_fetch', PACKAGE = 'RMySQL', rs, n)
+}
+
