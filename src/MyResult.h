@@ -11,6 +11,7 @@
 class MyResult : boost::noncopyable {
   MYSQL_STMT* pStatement_;
   MYSQL_RES* pSpec_;
+  int rowsAffected_;
 
   unsigned int nCols_;
   std::vector<MyFieldType> types_;
@@ -31,8 +32,12 @@ public:
       throwError();
 
     pSpec_ = mysql_stmt_result_metadata(pStatement_);
-    if (pSpec_ != NULL)
+    if (pSpec_ != NULL) {
       cacheMetadata();
+      rowsAffected_ = 0;
+    } else {
+      rowsAffected_ = mysql_stmt_affected_rows(pStatement_);
+    }
   }
 
   Rcpp::List columnInfo() {
@@ -99,7 +104,8 @@ public:
   ~MyResult() {
     try {
       mysql_stmt_close(pStatement_);
-      mysql_free_result(pSpec_);
+      if (pSpec_ != NULL)
+        mysql_free_result(pSpec_);
     } catch(...) {};
   }
 
