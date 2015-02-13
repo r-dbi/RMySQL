@@ -38,6 +38,7 @@ setMethod("show", "MySQLConnection", function(object) {
   if (dbIsValid(object)) {
     cat("  Host:   ", info$host, "\n", sep = "")
     cat("  Server: ", info$server, "\n", sep = "")
+    cat("  Client: ", info$client, "\n", sep = "")
   } else {
     cat("  DISCONNECTED\n")
   }

@@ -39,7 +39,7 @@ public:
     return Rcpp::List::create(
       Rcpp::_["host"] = mysql_get_host_info(pConn_),
       Rcpp::_["server"] = mysql_get_server_info(pConn_),
-      Rcpp::_["client"] = mysql_get_server_info(pConn_)
+      Rcpp::_["client"] = mysql_get_client_info()
     );
   }
 
