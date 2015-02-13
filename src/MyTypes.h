@@ -9,8 +9,7 @@ enum MyFieldType {
   MY_DATE,
   MY_DATE_TIME,
   MY_TIME,
-  MY_RAW,
-  MY_FACTOR
+  MY_RAW
 };
 
 // http://dev.mysql.com/doc/refman/5.7/en/c-api-data-structures.html
@@ -20,6 +19,7 @@ inline MyFieldType variableType(enum_field_types type) {
   case MYSQL_TYPE_SHORT:
   case MYSQL_TYPE_LONG:
   case MYSQL_TYPE_INT24:
+  case MYSQL_TYPE_YEAR:
     return MY_INT32;
 
   case MYSQL_TYPE_LONGLONG:
@@ -30,8 +30,6 @@ inline MyFieldType variableType(enum_field_types type) {
   case MYSQL_TYPE_FLOAT:
   case MYSQL_TYPE_DOUBLE:
     return MY_DBL;
-  case MYSQL_TYPE_BIT:
-    return MY_STR;
   case MYSQL_TYPE_TIMESTAMP:
   case MYSQL_TYPE_DATETIME:
   case MYSQL_TYPE_NEWDATE:
@@ -40,8 +38,8 @@ inline MyFieldType variableType(enum_field_types type) {
     return MY_DATE;
   case MYSQL_TYPE_TIME:
     return MY_TIME;
-  case MYSQL_TYPE_YEAR:
-    return MY_INT32;
+  case MYSQL_TYPE_BIT:
+  case MYSQL_TYPE_ENUM:
   case MYSQL_TYPE_STRING:
   case MYSQL_TYPE_VAR_STRING:
   case MYSQL_TYPE_VARCHAR:
@@ -53,8 +51,6 @@ inline MyFieldType variableType(enum_field_types type) {
     return MY_RAW;
   case MYSQL_TYPE_SET:
     return MY_STR;
-  case MYSQL_TYPE_ENUM:
-    return MY_FACTOR;
   case MYSQL_TYPE_GEOMETRY:
     return MY_RAW;
   case MYSQL_TYPE_NULL:
@@ -72,7 +68,6 @@ inline std::string typeName(MyFieldType type) {
   case MY_DATE_TIME:   return "POSIXct";
   case MY_TIME:        return "time";
   case MY_RAW:         return "raw";
-  case MY_FACTOR:      return "factor";
   }
 }
 
@@ -86,7 +81,6 @@ inline SEXPTYPE typeSEXP(MyFieldType type) {
   case MY_DATE_TIME:   return REALSXP;
   case MY_TIME:        return INTSXP;
   case MY_RAW:         return VECSXP;
-  case MY_FACTOR:      return INTSXP;
   }
 }
 
