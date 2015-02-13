@@ -89,7 +89,7 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
 
 #' @export
 #' @rdname query
-setMethod("dbGetQuery", signature("MyConnection", "character"),
+setMethod("dbGetQuery", signature("MySQLConnection", "character"),
   function(conn, statement, ..., params = NULL, row.names = NA) {
     rs <- dbSendQuery(conn, statement, params = params, ...)
     on.exit(dbClearResult(rs))

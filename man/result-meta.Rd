@@ -8,7 +8,6 @@
 \alias{dbGetRowsAffected,MySQLResult-method}
 \alias{dbHasCompleted,MySQLResult-method}
 \alias{result-meta}
-\alias{show,MySQLResult-method}
 \alias{summary,MySQLResult-method}
 \title{Database interface meta-data.}
 \usage{
@@ -23,8 +22,6 @@
 \S4method{dbGetException}{MySQLResult}(conn, ...)
 
 \S4method{summary}{MySQLResult}(object, verbose = FALSE, ...)
-
-\S4method{show}{MySQLResult}(object)
 }
 \arguments{
 \item{res,conn,object}{An object of class \code{\linkS4class{MySQLResult}}}

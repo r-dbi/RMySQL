@@ -3,7 +3,11 @@
 \docType{class}
 \name{MySQLResult-class}
 \alias{MySQLResult-class}
+\alias{show,MySQLResult-method}
 \title{Class MySQLResult}
+\usage{
+\S4method{show}{MySQLResult}(object)
+}
 \description{
 MySQL's query results class.  This classes encapsulates the result of an SQL
 statement (either \code{select} or not).

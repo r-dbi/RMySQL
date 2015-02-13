@@ -3,25 +3,23 @@
 \docType{methods}
 \name{dbFetch,MySQLResult,numeric-method}
 \alias{dbClearResult,MySQLResult-method}
-\alias{dbFetch,MySQLResult,missing-method}
 \alias{dbFetch,MySQLResult,numeric-method}
 \alias{dbGetInfo,MySQLResult-method}
+\alias{dbGetQuery,MySQLConnection,character-method}
 \alias{dbGetStatement,MySQLResult-method}
 \alias{dbListFields,MySQLResult,missing-method}
 \alias{dbSendQuery,MySQLConnection,character-method}
-\alias{fetch,MySQLResult,missing-method}
 \alias{fetch,MySQLResult,numeric-method}
 \title{Execute a SQL statement on a database connection.}
 \usage{
-\S4method{dbFetch}{MySQLResult,numeric}(res, n = -1, ...)
+\S4method{dbFetch}{MySQLResult,numeric}(res, n)
 
-\S4method{fetch}{MySQLResult,numeric}(res, n = -1, ...)
-
-\S4method{dbFetch}{MySQLResult,missing}(res, n = -1, ...)
-
-\S4method{fetch}{MySQLResult,missing}(res, n = -1, ...)
+\S4method{fetch}{MySQLResult,numeric}(res, n)
 
 \S4method{dbSendQuery}{MySQLConnection,character}(conn, statement)
+
+\S4method{dbGetQuery}{MySQLConnection,character}(conn, statement, ...,
+  params = NULL, row.names = NA)
 
 \S4method{dbClearResult}{MySQLResult}(res, ...)
 
@@ -34,17 +32,13 @@
 \arguments{
 \item{res,dbObj}{A  \code{\linkS4class{MySQLResult}} object.}
 
-\item{n}{maximum number of records to retrieve per fetch. Use \code{-1} to
-retrieve all pending records; use \code{0} for to fetch the default
-number of rows as defined in \code{\link{MySQL}}}
-
-\item{...}{Unused. Needed for compatibility with generic.}
-
 \item{conn}{an \code{\linkS4class{MySQLConnection}} object.}
 
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be
 provided.}
+
+\item{...}{Unused. Needed for compatibility with generic.}
 
 \item{what}{optional}
 
