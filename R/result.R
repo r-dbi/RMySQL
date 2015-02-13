@@ -7,11 +7,26 @@
 #' @keywords internal
 setClass("MySQLResult",
   contains = "DBIResult",
-  slots = list(Id = "integer")
+  slots = list(
+    ptr = "externalptr",
+    sql = "character"
+  )
 )
 
-setAs("MySQLResult", "MySQLConnection", function(from) {
-  new("MySQLConnection", Id = from@Id[1:2])
+#' @rdname MySQLResult-class
+#' @export
+setMethod("show", "MySQLResult", function(object) {
+  cat("<MySQLResult>\n")
+  if(!dbIsValid(object)){
+    cat("EXPIRED\n")
+  } else {
+    cat("  SQL  ", dbGetStatement(object), "\n", sep = "")
+
+#     done <- if (dbHasCompleted(object)) "complete" else "incomplete"
+#     cat("  ROWS Fetched: ", dbGetRowCount(object), " [", done, "]\n", sep = "")
+#     cat("       Changed: ", dbGetRowsAffected(object), "\n", sep = "")
+  }
+  invisible(NULL)
 })
 
 mysqlFetch <- function(res, n, ...) {
@@ -89,13 +104,11 @@ setMethod("fetch", c("MySQLResult", "missing"), function(res, n, ...) {
 
 #' @rdname query
 #' @export
-#' @useDynLib RMySQL RS_MySQL_exec
 setMethod("dbSendQuery", c("MySQLConnection", "character"),
   function(conn, statement) {
-    checkValid(conn)
-
-    rsId <- .Call(RS_MySQL_exec, conn@Id, as.character(statement))
-    new("MySQLResult", Id = rsId)
+    new("MySQLResult",
+      ptr = result_create(conn@ptr, statement),
+      sql = statement)
   }
 )
 
@@ -128,7 +141,7 @@ setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
 #' @rdname query
 #' @export
 setMethod("dbGetStatement", "MySQLResult", function(res, ...) {
-  dbGetInfo(res)$statement
+  res@sql
 })
 
 #' @param name Table name.
@@ -167,7 +180,7 @@ NULL
 #' @export
 #' @rdname result-meta
 setMethod("dbColumnInfo", "MySQLResult", function(res, ...) {
-  as.data.frame(.Call(rmysql_fields_info, res@Id))
+  result_column_info(res@ptr)
 })
 
 #' @export
@@ -215,11 +228,3 @@ setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
   invisible(NULL)
 })
 
-#' @export
-#' @rdname result-meta
-setMethod("show", "MySQLResult", function(object) {
-  expired <- if (dbIsValid(object)) "" else "Expired "
-  cat("<", expired, "MySQLResult:", paste(object@Id, collapse = ","), ">\n",
-    sep = "")
-  invisible(NULL)
-})

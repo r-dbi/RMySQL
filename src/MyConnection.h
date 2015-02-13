@@ -57,6 +57,10 @@ public:
     return output;
   }
 
+  MYSQL* conn() {
+    return pConn_;
+  }
+
   ~MyConnection() {
     try {
       mysql_close(pConn_);

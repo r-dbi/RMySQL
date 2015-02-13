@@ -69,3 +69,26 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// result_create
+XPtr<MyResult> result_create(XPtr<MyConnectionPtr> con, std::string sql);
+RcppExport SEXP RMySQL_result_create(SEXP conSEXP, SEXP sqlSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyConnectionPtr> >::type con(conSEXP);
+    Rcpp::traits::input_parameter< std::string >::type sql(sqlSEXP);
+    __result = Rcpp::wrap(result_create(con, sql));
+    return __result;
+END_RCPP
+}
+// result_column_info
+List result_column_info(XPtr<MyResult> rs);
+RcppExport SEXP RMySQL_result_column_info(SEXP rsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    __result = Rcpp::wrap(result_column_info(rs));
+    return __result;
+END_RCPP
+}

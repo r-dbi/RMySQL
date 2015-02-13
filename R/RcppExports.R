@@ -21,3 +21,11 @@ connection_quote_string <- function(con, input) {
     .Call('RMySQL_connection_quote_string', PACKAGE = 'RMySQL', con, input)
 }
 
+result_create <- function(con, sql) {
+    .Call('RMySQL_result_create', PACKAGE = 'RMySQL', con, sql)
+}
+
+result_column_info <- function(rs) {
+    .Call('RMySQL_result_column_info', PACKAGE = 'RMySQL', rs)
+}
+

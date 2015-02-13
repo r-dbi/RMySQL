@@ -32,14 +32,12 @@ checkValid <- function(obj) {
 
 #' @export
 #' @rdname isIdCurrent
-#' @useDynLib RMySQL rmysql_connection_valid
 setMethod("dbIsValid", "MySQLConnection", function(dbObj) {
   connection_valid(dbObj@ptr)
 })
 
 #' @export
 #' @rdname isIdCurrent
-#' @useDynLib RMySQL rmysql_result_valid
 setMethod("dbIsValid", "MySQLResult", function(dbObj) {
-  .Call(rmysql_result_valid, dbObj@Id)
+  TRUE
 })
