@@ -21,6 +21,12 @@ XPtr<MyConnectionPtr> connection_create(std::string host,
 
 // [[Rcpp::export]]
 void connection_release(XPtr<MyConnectionPtr> con) {
+  if ((*con)->hasQuery()) {
+    warning("%s\n%s",
+      "There is a result object still in use.",
+      "The connection will be automatically released when it is closed"
+    );
+  }
   return con.release();
 }
 

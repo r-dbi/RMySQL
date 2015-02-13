@@ -6,19 +6,24 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
+class MyResult;
+
 // convenience typedef for shared_ptr to PqConnection
 class MyConnection;
 typedef boost::shared_ptr<MyConnection> MyConnectionPtr;
 
 class MyConnection : boost::noncopyable {
   MYSQL* pConn_;
+  MyResult* pCurrentResult_;
 
 public:
 
   MyConnection(std::string host, std::string user, std::string password,
                std::string db, unsigned int port, std::string unix_socket,
                unsigned long client_flag, std::string groups,
-               std::string default_file) {
+               std::string default_file) :
+    pCurrentResult_(NULL)
+  {
 
     pConn_ = mysql_init(NULL);
     mysql_options(pConn_, MYSQL_SET_CHARSET_NAME, "UTF8");
@@ -59,6 +64,15 @@ public:
 
   MYSQL* conn() {
     return pConn_;
+  }
+
+  // Cancels previous query, if needed.
+  void setCurrentResult(MyResult* pResult);
+  bool isCurrentResult(MyResult* pResult) {
+    return pCurrentResult_ == pResult;
+  }
+  bool hasQuery() {
+    return pCurrentResult_ != NULL;
   }
 
   ~MyConnection() {

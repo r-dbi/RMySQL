@@ -9,6 +9,7 @@
 #include "MyUtils.h"
 
 class MyResult : boost::noncopyable {
+  MyConnectionPtr pConn_;
   MYSQL_STMT* pStatement_;
   MYSQL_RES* pSpec_;
   int rowsAffected_, rowsFetched_;
@@ -22,32 +23,38 @@ class MyResult : boost::noncopyable {
 
 public:
 
-  MyResult(MyConnectionPtr pConn, std::string sql): rowsFetched_(0) {
-    // pConn->setCurrentResult(this);
-    // Need to clean up on failure
+  MyResult(MyConnectionPtr pConn, std::string sql):
+    pConn_(pConn),
+    rowsFetched_(0)
+  {
+    pConn_->setCurrentResult(this);
 
-    pStatement_ = mysql_stmt_init(pConn->conn());
-    if (pStatement_ == NULL)
-      Rcpp::stop("Failed to send query");
+    try {
+      pStatement_ = mysql_stmt_init(pConn->conn());
+      if (pStatement_ == NULL)
+        Rcpp::stop("Failed to send query");
 
-    if (mysql_stmt_prepare(pStatement_, sql.data(), sql.size()) != 0)
-      throwError();
+      if (mysql_stmt_prepare(pStatement_, sql.data(), sql.size()) != 0)
+        throwError();
 
-    pSpec_ = mysql_stmt_result_metadata(pStatement_);
-    if (pSpec_ != NULL) {
-      cacheMetadata();
-      rowsAffected_ = 0;
-      complete_ = false;
+      pSpec_ = mysql_stmt_result_metadata(pStatement_);
+      if (pSpec_ != NULL) {
+        cacheMetadata();
+        rowsAffected_ = 0;
+        complete_ = false;
 
-      bindingRow_ = new MyRow(pStatement_, types_);
-    } else {
-      rowsAffected_ = mysql_stmt_affected_rows(pStatement_);
-      complete_ = true;
+        bindingRow_ = new MyRow(pStatement_, types_);
+      } else {
+        rowsAffected_ = mysql_stmt_affected_rows(pStatement_);
+        complete_ = true;
+      }
+
+      if (mysql_stmt_execute(pStatement_) != 0)
+        throwError();
+    } catch (...) {
+      pConn_->setCurrentResult(NULL);
+      throw;
     }
-
-    if (mysql_stmt_execute(pStatement_) != 0)
-      throwError();
-
 
     nParams_ = mysql_stmt_param_count(pStatement_);
     bound_ = (nParams_ == 0);
@@ -89,8 +96,8 @@ public:
   Rcpp::List fetch(int n_max = -1) {
     if (!bound_)
       Rcpp::stop("Query needs to be bound before fetching");
-//     if (!active())
-//       Rcpp::stop("Inactive result set");
+    if (!active())
+      Rcpp::stop("Inactive result set");
 
     int n = (n_max < 0) ? 100 : n_max;
     Rcpp::List out = dfCreate(types_, names_, n);
@@ -127,6 +134,10 @@ public:
     return out;
   }
 
+  bool active() {
+    return pConn_->isCurrentResult(this);
+  }
+
   void throwError() {
     Rcpp::stop("%s [%i]",
       mysql_stmt_error(pStatement_),
@@ -134,11 +145,21 @@ public:
     );
   }
 
+  void close() {
+    if (pStatement_ != NULL) {
+      mysql_stmt_close(pStatement_);
+      pStatement_ = NULL;
+    }
+    if (pSpec_ != NULL) {
+      mysql_free_result(pSpec_);
+      pSpec_ = NULL;
+    }
+  }
+
   ~MyResult() {
     try {
-      mysql_stmt_close(pStatement_);
-      if (pSpec_ != NULL)
-        mysql_free_result(pSpec_);
+      pConn_->setCurrentResult(NULL);
+      close();
     } catch(...) {};
   }
 
