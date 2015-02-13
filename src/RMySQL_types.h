@@ -3,5 +3,6 @@
 
 #include "MyConnection.h"
 #include "MyResult.h"
+#include "MyBinding.h"
 
 #endif

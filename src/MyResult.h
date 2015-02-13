@@ -4,6 +4,7 @@
 #include <Rcpp.h>
 #include <mysql.h>
 #include <boost/noncopyable.hpp>
+#include "MyBinding.h"
 #include "MyTypes.h"
 #include "MyUtils.h"
 
@@ -14,6 +15,7 @@ class MyResult : boost::noncopyable {
   unsigned int nCols_;
   std::vector<MyFieldType> types_;
   std::vector<std::string> names_;
+  std::vector<MyBinding> bindings_;
 
 public:
 
@@ -109,7 +111,10 @@ private:
 
     for (int i = 0; i < nCols_; ++i) {
       names_.push_back(fields[i].name);
-      types_.push_back(variableType(fields[i].type));
+
+      MyFieldType type = variableType(fields[i].type);
+      types_.push_back(type);
+      bindings_.push_back(MyBinding(type));
     }
   }
 
