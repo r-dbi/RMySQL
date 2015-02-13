@@ -13,7 +13,7 @@
 #' }
 NULL
 
-#' @rdname dbQuoteIdentifer
+#' @rdname mysql-quoting
 #' @export
 setMethod("dbQuoteIdentifier", c("MySQLConnection", "character"),
   function(conn, x, ...) {
@@ -22,7 +22,7 @@ setMethod("dbQuoteIdentifier", c("MySQLConnection", "character"),
   }
 )
 
-#' @rdname dbQuoteIdentifer
+#' @rdname mysql-quoting
 #' @export
 setMethod("dbQuoteString", c("MySQLConnection", "character"),
   function(conn, x, ...) {
