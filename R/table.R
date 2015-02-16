@@ -67,8 +67,8 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
 
-    dbBegin(conn)
-    on.exit(dbRollback(conn))
+#     dbBegin(conn)
+#     on.exit(dbRollback(conn))
 
     found <- dbExistsTable(conn, name)
     if (found && !overwrite && !append) {
@@ -89,8 +89,8 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
       rs <- dbSendQuery(conn, sql)
     }
 
-    on.exit(NULL)
-    dbCommit(conn)
+#     on.exit(NULL)
+#     dbCommit(conn)
 
     TRUE
   }
