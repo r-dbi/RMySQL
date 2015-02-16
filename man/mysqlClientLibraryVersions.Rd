@@ -7,9 +7,9 @@
 mysqlClientLibraryVersions()
 }
 \value{
-A named integer vector of length two, the first element representing
-the compiled library version and the second element representint the loaded
-client library version.
+A named integer vector of length two, the first element
+  representing the compiled library version and the second element
+  representing the loaded client library version.
 }
 \description{
 This function prints out the compiled and loaded client library versions.

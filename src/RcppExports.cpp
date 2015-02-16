@@ -158,3 +158,13 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// version
+IntegerVector version();
+RcppExport SEXP RMySQL_version() {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    __result = Rcpp::wrap(version());
+    return __result;
+END_RCPP
+}

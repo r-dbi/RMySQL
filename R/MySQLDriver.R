@@ -21,18 +21,16 @@ setMethod("show", "MySQLDriver", function(object) {
   cat("<MySQLDriver>\n")
 })
 
-
 #' MySQL Check for Compiled Versus Loaded Client Library Versions
 #'
 #' This function prints out the compiled and loaded client library versions.
 #'
-#' @return A named integer vector of length two, the first element representing
-#' the compiled library version and the second element representint the loaded
-#' client library version.
+#' @return A named integer vector of length two, the first element
+#'   representing the compiled library version and the second element
+#'   representing the loaded client library version.
 #' @export
 #' @examples
 #' mysqlClientLibraryVersions()
-#' @useDynLib RMySQL rmysql_version
 mysqlClientLibraryVersions <- function() {
-  .Call(rmysql_version)
+  version()
 }

@@ -53,3 +53,7 @@ result_active <- function(rs) {
     .Call('RMySQL_result_active', PACKAGE = 'RMySQL', rs)
 }
 
+version <- function() {
+    .Call('RMySQL_version', PACKAGE = 'RMySQL')
+}
+
