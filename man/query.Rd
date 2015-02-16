@@ -2,6 +2,7 @@
 % Please edit documentation in R/query.R
 \docType{methods}
 \name{dbFetch,MySQLResult,numeric-method}
+\alias{dbBind,MySQLResult-method}
 \alias{dbClearResult,MySQLResult-method}
 \alias{dbFetch,MySQLResult,numeric-method}
 \alias{dbGetQuery,MySQLConnection,character-method}
@@ -15,6 +16,8 @@
 
 \S4method{dbGetQuery}{MySQLConnection,character}(conn, statement, ...,
   params = NULL, row.names = NA)
+
+\S4method{dbBind}{MySQLResult}(res, params, ...)
 
 \S4method{dbClearResult}{MySQLResult}(res, ...)
 
