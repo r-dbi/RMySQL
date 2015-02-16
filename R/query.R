@@ -70,6 +70,13 @@ setMethod("dbGetQuery", signature("MySQLConnection", "character"),
 
 #' @rdname query
 #' @export
+setMethod("dbBind", "MySQLResult", function(res, params, ...) {
+  result_bind(res@ptr, params)
+  TRUE
+})
+
+#' @rdname query
+#' @export
 setMethod("dbClearResult", "MySQLResult", function(res, ...) {
   result_release(res@ptr)
   TRUE

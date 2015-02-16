@@ -174,7 +174,7 @@ setMethod("dbExistsTable", c("MySQLConnection", "character"),
 #' @rdname mysql-tables
 setMethod("dbRemoveTable", c("MySQLConnection", "character"),
   function(conn, name, ...){
-    name <- dbQuoteIdentifer(conn, name)
+    name <- dbQuoteIdentifier(conn, name)
     dbGetQuery(conn, paste0("DROP TABLE ", name))
     TRUE
   }

@@ -3,13 +3,15 @@
 
 enum MyFieldType {
   MY_INT32,
-  MY_INT64,
+  MY_INT64,   // output only
   MY_DBL,
   MY_STR,
   MY_DATE,
   MY_DATE_TIME,
-  MY_TIME,
-  MY_RAW
+  MY_TIME,   // output only
+  MY_RAW,
+  MY_FACTOR, // input only
+  MY_LGL     // input only
 };
 
 // http://dev.mysql.com/doc/refman/5.7/en/c-api-data-structures.html
@@ -68,6 +70,8 @@ inline std::string typeName(MyFieldType type) {
   case MY_DATE_TIME:   return "POSIXct";
   case MY_TIME:        return "time";
   case MY_RAW:         return "raw";
+  case MY_FACTOR:      return "factor";
+  case MY_LGL:         return "logical";
   }
 }
 
@@ -81,7 +85,40 @@ inline SEXPTYPE typeSEXP(MyFieldType type) {
   case MY_DATE_TIME:   return REALSXP;
   case MY_TIME:        return INTSXP;
   case MY_RAW:         return VECSXP;
+  case MY_FACTOR:      return INTSXP;
+  case MY_LGL:         return LGLSXP;
   }
+}
+
+std::string inline rClass(Rcpp::RObject x) {
+  Rcpp::RObject klass_ = x.attr("class");
+  std::string klass;
+  if (klass_ == R_NilValue)
+    return "";
+
+  Rcpp::CharacterVector klassv = Rcpp::as<Rcpp::CharacterVector>(klass_);
+  return std::string(klassv[0]);
+}
+
+inline MyFieldType variableType(Rcpp::RObject type) {
+  std::string klass = rClass(type);
+
+  switch (TYPEOF(type)) {
+  case LGLSXP:
+    return MY_LGL;
+  case INTSXP:
+    if (klass == "")        return MY_INT32;
+    if (klass == "factor")  return MY_FACTOR;
+    if (klass == "Date")    return MY_DATE;
+  case REALSXP:
+    if (klass == "")        return MY_DBL;
+    if (klass == "POSIXct") return MY_DATE_TIME;
+  case STRSXP:
+    return MY_STR;
+  }
+
+  Rcpp::stop("Unsupport column type %s", Rf_type2char(TYPEOF(type)));
+  return MY_STR;
 }
 
 

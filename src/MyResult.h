@@ -5,6 +5,7 @@
 #include <mysql.h>
 #include <boost/noncopyable.hpp>
 #include "MyBinding.h"
+#include "MyRow.h"
 #include "MyTypes.h"
 #include "MyUtils.h"
 
@@ -19,7 +20,8 @@ class MyResult : boost::noncopyable {
 
   std::vector<MyFieldType> types_;
   std::vector<std::string> names_;
-  MyRow* bindingRow_;
+  MyRow* bindingOutput_;
+  MyBinding* bindingInput_;
 
 public:
 
@@ -45,14 +47,12 @@ public:
         rowsAffected_ = 0;
         complete_ = false;
 
-        bindingRow_ = new MyRow(pStatement_, types_);
+        bindingOutput_ = new MyRow(pStatement_, types_);
       } else {
         rowsAffected_ = mysql_stmt_affected_rows(pStatement_);
         complete_ = true;
       }
 
-      if (mysql_stmt_execute(pStatement_) != 0)
-        throwError();
     } catch (...) {
       pConn_->setCurrentResult(NULL);
       throw;
@@ -60,6 +60,12 @@ public:
 
     nParams_ = mysql_stmt_param_count(pStatement_);
     bound_ = (nParams_ == 0);
+    if (nParams_ != 0) {
+      bindingInput_ = new MyBinding(pStatement_);
+    } else {
+      if (mysql_stmt_execute(pStatement_) != 0)
+        throwError();
+    }
   }
 
   void close() {
@@ -76,10 +82,25 @@ public:
   ~MyResult() {
     try {
       pConn_->setCurrentResult(NULL);
+      if (bindingInput_ != NULL)
+        delete(bindingInput_);
+      if (bindingOutput_ != NULL)
+        delete(bindingOutput_);
       close();
     } catch(...) {};
   }
 
+  void bind(Rcpp::List params) {
+    rowsAffected_ = 0;
+    complete_ = false;
+    rowsFetched_ = 0;
+    bound_ = true;
+
+    bindingInput_->initBinding(params);
+    bindingInput_->bindOne(params);
+    if (mysql_stmt_execute(pStatement_) != 0)
+      throwError();
+  }
 
   Rcpp::List columnInfo() {
     Rcpp::CharacterVector names(nCols_), types(nCols_);
@@ -141,7 +162,7 @@ public:
 
       for (int j = 0; j < nCols_; ++j) {
         // Rcpp::Rcout << i << "," << j << "\n";
-        bindingRow_->setListValue(out[j], i, j);
+        bindingOutput_->setListValue(out[j], i, j);
       }
 
       ++i;
