@@ -70,7 +70,6 @@ setMethod("dbGetQuery", signature("MySQLConnection", "character"),
 
 #' @rdname query
 #' @export
-#' @useDynLib RMySQL RS_MySQL_closeResultSet
 setMethod("dbClearResult", "MySQLResult", function(res, ...) {
   result_release(res@ptr)
   TRUE
@@ -81,15 +80,6 @@ setMethod("dbClearResult", "MySQLResult", function(res, ...) {
 setMethod("dbGetStatement", "MySQLResult", function(res, ...) {
   res@sql
 })
-
-#' @param name Table name.
-#' @rdname query
-#' @export
-#' @useDynLib RMySQL rmysql_fields_info
-setMethod("dbListFields", c("MySQLResult", "missing"), function(conn, name, ...) {
-  .Call(rmysql_fields_info, conn@Id)$name
-})
-
 
 #' Database interface meta-data.
 #'

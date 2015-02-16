@@ -6,7 +6,6 @@
 \alias{dbFetch,MySQLResult,numeric-method}
 \alias{dbGetQuery,MySQLConnection,character-method}
 \alias{dbGetStatement,MySQLResult-method}
-\alias{dbListFields,MySQLResult,missing-method}
 \alias{dbSendQuery,MySQLConnection,character-method}
 \title{Execute a SQL statement on a database connection.}
 \usage{
@@ -20,8 +19,6 @@
 \S4method{dbClearResult}{MySQLResult}(res, ...)
 
 \S4method{dbGetStatement}{MySQLResult}(res, ...)
-
-\S4method{dbListFields}{MySQLResult,missing}(conn, name, ...)
 }
 \arguments{
 \item{res,dbObj}{A  \code{\linkS4class{MySQLResult}} object.}
@@ -44,8 +41,6 @@
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be
 provided.}
-
-\item{name}{Table name.}
 }
 \description{
 To retrieve results a chunk at a time, use \code{dbSendQuery},

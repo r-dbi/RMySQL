@@ -1,5 +1,7 @@
 # Version 0.10.1.9000
 
+ * `dbListFields()` has been removed. Please use `dbColumnInfo()` instead.
+
  * `dbGetInfo()` has been removed. Please use the individual metadata 
     functions.
 
