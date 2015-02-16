@@ -189,7 +189,9 @@ private:
     for (int i = 0; i < nCols_; ++i) {
       names_.push_back(fields[i].name);
 
-      MyFieldType type = variableType(fields[i].type);
+
+      bool binary = fields[i].charsetnr == 63;
+      MyFieldType type = variableType(fields[i].type, binary);
       types_.push_back(type);
     }
   }
