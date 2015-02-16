@@ -72,9 +72,8 @@ setMethod("dbGetQuery", signature("MySQLConnection", "character"),
 #' @export
 #' @useDynLib RMySQL RS_MySQL_closeResultSet
 setMethod("dbClearResult", "MySQLResult", function(res, ...) {
-  if (!dbIsValid(res)) return(TRUE)
-
-  .Call(RS_MySQL_closeResultSet, res@Id)
+  result_release(res@ptr)
+  TRUE
 })
 
 

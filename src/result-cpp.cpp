@@ -17,3 +17,8 @@ List result_column_info(XPtr<MyResult> rs) {
 List result_fetch(XPtr<MyResult> rs, int n) {
   return rs->fetch(n);
 }
+
+// [[Rcpp::export]]
+void result_release(XPtr<MyResult> rs) {
+  rs.release();
+}

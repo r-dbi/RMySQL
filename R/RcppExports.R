@@ -33,3 +33,7 @@ result_fetch <- function(rs, n) {
     .Call('RMySQL_result_fetch', PACKAGE = 'RMySQL', rs, n)
 }
 
+result_release <- function(rs) {
+    invisible(.Call('RMySQL_result_release', PACKAGE = 'RMySQL', rs))
+}
+

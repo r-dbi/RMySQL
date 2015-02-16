@@ -104,3 +104,13 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// result_release
+void result_release(XPtr<MyResult> rs);
+RcppExport SEXP RMySQL_result_release(SEXP rsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    result_release(rs);
+    return R_NilValue;
+END_RCPP
+}
