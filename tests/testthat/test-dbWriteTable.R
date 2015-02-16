@@ -84,8 +84,30 @@ test_that("can read file from disk", {
     stringsAsFactors = FALSE
   )
 
-  dbWriteTable(con, "dat", "dat-n.txt", sep = "|", eol = "\n", temporary = TRUE)
+  dbWriteTable(con, "dat", "dat-n.txt", sep = "|", eol = "\n",
+               temporary = TRUE, overwrite = TRUE)
   expect_equal(dbReadTable(con, "dat"), expected)
+
+  dbDisconnect(con)
+})
+
+test_that("temporary tables work properly", {
+  con <- mysqlDefault()
+
+  df <- data.frame(
+    str = letters[1:5],
+    num = 1:5,
+    stringsAsFactors = FALSE
+  )
+  dbWriteTable(con, "dat", df, temporary = TRUE, row.names = FALSE)
+  res <- dbGetQuery(con, "SELECT * FROM dat")
+  expect_equal(res, df)
+
+  dbGetQuery(con, "DELETE FROM dat")
+  expect_true(dbWriteTable(con, "dat", df, append = TRUE, row.names = FALSE))
+
+  res <- dbGetQuery(con, "SELECT * FROM dat")
+  expect_equal(res, df)
 
   dbDisconnect(con)
 })

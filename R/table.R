@@ -196,7 +196,14 @@ setMethod("dbListTables", "MySQLConnection", function(conn, ...) {
 #' @rdname mysql-tables
 setMethod("dbExistsTable", c("MySQLConnection", "character"),
   function(conn, name, ...) {
-    name %in% dbListTables(conn)
+    tryCatch({
+      dbGetQuery(conn, paste0(
+        "SELECT NULL FROM ", dbQuoteIdentifier(conn, name), " WHERE FALSE"
+      ))
+      TRUE
+    }, error = function(...) {
+      FALSE
+    })
   }
 )
 
