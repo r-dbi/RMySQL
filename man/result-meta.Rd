@@ -3,7 +3,6 @@
 \docType{methods}
 \name{result-meta}
 \alias{dbColumnInfo,MySQLResult-method}
-\alias{dbGetException,MySQLResult-method}
 \alias{dbGetRowCount,MySQLResult-method}
 \alias{dbGetRowsAffected,MySQLResult-method}
 \alias{dbHasCompleted,MySQLResult-method}
@@ -17,8 +16,6 @@
 \S4method{dbGetRowCount}{MySQLResult}(res, ...)
 
 \S4method{dbHasCompleted}{MySQLResult}(res, ...)
-
-\S4method{dbGetException}{MySQLResult}(conn, ...)
 }
 \arguments{
 \item{res,conn,object}{An object of class \code{\linkS4class{MySQLResult}}}

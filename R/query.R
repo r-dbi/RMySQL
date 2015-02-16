@@ -129,10 +129,3 @@ setMethod("dbGetRowCount", "MySQLResult", function(res, ...) {
 setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
   dbGetInfo(res)$completed == 1
 })
-
-#' @export
-#' @rdname result-meta
-#' @useDynLib RMySQL rmysql_exception_info
-setMethod("dbGetException", "MySQLResult", function(conn, ...) {
-  .Call(rmysql_exception_info, conn@Id[1:2])
-})
