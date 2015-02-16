@@ -18,7 +18,7 @@ class MyBinding : boost::noncopyable {
 
 public:
   MyBinding(MYSQL_STMT* pStatement):
-    pStatement_(pStatement),
+    pStatement_(pStatement)
   {
     p_ = mysql_stmt_param_count(pStatement_);
 
@@ -27,10 +27,6 @@ public:
     buffers_.resize(p_);
     types_.resize(p_);
     isNull_.resize(p_);
-  }
-
-  bool bound() {
-    return bound_;
   }
 
   void initBinding(Rcpp::List params) {
