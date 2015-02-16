@@ -118,6 +118,8 @@ public:
       Rcpp::stop("Query needs to be bound before fetching");
     if (!active())
       Rcpp::stop("Inactive result set");
+    if (pSpec_ == NULL)
+      return dfCreate(types_, names_, 0);
 
     int n = (n_max < 0) ? 100 : n_max;
     Rcpp::List out = dfCreate(types_, names_, n);
