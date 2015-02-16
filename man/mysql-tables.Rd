@@ -16,12 +16,12 @@
 
 \S4method{dbWriteTable}{MySQLConnection,character,data.frame}(conn, name, value,
   field.types = NULL, row.names = TRUE, overwrite = FALSE,
-  append = FALSE, ..., allow.keywords = FALSE)
+  append = FALSE, ..., allow.keywords = FALSE, temporary = FALSE)
 
 \S4method{dbWriteTable}{MySQLConnection,character,character}(conn, name, value,
   field.types = NULL, overwrite = FALSE, append = FALSE, header = TRUE,
   row.names = FALSE, nrows = 50, sep = ",", eol = "\\n", skip = 0,
-  quote = "\\"", ...)
+  quote = "\\"", temporary = FALSE, ...)
 
 \S4method{dbListTables}{MySQLConnection}(conn, ...)
 
@@ -58,6 +58,8 @@ or not. Its default is \code{FALSE}. (See the BUGS section below)}
 in the DBMS.  Its default is \code{FALSE}.}
 
 \item{allow.keywords}{DEPRECATED.}
+
+\item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
 
 \item{header}{logical, does the input file have a header line? Default is the
 same heuristic used by \code{read.table}, i.e., \code{TRUE} if the first

@@ -24,7 +24,7 @@ NULL
 #'
 #' # By default, row names are written in a column to row_names, and
 #' # automatically read back into the row.names()
-#' dbWriteTable(con, "mtcars", mtcars[1:5, ], overwrite = TRUE)
+#' dbWriteTable(con, "mtcars", mtcars[1:5, ], temporary = TRUE)
 #' dbReadTable(con, "mtcars")
 #' dbReadTable(con, "mtcars", row.names = NULL)
 #' }
@@ -34,7 +34,7 @@ NULL
 #' @export
 #' @rdname mysql-tables
 setMethod("dbReadTable", c("MySQLConnection", "character"),
-  function(conn, name, row.names, check.names = TRUE, ...) {
+  function(conn, name, row.names = NA, check.names = TRUE, ...) {
     name <- dbQuoteIdentifier(conn, name)
     out <- dbGetQuery(conn, paste("SELECT * FROM ", name),
       row.names = row.names)
@@ -58,7 +58,8 @@ setMethod("dbReadTable", c("MySQLConnection", "character"),
 #' @rdname mysql-tables
 setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
   function(conn, name, value, field.types = NULL, row.names = TRUE,
-    overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE)     {
+           overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE,
+           temporary = FALSE) {
 
     if (!missing(allow.keywords)) {
       warning("allow.keywords is deprecated.")
@@ -80,7 +81,8 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
     }
 
     if (!found || overwrite) {
-      sql <- SQL::sqlTableCreate(conn, name, value, row.names = row.names)
+      sql <- SQL::sqlTableCreate(conn, name, value, row.names = row.names,
+        temporary = temporary)
       dbGetQuery(conn, sql)
     }
 
@@ -110,8 +112,9 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
 #'   the input file to create the proper table definition. Default is 50.
 setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
   function(conn, name, value, field.types = NULL, overwrite = FALSE,
-    append = FALSE, header = TRUE, row.names = FALSE, nrows = 50, sep = ",",
-    eol="\n", skip = 0, quote = '"', ...)   {
+           append = FALSE, header = TRUE, row.names = FALSE, nrows = 50,
+           sep = ",", eol = "\n", skip = 0, quote = '"', temporary = FALSE,
+           ...) {
 
     if (overwrite && append)
       stop("overwrite and append cannot both be TRUE", call. = FALSE)
@@ -126,11 +129,16 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
     }
 
     if (!found || overwrite) {
-      # Initialise table with first `nrows` lines
-      d <- read.table(value, sep = sep, header = header, skip = skip, nrows = nrows,
-        na.strings = "\\N", comment.char = "", stringsAsFactors = FALSE)
-      sql <- mysqlBuildTableDefinition(conn, name, d, field.types = field.types,
-        row.names = row.names)
+      if (is.null(field.types)) {
+        # Initialise table with first `nrows` lines
+        d <- read.table(value, sep = sep, header = header, skip = skip,
+          nrows = nrows, na.strings = "\\N", comment.char = "",
+          stringsAsFactors = FALSE)
+        field.types <- vapply(d, dbDataType, character(1))
+      }
+
+      sql <- SQL::sqlTableCreate(conn, name, field.types,
+        row.names = row.names, temporary = temporary)
       dbGetQuery(conn, sql)
     }
 
