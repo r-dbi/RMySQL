@@ -108,6 +108,7 @@ public:
     case 1:
       throwError();
     case MYSQL_NO_DATA:
+      complete_ = true;
       return false;
     }
     return false;
@@ -165,7 +166,7 @@ public:
   }
 
   bool complete() {
-    return false;
+    return complete_;
   }
 
   bool active() {
