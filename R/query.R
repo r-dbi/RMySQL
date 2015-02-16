@@ -40,7 +40,6 @@ NULL
 #' dbDisconnect(con)
 #' }
 #' @rdname query
-#' @useDynLib RMySQL RS_MySQL_fetch
 setMethod("dbFetch", c("MySQLResult", "numeric"),
   function(res, n = -1, ..., row.names = NA) {
     SQL::columnToRownames(result_fetch(res@ptr, n), row.names)

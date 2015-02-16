@@ -50,7 +50,6 @@ NULL
 #'   dbDisconnect(con)
 #' }
 #' @export
-#' @useDynLib RMySQL RS_MySQL_newConnection
 setMethod("dbConnect", "MySQLDriver",
   function(drv, dbname = "", username = "", password = "", host = "",
     unix.socket = "", port = 0, client.flag = 0,
@@ -100,7 +99,6 @@ setMethod("dbConnect", "MySQLDriver",
 #' dbRemoveTable(con, "USArrests")
 #' dbDisconnect(con)
 #' }
-#' @useDynLib RMySQL rmysql_driver_init
 MySQL <- function(max.con=16, fetch.default.rec = 500) {
   if (!missing(max.con)) {
     warning("`max.con` argument is ignored", call. = FALSE)
@@ -111,19 +109,6 @@ MySQL <- function(max.con=16, fetch.default.rec = 500) {
 
   new("MySQLDriver")
 }
-
-
-
-#' @export
-#' @rdname dbConnect-MySQLDriver-method
-#' @useDynLib RMySQL RS_MySQL_cloneConnection
-setMethod("dbConnect", "MySQLConnection", function(drv, ...) {
-  checkValid(drv)
-
-  newId <- .Call(RS_MySQL_cloneConnection, drv@Id)
-  new("MySQLConnection", Id = newId)
-})
-
 
 #' Constants
 #'

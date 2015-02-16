@@ -3,7 +3,6 @@
 \docType{methods}
 \name{dbDisconnect,MySQLConnection-method}
 \alias{MySQL}
-\alias{dbConnect,MySQLConnection-method}
 \alias{dbConnect,MySQLDriver-method}
 \alias{dbDisconnect,MySQLConnection-method}
 \alias{dbGetInfo,MySQLConnection-method}
@@ -24,8 +23,6 @@
   client.flag = 0, groups = "rs-dbi", default.file = "", ...)
 
 MySQL(max.con = 16, fetch.default.rec = 500)
-
-\S4method{dbConnect}{MySQLConnection}(drv, ...)
 }
 \arguments{
 \item{conn}{an \code{MySQLConnection} object as produced by \code{dbConnect}.}
