@@ -12,7 +12,6 @@ class MyBinding : boost::noncopyable {
 
   int p_;
   std::vector<MYSQL_BIND> bindings_;
-  std::vector<std::vector<unsigned char> > buffers_;
   std::vector<my_bool> isNull_;
   std::vector<MyFieldType> types_;
 
@@ -23,8 +22,6 @@ public:
     p_ = mysql_stmt_param_count(pStatement_);
 
     bindings_.resize(p_);
-    buffers_.resize(p_);
-    buffers_.resize(p_);
     types_.resize(p_);
     isNull_.resize(p_);
   }
@@ -66,21 +63,22 @@ public:
           missing = true;
           break;
         }
-        memcpy(&buffers_[j][0], &LOGICAL(col)[i], 1);
+        bindings_[j].buffer = &LOGICAL(col)[i];
+
         break;
       case MY_INT32:
         if (INTEGER(col)[i] == NA_INTEGER) {
           missing = true;
           break;
         }
-        memcpy(&buffers_[j][0], &INTEGER(col)[i], 4);
+        bindings_[j].buffer = &INTEGER(col)[i];
         break;
       case MY_DBL:
         if (REAL(col)[i] == NA_REAL) {
           missing = true;
           break;
         }
-        memcpy(&buffers_[j][0], &REAL(col)[i], 8);
+        bindings_[j].buffer = &REAL(col)[i];
         break;
       case MY_STR:
         if (STRING_ELT(col, i) == NA_STRING) {
@@ -88,24 +86,14 @@ public:
           break;
         } else {
           SEXP string = STRING_ELT(col, i);
-          int size = Rf_length(string);
-
-          buffers_[j].resize(size);
-          bindings_[j].buffer = &buffers_[j][0];
-          memcpy(&buffers_[j][0], &CHAR(string)[0], size);
+          bindings_[j].buffer_length = Rf_length(string);
+          bindings_[j].buffer = (void*) CHAR(string);
         }
         break;
       case MY_RAW: {
         SEXP raw = VECTOR_ELT(col, i);
-        int size = Rf_length(raw);
-
-        if (size == 0) {
-          missing = true;
-        } else {
-          buffers_[j].resize(size);
-          bindings_[j].buffer = &buffers_[j][0];
-          memcpy(&buffers_[j][0], &RAW(raw)[0], size);
-        }
+        bindings_[j].buffer_length = Rf_length(raw);
+        bindings_[j].buffer = RAW(raw);
       }
       case MY_FACTOR:
       case MY_DATE:
@@ -131,10 +119,7 @@ public:
   }
 
   void bindingUpdate(int j, enum_field_types type, int size) {
-    buffers_[j].resize(size);
-
     bindings_[j].buffer_length = size;
-    bindings_[j].buffer = &buffers_[j][0];
     bindings_[j].buffer_type = type;
     bindings_[j].is_null = &isNull_[j];
   }
