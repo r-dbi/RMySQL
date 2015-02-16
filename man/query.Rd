@@ -4,7 +4,6 @@
 \name{dbFetch,MySQLResult,numeric-method}
 \alias{dbClearResult,MySQLResult-method}
 \alias{dbFetch,MySQLResult,numeric-method}
-\alias{dbGetInfo,MySQLResult-method}
 \alias{dbGetQuery,MySQLConnection,character-method}
 \alias{dbGetStatement,MySQLResult-method}
 \alias{dbListFields,MySQLResult,missing-method}
@@ -19,8 +18,6 @@
   params = NULL, row.names = NA)
 
 \S4method{dbClearResult}{MySQLResult}(res, ...)
-
-\S4method{dbGetInfo}{MySQLResult}(dbObj, what = "", ...)
 
 \S4method{dbGetStatement}{MySQLResult}(res, ...)
 
@@ -47,8 +44,6 @@
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be
 provided.}
-
-\item{what}{optional}
 
 \item{name}{Table name.}
 }

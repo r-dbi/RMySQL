@@ -1,5 +1,8 @@
 # Version 0.10.1.9000
 
+ * `dbGetInfo()` has been removed. Please use the individual metadata 
+    functions.
+
  *  Information formerly contain in `summary()` methods has now been integrated
     into `show()` methods.
 

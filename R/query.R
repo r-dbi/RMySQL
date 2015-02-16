@@ -76,23 +76,6 @@ setMethod("dbClearResult", "MySQLResult", function(res, ...) {
   TRUE
 })
 
-
-#' @rdname query
-#' @param what optional
-#' @export
-#' @useDynLib RMySQL RS_MySQL_resultSetInfo
-setMethod("dbGetInfo", "MySQLResult", function(dbObj, what = "", ...) {
-  checkValid(dbObj)
-
-  info <- .Call(RS_MySQL_resultSetInfo, dbObj@Id)
-
-  if (!missing(what)) {
-    info[what]
-  } else {
-    info
-  }
-})
-
 #' @rdname query
 #' @export
 setMethod("dbGetStatement", "MySQLResult", function(res, ...) {
