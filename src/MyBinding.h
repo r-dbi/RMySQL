@@ -62,7 +62,7 @@ public:
       case MY_RAW:
         bindings_[i].buffer_type = MYSQL_TYPE_STRING;
         // buffers might be arbitrary length, so leave size and use
-        // alternative strategy 0
+        // alternative strategy: see fetchBuffer() for details
         break;
       }
 
@@ -74,9 +74,15 @@ public:
       bindings_[i].error = &errors_[i];
     }
 
-    if (mysql_stmt_bind_result(pStatement, &bindings_[0]) != 0)
+    if (mysql_stmt_bind_result(pStatement, &bindings_[0]) != 0) {
       Rcpp::stop(mysql_stmt_error(pStatement));
+    }
+  }
 
+  ~MyRow() {
+    try {
+      // pStatement_ is owned by MyResult
+    } catch(...) {}
   }
 
   // Value accessors -----------------------------------------------------------
