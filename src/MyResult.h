@@ -134,6 +134,18 @@ public:
     return out;
   }
 
+  int rowsAffected() {
+    return rowsAffected_;
+  }
+
+  int rowsFetched() {
+    return rowsFetched_;
+  }
+
+  bool complete() {
+    return false;
+  }
+
   bool active() {
     return pConn_->isCurrentResult(this);
   }

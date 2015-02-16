@@ -114,3 +114,47 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// result_rows_affected
+int result_rows_affected(XPtr<MyResult> rs);
+RcppExport SEXP RMySQL_result_rows_affected(SEXP rsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    __result = Rcpp::wrap(result_rows_affected(rs));
+    return __result;
+END_RCPP
+}
+// result_rows_fetched
+int result_rows_fetched(XPtr<MyResult> rs);
+RcppExport SEXP RMySQL_result_rows_fetched(SEXP rsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    __result = Rcpp::wrap(result_rows_fetched(rs));
+    return __result;
+END_RCPP
+}
+// result_complete
+bool result_complete(XPtr<MyResult> rs);
+RcppExport SEXP RMySQL_result_complete(SEXP rsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    __result = Rcpp::wrap(result_complete(rs));
+    return __result;
+END_RCPP
+}
+// result_active
+bool result_active(XPtr<MyResult> rs);
+RcppExport SEXP RMySQL_result_active(SEXP rsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    __result = Rcpp::wrap(result_active(rs));
+    return __result;
+END_RCPP
+}

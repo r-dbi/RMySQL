@@ -37,3 +37,19 @@ result_release <- function(rs) {
     invisible(.Call('RMySQL_result_release', PACKAGE = 'RMySQL', rs))
 }
 
+result_rows_affected <- function(rs) {
+    .Call('RMySQL_result_rows_affected', PACKAGE = 'RMySQL', rs)
+}
+
+result_rows_fetched <- function(rs) {
+    .Call('RMySQL_result_rows_fetched', PACKAGE = 'RMySQL', rs)
+}
+
+result_complete <- function(rs) {
+    .Call('RMySQL_result_complete', PACKAGE = 'RMySQL', rs)
+}
+
+result_active <- function(rs) {
+    .Call('RMySQL_result_active', PACKAGE = 'RMySQL', rs)
+}
+

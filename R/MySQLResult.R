@@ -21,10 +21,9 @@ setMethod("show", "MySQLResult", function(object) {
     cat("EXPIRED\n")
   } else {
     cat("  SQL  ", dbGetStatement(object), "\n", sep = "")
-
-    #     done <- if (dbHasCompleted(object)) "complete" else "incomplete"
-    #     cat("  ROWS Fetched: ", dbGetRowCount(object), " [", done, "]\n", sep = "")
-    #     cat("       Changed: ", dbGetRowsAffected(object), "\n", sep = "")
+    done <- if (dbHasCompleted(object)) "complete" else "incomplete"
+    cat("  ROWS Fetched: ", dbGetRowCount(object), " [", done, "]\n", sep = "")
+    cat("       Changed: ", dbGetRowsAffected(object), "\n", sep = "")
   }
   invisible(NULL)
 })
@@ -32,6 +31,6 @@ setMethod("show", "MySQLResult", function(object) {
 #' @rdname MySQLResult-class
 #' @export
 setMethod("dbIsValid", "MySQLResult", function(dbObj) {
-  TRUE
+  result_active(dbObj@ptr)
 })
 

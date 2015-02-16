@@ -115,17 +115,17 @@ setMethod("dbColumnInfo", "MySQLResult", function(res, ...) {
 #' @export
 #' @rdname result-meta
 setMethod("dbGetRowsAffected", "MySQLResult", function(res, ...) {
-  dbGetInfo(res)$rowsAffected
+  result_rows_affected(res@ptr)
 })
 
 #' @export
 #' @rdname result-meta
 setMethod("dbGetRowCount", "MySQLResult", function(res, ...) {
-  dbGetInfo(res)$rowCount
+  result_rows_fetched(res@ptr)
 })
 
 #' @export
 #' @rdname result-meta
 setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
-  dbGetInfo(res)$completed == 1
+  result_complete(res@ptr)
 })

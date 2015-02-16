@@ -22,3 +22,23 @@ List result_fetch(XPtr<MyResult> rs, int n) {
 void result_release(XPtr<MyResult> rs) {
   rs.release();
 }
+
+// [[Rcpp::export]]
+int result_rows_affected(XPtr<MyResult> rs) {
+  return rs->rowsAffected();
+}
+
+// [[Rcpp::export]]
+int result_rows_fetched(XPtr<MyResult> rs) {
+  return rs->rowsFetched();
+}
+
+// [[Rcpp::export]]
+bool result_complete(XPtr<MyResult> rs) {
+  return rs->complete();
+}
+
+// [[Rcpp::export]]
+bool result_active(XPtr<MyResult> rs) {
+  return rs.get() != NULL &&  rs->active();
+}
