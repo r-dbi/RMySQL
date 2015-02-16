@@ -9,12 +9,9 @@
 \alias{dbGetStatement,MySQLResult-method}
 \alias{dbListFields,MySQLResult,missing-method}
 \alias{dbSendQuery,MySQLConnection,character-method}
-\alias{fetch,MySQLResult,numeric-method}
 \title{Execute a SQL statement on a database connection.}
 \usage{
-\S4method{dbFetch}{MySQLResult,numeric}(res, n)
-
-\S4method{fetch}{MySQLResult,numeric}(res, n)
+\S4method{dbFetch}{MySQLResult,numeric}(res, n = -1, ..., row.names = NA)
 
 \S4method{dbSendQuery}{MySQLConnection,character}(conn, statement)
 
@@ -32,13 +29,24 @@
 \arguments{
 \item{res,dbObj}{A  \code{\linkS4class{MySQLResult}} object.}
 
+\item{...}{Unused. Needed for compatibility with generic.}
+
+\item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
+
+  If \code{TRUE}, always translate row names to a column called "row_names".
+  If \code{FALSE}, never translate row names. If \code{NA}, translate
+  rownames only if they're a character vector.
+
+  A string is equivalent to \code{TRUE}, but allows you to override the
+  default name.
+
+  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
+
 \item{conn}{an \code{\linkS4class{MySQLConnection}} object.}
 
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be
 provided.}
-
-\item{...}{Unused. Needed for compatibility with generic.}
 
 \item{what}{optional}
 

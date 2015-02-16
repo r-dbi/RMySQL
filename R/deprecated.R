@@ -1,6 +1,17 @@
 #' @include MySQLConnection.R
 NULL
 
+#' Fetch rows (deprecated)
+#'
+#' Please use \code{dbFetch} instead
+#'
+#' @export
+#' @keywords internal
+setMethod("fetch", c("MySQLResult", "numeric"), function(res, n) {
+  result_fetch(res@ptr, n)
+})
+
+
 #' Make R/S-Plus identifiers into legal SQL identifiers
 #'
 #' DEPRECATED: please use \code{dbQuoteIdentifier} instead.

@@ -14,6 +14,7 @@ NULL
 #'
 #' @param conn an \code{\linkS4class{MySQLConnection}} object.
 #' @param res,dbObj A  \code{\linkS4class{MySQLResult}} object.
+#' @inheritParams SQL::rownamesToColumn
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
@@ -40,15 +41,11 @@ NULL
 #' }
 #' @rdname query
 #' @useDynLib RMySQL RS_MySQL_fetch
-setMethod("dbFetch", c("MySQLResult", "numeric"), function(res, n) {
-  result_fetch(res@ptr, n)
-})
-
-#' @export
-#' @rdname query
-setMethod("fetch", c("MySQLResult", "numeric"), function(res, n) {
-  result_fetch(res@ptr, n)
-})
+setMethod("dbFetch", c("MySQLResult", "numeric"),
+  function(res, n = -1, ..., row.names = NA) {
+    SQL::columnToRownames(result_fetch(res@ptr, n), row.names)
+  }
+)
 
 #' @rdname query
 #' @export
@@ -64,7 +61,7 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
 #' @rdname query
 setMethod("dbGetQuery", signature("MySQLConnection", "character"),
   function(conn, statement, ..., params = NULL, row.names = NA) {
-    rs <- dbSendQuery(conn, statement, params = params, ...)
+    rs <- dbSendQuery(conn, statement, ...) # params = params
     on.exit(dbClearResult(rs))
 
     dbFetch(rs, n = -1, ..., row.names = row.names)
