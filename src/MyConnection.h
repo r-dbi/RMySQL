@@ -75,6 +75,12 @@ public:
     return pCurrentResult_ != NULL;
   }
 
+  bool exec(std::string sql) {
+    if (mysql_real_query(pConn_, sql.data(), sql.size()) != 0)
+      Rcpp::stop(mysql_error(pConn_));
+    return true;
+  }
+
   ~MyConnection() {
     try {
       mysql_close(pConn_);

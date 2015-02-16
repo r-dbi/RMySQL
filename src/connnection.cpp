@@ -53,3 +53,8 @@ CharacterVector connection_quote_string(XPtr<MyConnectionPtr> con,
 
   return output;
 }
+
+// [[Rcpp::export]]
+bool connection_exec(XPtr<MyConnectionPtr> con, std::string sql) {
+  return (*con)->exec(sql);
+}

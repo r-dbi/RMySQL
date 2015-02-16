@@ -132,3 +132,20 @@ setMethod("dbGetRowCount", "MySQLResult", function(res, ...) {
 setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
   result_complete(res@ptr)
 })
+
+
+#' Execute a query on the server (no binding).
+#'
+#' MySQL has two APIs for submitting queries, one for parameterised queries
+#' and one for unparameterised. In most cases, you can use the parameterised
+#' query interface even if you have zero parameter. However, some queries
+#' (e.g. transaction modification) can not be executed through the
+#' paramaterised interface. This function allows you to submit those queries
+#' directly.
+#'
+#' @param con A MySQL connection.
+#' @param sql A sql string to execute
+#' @export
+mysqlExecQuery <- function(con, sql) {
+  connection_exec(con@ptr, sql)
+}
