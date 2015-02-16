@@ -31,11 +31,14 @@ con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 dbWriteTable(con, "t1", datasets::USArrests, overwrite = TRUE)
 
 rs <- dbSendQuery(con, "SELECT * FROM t1 WHERE UrbanPop >= 80")
+rs
+
 dbGetStatement(rs)
 dbHasCompleted(rs)
-
-dbGetInfo(rs)
 dbColumnInfo(rs)
+
+dbFetch(rs)
+rs
 
 dbClearResult(rs)
 dbRemoveTable(con, "t1")
