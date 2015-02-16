@@ -11,7 +11,7 @@
 \alias{mysql-tables}
 \title{Read and write MySQL tables.}
 \usage{
-\S4method{dbReadTable}{MySQLConnection,character}(conn, name, row.names,
+\S4method{dbReadTable}{MySQLConnection,character}(conn, name, row.names = NA,
   check.names = TRUE, ...)
 
 \S4method{dbWriteTable}{MySQLConnection,character,data.frame}(conn, name, value,
@@ -95,7 +95,7 @@ con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 
 # By default, row names are written in a column to row_names, and
 # automatically read back into the row.names()
-dbWriteTable(con, "mtcars", mtcars[1:5, ], overwrite = TRUE)
+dbWriteTable(con, "mtcars", mtcars[1:5, ], temporary = TRUE)
 dbReadTable(con, "mtcars")
 dbReadTable(con, "mtcars", row.names = NULL)
 }
