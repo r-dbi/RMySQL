@@ -25,6 +25,8 @@ public:
 
   MyResult(MyConnectionPtr pConn, std::string sql):
     pConn_(pConn),
+    pStatement_(NULL),
+    pSpec_(NULL),
     rowsFetched_(0)
   {
     pConn_->setCurrentResult(this);
@@ -58,8 +60,26 @@ public:
 
     nParams_ = mysql_stmt_param_count(pStatement_);
     bound_ = (nParams_ == 0);
-
   }
+
+  void close() {
+    if (pSpec_ != NULL) {
+      mysql_free_result(pSpec_);
+      pSpec_ = NULL;
+    }
+    if (pStatement_ != NULL) {
+      mysql_stmt_close(pStatement_);
+      pStatement_ = NULL;
+    }
+  }
+
+  ~MyResult() {
+    try {
+      pConn_->setCurrentResult(NULL);
+      close();
+    } catch(...) {};
+  }
+
 
   Rcpp::List columnInfo() {
     Rcpp::CharacterVector names(nCols_), types(nCols_);
@@ -155,24 +175,6 @@ public:
       mysql_stmt_error(pStatement_),
       mysql_stmt_errno(pStatement_)
     );
-  }
-
-  void close() {
-    if (pStatement_ != NULL) {
-      mysql_stmt_close(pStatement_);
-      pStatement_ = NULL;
-    }
-    if (pSpec_ != NULL) {
-      mysql_free_result(pSpec_);
-      pSpec_ = NULL;
-    }
-  }
-
-  ~MyResult() {
-    try {
-      pConn_->setCurrentResult(NULL);
-      close();
-    } catch(...) {};
   }
 
 private:
