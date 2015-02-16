@@ -124,15 +124,15 @@ public:
     return bytes;
   }
 
-  int valueDateTime(int j) {
+  double valueDateTime(int j) {
     if (isNull(j))
-      return NA_INTEGER;
+      return NA_REAL;
 
     MYSQL_TIME* mytime = (MYSQL_TIME*) &buffers_[j][0];
 
     struct tm t = { 0 };
-    t.tm_year = mytime->year;
-    t.tm_mon = mytime->month;
+    t.tm_year = mytime->year - 1900;
+    t.tm_mon = mytime->month - 1;
     t.tm_mday = mytime->day;
     t.tm_hour = mytime->hour;
     t.tm_min = mytime->minute;
@@ -165,7 +165,7 @@ public:
       break;
     case MY_DATE:
     case MY_DATE_TIME:
-      REAL(x)[i] = (double) valueDateTime(j);
+      REAL(x)[i] = valueDateTime(j);
       break;
     case MY_TIME:
       INTEGER(x)[i] = valueTime(j);
