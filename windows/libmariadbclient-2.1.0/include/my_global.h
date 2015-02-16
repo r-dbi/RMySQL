@@ -318,7 +318,6 @@ typedef unsigned short ushort;
 */
 #define _VARARGS(X) X
 #define _STATIC_VARARGS(X) X
-#define _PC(X)	X
 
 #if defined(DBUG_ON) && defined(DBUG_OFF)
 #undef DBUG_OFF
@@ -364,14 +363,11 @@ typedef int	(*qsort_cmp)(const void *,const void *);
 #else
 #define qsort_t RETQSORTTYPE	/* Broken GCC cant handle typedef !!!! */
 #endif
-#ifdef HAVE_mit_thread
-#define size_socket socklen_t	/* Type of last arg to accept */
-#else
+
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
-
-#endif
+typedef SOCKET_SIZE_TYPE size_socket;
 
 #ifndef SOCKOPT_OPTLEN_TYPE
 #define SOCKOPT_OPTLEN_TYPE size_socket
@@ -455,9 +451,12 @@ typedef int	(*qsort_cmp)(const void *,const void *);
 #define NO_PISAM		/* Not needed anymore */
 #define NO_MISAM		/* Not needed anymore */
 #define NO_HASH			/* Not needed anymore */
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 #define NO_DIR_LIBRARY		/* Not standar dir-library */
 #define USE_MY_STAT_STRUCT	/* For my_lib */
+#ifdef _SIZE_T_DEFINED
+typedef SSIZE_T ssize_t;
+#endif
 #endif
 
 /* Some things that this system does have */
@@ -1080,9 +1079,25 @@ do { doubleget_union _tmp; \
 #elif defined(HAVE_DLFCN_H)
 #include <dlfcn.h>
 #endif
-#if HAVE_DLERROR
+#ifndef HAVE_DLERROR
 #define dlerror() ""
 #endif
+#endif
+
+#if SIZEOF_CHARP == SIZEOF_INT
+typedef unsigned int intptr;
+#elif SIZEOF_CHARP == SIZEOF_LONG
+typedef unsigned long intptr;
+#elif SIZEOF_CHARP == SIZEOF_LONG_LONG
+typedef unsigned long long intptr;
+#else
+#error sizeof(void *) is not sizeof(int, long or long long)
+#endif
+
+#ifdef _WIN32
+#define IF_WIN(A,B) A 
+#else
+#define IF_WIN(A,B) B 
 #endif
 
 #ifndef RTLD_NOW
