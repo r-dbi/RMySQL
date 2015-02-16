@@ -1,5 +1,12 @@
 # Version 0.10.1.9000
 
+ *  Information formerly contain in `summary()` methods has now been integrated
+    into `show()` methods.
+
+ *  `make.db.names()` has been deprecated. Use `dbQuoteIdentifier()` instead.
+ 
+ *  `isIdCurrent()` has been deprecated. Use `dbIsValid()` instead.
+
  *  `dbApply()`, `dbMoreResults()` and `dbNextResults()` have been removed.
     These were always flagged as experimental, and now the experiment is over.
 

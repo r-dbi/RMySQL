@@ -1,3 +1,6 @@
+#' @include MySQLConnection.R
+NULL
+
 #' Quote MySQL strings and identifiers.
 #'
 #' In MySQL, identifiers are enclosed in backticks, e.g. \code{`x`}.

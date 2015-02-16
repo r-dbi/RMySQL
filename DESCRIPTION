@@ -22,16 +22,14 @@ SystemRequirements: MySQL/MariaDB client headers and libraries, except on
     Windows. E.g. libmysqlclient-dev (Debian/Ubuntu), mariadb-devel (Fedora).
 NeedsCompilation: yes
 Collate:
+    'MySQLConnection.R'
+    'MySQLDriver.R'
+    'MySQLResult.R'
     'RcppExports.R'
-    'mysql.R'
-    'driver.R'
-    'connection.R'
-    'data-type.R'
+    'connect.R'
     'default.R'
-    'escaping.R'
-    'result.R'
-    'extension.R'
-    'is-valid.R'
+    'deprecated.R'
+    'query.R'
     'quote.R'
     'table.R'
     'transaction.R'

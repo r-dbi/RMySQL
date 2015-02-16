@@ -1,33 +1,6 @@
-#' Class MySQLResult
-#'
-#' MySQL's query results class.  This classes encapsulates the result of an SQL
-#' statement (either \code{select} or not).
-#'
-#' @export
-#' @keywords internal
-setClass("MySQLResult",
-  contains = "DBIResult",
-  slots = list(
-    ptr = "externalptr",
-    sql = "character"
-  )
-)
-
-#' @rdname MySQLResult-class
-#' @export
-setMethod("show", "MySQLResult", function(object) {
-  cat("<MySQLResult>\n")
-  if(!dbIsValid(object)){
-    cat("EXPIRED\n")
-  } else {
-    cat("  SQL  ", dbGetStatement(object), "\n", sep = "")
-
-#     done <- if (dbHasCompleted(object)) "complete" else "incomplete"
-#     cat("  ROWS Fetched: ", dbGetRowCount(object), " [", done, "]\n", sep = "")
-#     cat("       Changed: ", dbGetRowsAffected(object), "\n", sep = "")
-  }
-  invisible(NULL)
-})
+#' @include MySQLConnection.R
+#' @include MySQLResult.R
+NULL
 
 #' Execute a SQL statement on a database connection.
 #'
@@ -138,6 +111,7 @@ setMethod("dbListFields", c("MySQLResult", "missing"), function(conn, name, ...)
   .Call(rmysql_fields_info, conn@Id)$name
 })
 
+
 #' Database interface meta-data.
 #'
 #' See documentation of generics for more details.
@@ -193,24 +167,3 @@ setMethod("dbHasCompleted", "MySQLResult", function(res, ...) {
 setMethod("dbGetException", "MySQLResult", function(conn, ...) {
   .Call(rmysql_exception_info, conn@Id[1:2])
 })
-
-#' @export
-#' @param verbose If \code{TRUE}, print extra information.
-#' @rdname result-meta
-setMethod("summary", "MySQLResult", function(object, verbose = FALSE, ...) {
-  checkValid(object)
-
-  print(object)
-  cat("  Statement:", dbGetStatement(object), "\n")
-  cat("  Has completed?", if(dbHasCompleted(object)) "yes" else "no", "\n")
-  cat("  Affected rows:", dbGetRowsAffected(object), "\n")
-  cat("  Rows fetched:", dbGetRowCount(object), "\n")
-
-  flds <- dbColumnInfo(object)
-  if (verbose && !is.null(flds)) {
-    cat("  Fields:\n")
-    print(dbColumnInfo(object))
-  }
-  invisible(NULL)
-})
-
