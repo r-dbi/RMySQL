@@ -165,7 +165,7 @@ public:
       break;
     case MY_DATE:
     case MY_DATE_TIME:
-      INTEGER(x)[i] = valueDateTime(j);
+      REAL(x)[i] = (double) valueDateTime(j);
       break;
     case MY_TIME:
       INTEGER(x)[i] = valueTime(j);
