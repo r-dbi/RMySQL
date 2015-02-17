@@ -1,5 +1,19 @@
 # Version 0.10.1.9000
 
+ *  RMySQL has been rewritten (essentially from scratch) in C++ with
+    Rcpp. This has considerably reduced the amount of code, and allow us to
+    take advantage of the more sophisticated memory management tools available in
+    Rcpp. This rewrite should yield some minor performance improvements, but 
+    most importantly protect against memory leaks and crashes. It also provides
+    a better base for future development.
+
+ *  Support for prepared queries: create prepared query with `dbSendQuery()` 
+    and bind values with `dbBind()`. `dbSendQuery()` and `dbGetQuery()` also 
+    support inline parameterised queries, like 
+    `dbGetQuery(mysqlDefault(), "SELECT * FROM mtcars WHERE cyl = :cyl", 
+    params = list(cyl = 4))`. This has no performance benefits but protects you 
+    from SQL injection attacks.
+
  * `dbListFields()` has been removed. Please use `dbColumnInfo()` instead.
 
  * `dbGetInfo()` has been removed. Please use the individual metadata 
