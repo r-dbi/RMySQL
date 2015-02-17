@@ -173,9 +173,9 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
     sql <- paste0(
       "LOAD DATA LOCAL INFILE ", dbQuoteString(conn, path), "\n",
       "INTO TABLE ", dbQuoteIdentifier(conn, name), "\n",
-      "FIELDS TERMINATED BY ", dbQuoteString(conn, encodeString(sep)), "\n",
+      "FIELDS TERMINATED BY ", dbQuoteString(conn, sep), "\n",
       "OPTIONALLY ENCLOSED BY ", dbQuoteString(conn, quote), "\n",
-      "LINES TERMINATED BY ", dbQuoteString(conn, encodeString(eol)), "\n",
+      "LINES TERMINATED BY ", dbQuoteString(conn, eol), "\n",
       "IGNORE ", skip + as.integer(header), " LINES")
 
     mysqlExecQuery(conn, sql)

@@ -53,14 +53,12 @@ public:
 
   std::string quoteString(std::string input) {
     // Create buffer with enough room to escape every character
-    std::string output(' ', input.length() * 2 + 1);
+    std::string output;
+    output.resize(input.size() * 2 + 1);
 
-    mysql_real_escape_string(pConn_, &output[0], input.c_str(), input.size());
-
-    // Find null
-    size_t end = output.find_first_of('\0');
-    if (end != std::string::npos)
-      output.resize(end);
+    size_t end = mysql_real_escape_string(pConn_, &output[0],
+      input.data(), input.size());
+    output.resize(end);
 
     return output;
   }

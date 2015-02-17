@@ -29,6 +29,6 @@ setMethod("dbQuoteIdentifier", c("MySQLConnection", "character"),
 #' @export
 setMethod("dbQuoteString", c("MySQLConnection", "character"),
   function(conn, x, ...) {
-    SQL(connection_quote_string(conn@ptr, x));
+    SQL(connection_quote_string(conn@ptr, enc2utf8(x)));
   }
 )
