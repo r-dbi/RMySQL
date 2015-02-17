@@ -98,6 +98,32 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
   }
 )
 
+#' @importFrom SQL sqlData
+setMethod("sqlData", "MySQLConnection", function(con, value, row.names = NA, ...) {
+  value <- SQL::rownamesToColumn(value, row.names)
+
+  # Convert factors to strings
+  is_factor <- vapply(value, is.factor, logical(1))
+  value[is_factor] <- lapply(value[is_factor], as.character)
+
+  # Ensure all in utf-8
+  is_char <- vapply(value, is.character, logical(1))
+  value[is_char] <- lapply(value[is_char], enc2utf8)
+
+  # Convert logical to integer
+  is_logical <- vapply(value, is.logical, logical(1))
+  value[is_char] <- lapply(value[is_char], function(x) {
+    dbQuoteString(con, x)
+  })
+
+  # Convert everything to character and turn NAs into NULL
+  value[] <- lapply(value, as.character)
+  value[is.na(value)] <- "NULL"
+
+  value
+
+})
+
 #' @export
 #' @rdname mysql-tables
 #' @param sep field separator character
@@ -134,7 +160,8 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
         d <- read.table(value, sep = sep, header = header, skip = skip,
           nrows = nrows, na.strings = "\\N", comment.char = "",
           stringsAsFactors = FALSE)
-        field.types <- vapply(d, dbDataType, character(1))
+        field.types <- vapply(d, dbDataType, dbObj = conn,
+          FUN.VALUE = character(1))
       }
 
       sql <- SQL::sqlTableCreate(conn, name, field.types,
@@ -150,7 +177,8 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
       "OPTIONALLY ENCLOSED BY ", dbQuoteString(conn, quote), "\n",
       "LINES TERMINATED BY ", dbQuoteString(conn, encodeString(eol)), "\n",
       "IGNORE ", skip + as.integer(header), " LINES")
-    dbSendQuery(conn, sql)
+
+    mysqlExecQuery(conn, sql)
 
     TRUE
   }
@@ -193,32 +221,23 @@ setMethod("dbRemoveTable", c("MySQLConnection", "character"),
 #' dbDataType(RMySQL::MySQL(), "a")
 #' dbDataType(RMySQL::MySQL(), 1:3)
 #' dbDataType(RMySQL::MySQL(), 2.5)
-setMethod("dbDataType", c("MySQLDriver", "ANY"), function(dbObj, obj) {
-  mysqlDataType(obj)
+setMethod("dbDataType", "MySQLConnection", function(dbObj, obj, ...) {
+  dbDataType(MySQL(), obj, ...)
 })
 
+#' @rdname dbDataType-MySQLConnection-ANY-method
 #' @export
-#' @rdname dbDataType-MySQLDriver-ANY-method
-setMethod("dbDataType", c("MySQLConnection", "ANY"), function(dbObj, obj) {
-  mysqlDataType(obj)
-})
+setMethod("dbDataType", "MySQLDriver", function(dbObj, obj, ...) {
+  if (is.factor(obj)) return("TEXT")
+  if (inherits(obj, "POSIXct")) return("DATETIME")
+  if (inherits(obj, "Date")) return("DATE")
 
-mysqlDataType <- function(obj) {
-  rs.class <- data.class(obj)    ## this differs in R 1.4 from older vers
-  rs.mode <- storage.mode(obj)
-  if (rs.class == "numeric" || rs.class == "integer") {
-    if (rs.mode == "integer") {
-      "bigint"
-    } else {
-      "double"
-    }
-  } else {
-    switch(rs.class,
-      character = "text",
-      logical = "tinyint",  ## but we need to coerce to int!!
-      factor = "text",      ## up to 65535 characters
-      ordered = "text",
-      "text"
-    )
-  }
-}
+  switch(typeof(obj),
+    logical = "TINYINT",
+    integer = "INTEGER",
+    double = "DOUBLE",
+    character = "TEXT",
+    list = "BLOB",
+    stop("Unsupported type", call. = FALSE)
+  )
+})

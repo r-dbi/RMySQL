@@ -94,7 +94,7 @@ public:
     return isNull(j) ? NA_INTEGER : *((long long int*) &buffers_[j][0]);
   }
 
-  int valueDouble(int j) {
+  double valueDouble(int j) {
     return isNull(j) ? NA_REAL : *((double*) &buffers_[j][0]);
   }
 
@@ -156,15 +156,15 @@ public:
     case MY_DBL:
       REAL(x)[i] = valueDouble(j);
       break;
-    case MY_STR:
-      SET_STRING_ELT(x, i, valueString(j));
-      break;
     case MY_DATE:
     case MY_DATE_TIME:
       REAL(x)[i] = valueDateTime(j);
       break;
     case MY_TIME:
       INTEGER(x)[i] = valueTime(j);
+      break;
+    case MY_STR:
+      SET_STRING_ELT(x, i, valueString(j));
       break;
     case MY_RAW:
       SET_VECTOR_ELT(x, i, valueRaw(j));

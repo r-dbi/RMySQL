@@ -1,19 +1,33 @@
 context("tables")
 
-test_that("basic roundtrip is succesful", {
-  myDF <- data.frame(
-    x = paste("x", 1:5, sep = ""),
-    y = paste("y", 1:5, sep = ""),
-    row.names = letters[1:5],
-    stringsAsFactors = FALSE)
+types <- list(
+  logical = c(TRUE, FALSE, NA),
+  integer = c(1:5, NA),
+  double = c(runif(5), NA),
+  character = c("a", "b", NA)
+)
 
-  conn <- mysqlDefault()
-  dbRemoveTable(conn, "myDF")
-  dbWriteTable(conn, name = "myDF", value = myDF)
+round_trip <- function(x) {
+  con <- mysqlDefault()
+  dbWriteTable(con, "round_trip_test", data.frame(x = x), temporary = TRUE)
+  y <- dbReadTable(con, "round_trip_test")[[1]]
+  dbDisconnect(con)
 
-  expect_equal(dbReadTable(conn, "myDF"), myDF)
+  y
+}
 
-  dbRemoveTable(conn, "myDF")
-  dbDisconnect(conn)
+test_that("can round trip atomic vectors", {
+  expect_equal(round_trip(types$logical), as.integer(types$logical))
+  expect_equal(round_trip(types$integer), types$integer)
+  expect_equal(round_trip(types$double), types$double)
+  expect_equal(round_trip(types$character), types$character)
 })
 
+test_that("can round trip simple data frame", {
+  con <- mysqlDefault()
+
+  dbWriteTable(con, "mtcars", datasets::mtcars, temporary = TRUE)
+  expect_equal(mtcars, dbReadTable(con, "mtcars"))
+
+  dbDisconnect(con)
+})

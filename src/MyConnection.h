@@ -32,6 +32,9 @@ public:
     if (default_file != "")
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE, default_file.c_str());
 
+    // Enable LOCAL INFILE for fast data ingest
+    mysql_options(pConn_, MYSQL_OPT_LOCAL_INFILE, 0);
+
     if (!mysql_real_connect(pConn_, host.c_str(), user.c_str(),
         password.c_str(), db == "" ? NULL : db.c_str(), port,
         unix_socket == "" ? NULL : unix_socket.c_str(), client_flag)) {
