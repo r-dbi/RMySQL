@@ -66,15 +66,8 @@ setMethod("dbConnect", "MySQLDriver",
   }
 )
 
-#' @param max.con maximum number of connections that can be open
-#'   at one time. There's no intrinic limit, since strictly speaking this limit
-#'   applies to MySQL \emph{servers}, but clients can have (at least in theory)
-#'   more than this.  Typically there are at most a handful of open connections,
-#'   thus the internal \code{RMySQL} code uses a very simple linear search
-#'   algorithm to manage its connection table.
-#' @param fetch.default.rec number of records to fetch at one time from the
-#'   database. (The \code{\link[DBI]{fetch}} method uses this number as a
-#'   default.)
+#' @param max.con DEPRECATED
+#' @param fetch.default.rec DEPRECATED
 #' @export
 #' @import methods DBI
 #' @importFrom Rcpp sourceCpp

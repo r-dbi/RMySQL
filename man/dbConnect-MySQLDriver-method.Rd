@@ -56,16 +56,9 @@ for setting authentication parameters (see \code{\link{MySQL}}).}
 \item{default.file}{string of the filename with MySQL client options.
 Defaults to \code{\$HOME/.my.cnf}}
 
-\item{max.con}{maximum number of connections that can be open
-at one time. There's no intrinic limit, since strictly speaking this limit
-applies to MySQL \emph{servers}, but clients can have (at least in theory)
-more than this.  Typically there are at most a handful of open connections,
-thus the internal \code{RMySQL} code uses a very simple linear search
-algorithm to manage its connection table.}
+\item{max.con}{DEPRECATED}
 
-\item{fetch.default.rec}{number of records to fetch at one time from the
-database. (The \code{\link[DBI]{fetch}} method uses this number as a
-default.)}
+\item{fetch.default.rec}{DEPRECATED}
 }
 \description{
 These methods are straight-forward implementations of the corresponding
