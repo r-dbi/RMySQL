@@ -88,7 +88,7 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
 
     if (nrow(value) > 0) {
       sql <- SQL::sqlTableInsertInto(conn, name, value)
-      rs <- dbSendQuery(conn, sql)
+      dbGetQuery(conn, sql)
     }
 
     on.exit(NULL)
