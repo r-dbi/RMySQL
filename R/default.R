@@ -24,3 +24,11 @@ mysqlHasDefault <- function() {
     FALSE
   })
 }
+
+mysqlDefault <- function() {
+  tryCatch({
+    dbConnect(MySQL(), dbname = "test")
+  }, error = function(...) {
+    testthat::skip("Test database not available")
+  })
+}
