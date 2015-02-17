@@ -171,6 +171,8 @@ public:
     if (i < n) {
       out = dfResize(out, i);
     }
+    // Set up S3 classes
+    dfS3(out, types_);
 
     return out;
   }

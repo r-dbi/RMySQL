@@ -21,6 +21,25 @@ Rcpp::List inline dfResize(const Rcpp::List& df, int n) {
   return out;
 }
 
+// Set up S3 classes correctly
+void inline dfS3(const Rcpp::List& df,
+                           const std::vector<MyFieldType>& types) {
+  int p = df.size();
+
+  for (int j = 0; j < p; ++j) {
+    Rcpp::RObject col = df[j];
+    switch (types[j]) {
+    case MY_DATE:
+    case MY_DATE_TIME:
+      col.attr("class") = Rcpp::CharacterVector::create("POSIXct", "POSIXt");
+    default:
+      break;
+    }
+
+  }
+}
+
+
 Rcpp::List inline dfCreate(const std::vector<MyFieldType>& types,
                            const std::vector<std::string>& names,
                            int n) {
