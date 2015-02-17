@@ -12,7 +12,8 @@
 \usage{
 \S4method{dbFetch}{MySQLResult,numeric}(res, n = -1, ..., row.names = NA)
 
-\S4method{dbSendQuery}{MySQLConnection,character}(conn, statement)
+\S4method{dbSendQuery}{MySQLConnection,character}(conn, statement,
+  params = NULL, ...)
 
 \S4method{dbGetQuery}{MySQLConnection,character}(conn, statement, ...,
   params = NULL, row.names = NA)
@@ -44,6 +45,9 @@
 \item{statement}{a character vector of length one specifying the SQL
 statement that should be executed.  Only a single SQL statment should be
 provided.}
+
+\item{params}{A list of query parameters to be substituted into
+a parameterised query.}
 }
 \description{
 To retrieve results a chunk at a time, use \code{dbSendQuery},

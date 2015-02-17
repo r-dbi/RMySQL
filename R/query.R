@@ -15,6 +15,8 @@ NULL
 #' @param conn an \code{\linkS4class{MySQLConnection}} object.
 #' @param res,dbObj A  \code{\linkS4class{MySQLResult}} object.
 #' @inheritParams SQL::rownamesToColumn
+#' @param params A list of query parameters to be substituted into
+#'   a parameterised query.
 #' @param statement a character vector of length one specifying the SQL
 #'   statement that should be executed.  Only a single SQL statment should be
 #'   provided.
@@ -49,10 +51,19 @@ setMethod("dbFetch", c("MySQLResult", "numeric"),
 #' @rdname query
 #' @export
 setMethod("dbSendQuery", c("MySQLConnection", "character"),
-  function(conn, statement) {
-    new("MySQLResult",
-      ptr = result_create(conn@ptr, statement),
-      sql = statement)
+  function(conn, statement, params = NULL, ...) {
+    statement <- enc2utf8(statement)
+
+    rs <- new("MySQLResult",
+      sql = statement,
+      ptr = result_create(conn@ptr, statement)
+    )
+
+    if (!is.null(params)) {
+      dbBind(rs, params)
+    }
+
+    rs
   }
 )
 
@@ -60,7 +71,7 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
 #' @rdname query
 setMethod("dbGetQuery", signature("MySQLConnection", "character"),
   function(conn, statement, ..., params = NULL, row.names = NA) {
-    rs <- dbSendQuery(conn, statement, ...) # params = params
+    rs <- dbSendQuery(conn, statement, ..., params = params)
     on.exit(dbClearResult(rs))
 
     dbFetch(rs, n = -1, ..., row.names = row.names)
