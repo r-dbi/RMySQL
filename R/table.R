@@ -57,7 +57,7 @@ setMethod("dbReadTable", c("MySQLConnection", "character"),
 #' @export
 #' @rdname mysql-tables
 setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
-  function(conn, name, value, field.types = NULL, row.names = TRUE,
+  function(conn, name, value, field.types = NULL, row.names = NA,
            overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE,
            temporary = FALSE) {
 

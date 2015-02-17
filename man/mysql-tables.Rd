@@ -15,8 +15,8 @@
   check.names = TRUE, ...)
 
 \S4method{dbWriteTable}{MySQLConnection,character,data.frame}(conn, name, value,
-  field.types = NULL, row.names = TRUE, overwrite = FALSE,
-  append = FALSE, ..., allow.keywords = FALSE, temporary = FALSE)
+  field.types = NULL, row.names = NA, overwrite = FALSE, append = FALSE,
+  ..., allow.keywords = FALSE, temporary = FALSE)
 
 \S4method{dbWriteTable}{MySQLConnection,character,character}(conn, name, value,
   field.types = NULL, overwrite = FALSE, append = FALSE, header = TRUE,
