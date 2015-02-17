@@ -6,7 +6,7 @@
 
 // Generic data frame utils ----------------------------------------------------
 
-Rcpp::List inline dfResize(Rcpp::List df, int n) {
+Rcpp::List inline dfResize(const Rcpp::List& df, int n) {
   int p = df.size();
 
   Rcpp::List out(p);
@@ -21,7 +21,9 @@ Rcpp::List inline dfResize(Rcpp::List df, int n) {
   return out;
 }
 
-Rcpp::List inline dfCreate(std::vector<MyFieldType> types, std::vector<std::string> names, int n) {
+Rcpp::List inline dfCreate(const std::vector<MyFieldType>& types,
+                           const std::vector<std::string>& names,
+                           int n) {
   int p = types.size();
 
   Rcpp::List out(p);
