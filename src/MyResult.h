@@ -20,8 +20,8 @@ class MyResult : boost::noncopyable {
 
   std::vector<MyFieldType> types_;
   std::vector<std::string> names_;
-  MyRow* bindingOutput_;
   MyBinding* bindingInput_;
+  MyRow* bindingOutput_;
 
 public:
 
@@ -29,7 +29,9 @@ public:
     pConn_(pConn),
     pStatement_(NULL),
     pSpec_(NULL),
-    rowsFetched_(0)
+    rowsFetched_(0),
+    bindingInput_(NULL),
+    bindingOutput_(NULL)
   {
     pConn_->setCurrentResult(this);
 
