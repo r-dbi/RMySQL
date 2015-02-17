@@ -152,7 +152,11 @@ public:
 
     int i = 0;
 
-    while(fetchRow()) {
+    if (rowsFetched_ == 0) {
+      fetchRow();
+    }
+
+    while(!complete_) {
       if (i >= n) {
         if (n_max < 0) {
           n *= 2;
@@ -167,6 +171,7 @@ public:
         bindingOutput_->setListValue(out[j], i, j);
       }
 
+      fetchRow();
       ++i;
       if (i % 1000 == 0)
         Rcpp::checkUserInterrupt();
@@ -185,7 +190,7 @@ public:
   }
 
   int rowsFetched() {
-    return rowsFetched_;
+    return rowsFetched_ == 0 ? 0 : rowsFetched_ - 1;
   }
 
   bool complete() {
