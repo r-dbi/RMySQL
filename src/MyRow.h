@@ -3,11 +3,10 @@
 
 #include <Rcpp.h>
 #include <mysql.h>
-#include <boost/noncopyable.hpp>
 #include "MyTypes.h"
 #include <ctime>
 
-class MyRow : boost::noncopyable {
+class MyRow {
   MYSQL_STMT* pStatement_;
 
   int n_;
@@ -19,10 +18,9 @@ class MyRow : boost::noncopyable {
   std::vector<my_bool> nulls_, errors_;
 
 public:
-  MyRow(MYSQL_STMT* pStatement, std::vector<MyFieldType> types):
-  pStatement_(pStatement),
-  types_(types)
-  {
+  void setUp(MYSQL_STMT* pStatement, std::vector<MyFieldType> types) {
+    pStatement_ = pStatement;
+    types_ = types;
     n_ = types_.size();
 
     bindings_.resize(n_);
@@ -81,12 +79,6 @@ public:
     if (mysql_stmt_bind_result(pStatement, &bindings_[0]) != 0) {
       Rcpp::stop(mysql_stmt_error(pStatement));
     }
-  }
-
-  ~MyRow() {
-    try {
-      // pStatement_ is owned by MyResult
-    } catch(...) {}
   }
 
   // Value accessors -----------------------------------------------------------

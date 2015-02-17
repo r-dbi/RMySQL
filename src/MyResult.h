@@ -20,53 +20,41 @@ class MyResult : boost::noncopyable {
 
   std::vector<MyFieldType> types_;
   std::vector<std::string> names_;
-  MyBinding* bindingInput_;
-  MyRow* bindingOutput_;
+  MyBinding bindingInput_;
+  MyRow bindingOutput_;
 
 public:
 
-  MyResult(MyConnectionPtr pConn, std::string sql):
+  MyResult(MyConnectionPtr pConn):
     pConn_(pConn),
     pStatement_(NULL),
     pSpec_(NULL),
+    rowsAffected_(0),
     rowsFetched_(0),
-    bindingInput_(NULL),
-    bindingOutput_(NULL)
+    bound_(false),
+    complete_(false)
   {
+    pStatement_ = mysql_stmt_init(pConn->conn());
+    if (pStatement_ == NULL)
+      Rcpp::stop("Out of memory");
     pConn_->setCurrentResult(this);
+  }
 
-    try {
-      pStatement_ = mysql_stmt_init(pConn->conn());
-      if (pStatement_ == NULL)
-        Rcpp::stop("Failed to send query");
-
-      if (mysql_stmt_prepare(pStatement_, sql.data(), sql.size()) != 0)
-        throwError();
-
-      pSpec_ = mysql_stmt_result_metadata(pStatement_);
-      if (pSpec_ != NULL) {
-        cacheMetadata();
-        rowsAffected_ = 0;
-        complete_ = false;
-
-        bindingOutput_ = new MyRow(pStatement_, types_);
-      } else {
-        rowsAffected_ = mysql_stmt_affected_rows(pStatement_);
-        complete_ = true;
-      }
-
-    } catch (...) {
-      pConn_->setCurrentResult(NULL);
-      throw;
-    }
+  void sendQuery(std::string sql) {
+    if (mysql_stmt_prepare(pStatement_, sql.data(), sql.size()) != 0)
+      throwError();
 
     nParams_ = mysql_stmt_param_count(pStatement_);
-    bound_ = (nParams_ == 0);
-    if (nParams_ != 0) {
-      bindingInput_ = new MyBinding(pStatement_);
-    } else {
-      if (mysql_stmt_execute(pStatement_) != 0)
-        throwError();
+    if (nParams_ == 0) {
+      // Not parameterised so we can execute immediately
+      execute();
+    }
+
+    pSpec_ = mysql_stmt_result_metadata(pStatement_);
+    if (pSpec_ != NULL) {
+      // Query returns results, so cache column names and types
+      cacheMetadata();
+      bindingOutput_.setUp(pStatement_, types_);
     }
   }
 
@@ -75,6 +63,7 @@ public:
       mysql_free_result(pSpec_);
       pSpec_ = NULL;
     }
+
     if (pStatement_ != NULL) {
       mysql_stmt_close(pStatement_);
       pStatement_ = NULL;
@@ -84,24 +73,25 @@ public:
   ~MyResult() {
     try {
       pConn_->setCurrentResult(NULL);
-      if (bindingInput_ != NULL)
-        delete(bindingInput_);
-      if (bindingOutput_ != NULL)
-        delete(bindingOutput_);
       close();
     } catch(...) {};
   }
 
-  void bind(Rcpp::List params) {
-    rowsAffected_ = 0;
+  void execute() {
     complete_ = false;
     rowsFetched_ = 0;
     bound_ = true;
 
-    bindingInput_->initBinding(params);
-    bindingInput_->bindOne(params);
     if (mysql_stmt_execute(pStatement_) != 0)
       throwError();
+    rowsAffected_ = mysql_stmt_affected_rows(pStatement_);
+  }
+
+  void bind(Rcpp::List params) {
+    bindingInput_.setUp(pStatement_);
+    bindingInput_.initBinding(params);
+    bindingInput_.bindOne(params);
+    execute();
   }
 
   Rcpp::List columnInfo() {
@@ -168,7 +158,7 @@ public:
 
       for (int j = 0; j < nCols_; ++j) {
         // Rcpp::Rcout << i << "," << j << "\n";
-        bindingOutput_->setListValue(out[j], i, j);
+        bindingOutput_.setListValue(out[j], i, j);
       }
 
       fetchRow();

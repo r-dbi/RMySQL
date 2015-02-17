@@ -3,11 +3,10 @@
 
 #include <Rcpp.h>
 #include <mysql.h>
-#include <boost/noncopyable.hpp>
 #include "MyTypes.h"
 #include <ctime>
 
-class MyBinding : boost::noncopyable {
+class MyBinding {
   MYSQL_STMT* pStatement_;
 
   int p_;
@@ -16,9 +15,9 @@ class MyBinding : boost::noncopyable {
   std::vector<MyFieldType> types_;
 
 public:
-  MyBinding(MYSQL_STMT* pStatement):
-    pStatement_(pStatement)
-  {
+
+  void setUp(MYSQL_STMT* pStatement) {
+    pStatement_ = pStatement;
     p_ = mysql_stmt_param_count(pStatement_);
 
     bindings_.resize(p_);

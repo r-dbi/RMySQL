@@ -4,7 +4,8 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 XPtr<MyResult> result_create(XPtr<MyConnectionPtr> con, std::string sql) {
-  MyResult* res = new MyResult(*con, sql);
+  MyResult* res = new MyResult(*con);
+  res->sendQuery(sql);
   return XPtr<MyResult>(res, true);
 }
 
