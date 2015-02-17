@@ -76,6 +76,8 @@ public:
   }
 
   bool exec(std::string sql) {
+    setCurrentResult(NULL);
+
     if (mysql_real_query(pConn_, sql.data(), sql.size()) != 0)
       Rcpp::stop(mysql_error(pConn_));
 
