@@ -1,10 +1,7 @@
 context("dbWriteTable")
 
 test_that("options work", {
-  if (!mysqlHasDefault()) skip("Test database not available")
-
-  con <- dbConnect(MySQL(), dbname = "test")
-  on.exit(dbDisconnect(con))
+  con <- mysqlDefault()
 
   expected <- data.frame(
     a = c(1:3, NA),
