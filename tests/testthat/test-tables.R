@@ -22,12 +22,3 @@ test_that("can round trip atomic vectors", {
   expect_equal(round_trip(types$double), types$double)
   expect_equal(round_trip(types$character), types$character)
 })
-
-test_that("can round trip simple data frame", {
-  con <- mysqlDefault()
-
-  dbWriteTable(con, "mtcars", datasets::mtcars, temporary = TRUE)
-  expect_equal(mtcars, dbReadTable(con, "mtcars"))
-
-  dbDisconnect(con)
-})
