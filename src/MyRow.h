@@ -137,6 +137,13 @@ public:
     return mktime(&t);
   }
 
+  int valueDate(int j) {
+    if (isNull(j))
+      return NA_INTEGER;
+
+    return valueDateTime(j) / 86400;
+  }
+
   int valueTime(int j) {
     if (isNull(j))
       return NA_INTEGER;
@@ -157,6 +164,8 @@ public:
       REAL(x)[i] = valueDouble(j);
       break;
     case MY_DATE:
+      INTEGER(x)[i] = valueDate(j);
+      break;
     case MY_DATE_TIME:
       REAL(x)[i] = valueDateTime(j);
       break;

@@ -30,8 +30,11 @@ void inline dfS3(const Rcpp::List& df,
     Rcpp::RObject col = df[j];
     switch (types[j]) {
     case MY_DATE:
+      col.attr("class") = Rcpp::CharacterVector::create("Date");
+      break;
     case MY_DATE_TIME:
       col.attr("class") = Rcpp::CharacterVector::create("POSIXct", "POSIXt");
+      break;
     default:
       break;
     }
