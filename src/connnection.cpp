@@ -47,8 +47,12 @@ CharacterVector connection_quote_string(XPtr<MyConnectionPtr> con,
   CharacterVector output(n);
 
   for (int i = 0; i < n; ++i) {
-    String x = input[i];
-    output[i] = (*con)->quoteString(x);
+    if (input[i] == NA_STRING) {
+      output[i] = NA_STRING;
+    } else {
+      String x = input[i];
+      output[i] = "'" + (*con)->quoteString(x) + "'";
+    }
   }
 
   return output;

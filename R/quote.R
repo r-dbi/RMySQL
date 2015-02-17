@@ -29,6 +29,6 @@ setMethod("dbQuoteIdentifier", c("MySQLConnection", "character"),
 #' @export
 setMethod("dbQuoteString", c("MySQLConnection", "character"),
   function(conn, x, ...) {
-    SQL(paste0("'", connection_quote_string(conn@ptr, x), "'"));
+    SQL(connection_quote_string(conn@ptr, x));
   }
 )
