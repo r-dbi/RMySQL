@@ -25,6 +25,11 @@ void result_bind(XPtr<MyResult> rs, List params) {
 }
 
 // [[Rcpp::export]]
+void result_bind_rows(XPtr<MyResult> rs, List params) {
+  return rs->bindRows(params);
+}
+
+// [[Rcpp::export]]
 void result_release(XPtr<MyResult> rs) {
   rs.release();
 }

@@ -87,8 +87,21 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
     }
 
     if (nrow(value) > 0) {
-      sql <- SQL::sqlTableInsertInto(conn, name, value)
-      dbGetQuery(conn, sql)
+      values <- sqlData(conn, value[, , drop = FALSE], row.names)
+
+      name <- dbQuoteIdentifier(conn, name)
+      fields <- dbQuoteIdentifier(conn, names(values))
+      params <- rep("?", length(fields))
+
+      sql <- paste0(
+        "INSERT INTO ", name, " (", paste0(fields, collapse = ", "), ")\n",
+        "VALUES (", paste0(params, collapse = ", "), ")"
+      )
+      rs <- dbSendQuery(conn, sql)
+      tryCatch(
+        result_bind_rows(rs@ptr, values),
+        finally = dbClearResult(rs)
+      )
     }
 
     on.exit(NULL)
@@ -110,18 +123,7 @@ setMethod("sqlData", "MySQLConnection", function(con, value, row.names = NA, ...
   is_char <- vapply(value, is.character, logical(1))
   value[is_char] <- lapply(value[is_char], enc2utf8)
 
-  # Convert logical to integer
-  is_logical <- vapply(value, is.logical, logical(1))
-  value[is_char] <- lapply(value[is_char], function(x) {
-    dbQuoteString(con, x)
-  })
-
-  # Convert everything to character and turn NAs into NULL
-  value[] <- lapply(value, as.character)
-  value[is.na(value)] <- "NULL"
-
   value
-
 })
 
 #' @export
@@ -241,3 +243,19 @@ setMethod("dbDataType", "MySQLDriver", function(dbObj, obj, ...) {
     stop("Unsupported type", call. = FALSE)
   )
 })
+
+roundTrip <- function(x) {
+  con <- mysqlDefault()
+
+  # Turn into a list avoiding all coercions
+  df <- list(x)
+  names(df) <- "x"
+  attr(df, "row.names") <- .set_row_names(length(x))
+  class(df) <- "data.frame"
+
+  dbWriteTable(con, "round_trip_test", df, temporary = TRUE)
+  y <- dbReadTable(con, "round_trip_test")[[1]]
+  dbDisconnect(con)
+
+  y
+}

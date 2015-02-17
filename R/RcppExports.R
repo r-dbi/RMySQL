@@ -41,6 +41,10 @@ result_bind <- function(rs, params) {
     invisible(.Call('RMySQL_result_bind', PACKAGE = 'RMySQL', rs, params))
 }
 
+result_bind_rows <- function(rs, params) {
+    invisible(.Call('RMySQL_result_bind_rows', PACKAGE = 'RMySQL', rs, params))
+}
+
 result_release <- function(rs) {
     invisible(.Call('RMySQL_result_release', PACKAGE = 'RMySQL', rs))
 }

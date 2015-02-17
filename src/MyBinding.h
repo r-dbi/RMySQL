@@ -36,7 +36,7 @@ public:
 
       switch(type) {
       case MY_LGL:       bindingUpdate(j, MYSQL_TYPE_TINY, 1); break;
-      case MY_INT32:     bindingUpdate(j, MYSQL_TYPE_INT24, 4); break;
+      case MY_INT32:     bindingUpdate(j, MYSQL_TYPE_LONG, 4); break;
       case MY_DBL:       bindingUpdate(j, MYSQL_TYPE_DOUBLE, 8); break;
       case MY_DATE:      bindingUpdate(j, MYSQL_TYPE_DATE, sizeof(MYSQL_TIME)); break;
       case MY_DATE_TIME: bindingUpdate(j, MYSQL_TYPE_DATETIME, sizeof(MYSQL_TIME)); break;
@@ -51,10 +51,10 @@ public:
     }
   }
 
-  void bindOne(Rcpp::List params, int i = 0) {
+  void bindRow(Rcpp::List params, int i) {
     for (int j = 0; j < p_; ++j) {
       bool missing = false;
-      Rcpp::RObject col = params[i];
+      Rcpp::RObject col = params[j];
 
       switch(types_[j]) {
       case MY_LGL:
@@ -63,7 +63,6 @@ public:
           break;
         }
         bindings_[j].buffer = &LOGICAL(col)[i];
-
         break;
       case MY_INT32:
         if (INTEGER(col)[i] == NA_INTEGER) {
@@ -106,15 +105,6 @@ public:
       isNull_[j] = missing;
     }
     mysql_stmt_bind_param(pStatement_, &bindings_[0]);
-  }
-
-  void bindRows(Rcpp::List params) {
-    if (params.size() == 0)
-      return;
-
-    int n = Rf_length(params[0]);
-    for (int i = 0; i < n; ++i)
-      bindOne(params, i);
   }
 
   void bindingUpdate(int j, enum_field_types type, int size) {

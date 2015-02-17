@@ -90,8 +90,22 @@ public:
   void bind(Rcpp::List params) {
     bindingInput_.setUp(pStatement_);
     bindingInput_.initBinding(params);
-    bindingInput_.bindOne(params);
+    bindingInput_.bindRow(params, 0);
     execute();
+  }
+
+  void bindRows(Rcpp::List params) {
+    if (params.size() == 0)
+      return;
+
+    bindingInput_.setUp(pStatement_);
+    bindingInput_.initBinding(params);
+
+    int n = Rf_length(params[0]);
+    for (int i = 0; i < n; ++i) {
+      bindingInput_.bindRow(params, i);
+      execute();
+    }
   }
 
   Rcpp::List columnInfo() {

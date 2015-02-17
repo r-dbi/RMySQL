@@ -127,6 +127,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// result_bind_rows
+void result_bind_rows(XPtr<MyResult> rs, List params);
+RcppExport SEXP RMySQL_result_bind_rows(SEXP rsSEXP, SEXP paramsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< XPtr<MyResult> >::type rs(rsSEXP);
+    Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
+    result_bind_rows(rs, params);
+    return R_NilValue;
+END_RCPP
+}
 // result_release
 void result_release(XPtr<MyResult> rs);
 RcppExport SEXP RMySQL_result_release(SEXP rsSEXP) {
