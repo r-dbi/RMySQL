@@ -1,5 +1,10 @@
 # Version 0.10.1.9000
 
+ *  RMySQL fully supports DATE and DATETIME columns. On output, DATE columns
+    will be converted to vectors of `Date`s and DATETIME will be converted
+    to `POSIXct`. To faciliate correct computation of time zone, RMySQL
+    always sets the session timezone to UTC.
+
  *  RMySQL has been rewritten (essentially from scratch) in C++ with
     Rcpp. This has considerably reduced the amount of code, and allow us to
     take advantage of the more sophisticated memory management tools available in

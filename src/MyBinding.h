@@ -13,6 +13,7 @@ class MyBinding {
   std::vector<MYSQL_BIND> bindings_;
   std::vector<my_bool> isNull_;
   std::vector<MyFieldType> types_;
+  std::vector<MYSQL_TIME> timeBuffers_;
 
 public:
 
@@ -23,6 +24,7 @@ public:
     bindings_.resize(p_);
     types_.resize(p_);
     isNull_.resize(p_);
+    timeBuffers_.resize(p_);
   }
 
   void initBinding(Rcpp::List params) {
@@ -93,9 +95,19 @@ public:
         bindings_[j].buffer_length = Rf_length(raw);
         bindings_[j].buffer = RAW(raw);
       }
-      case MY_FACTOR:
       case MY_DATE:
       case MY_DATE_TIME:
+        if (isnan(REAL(col)[i])) {
+          missing = true;
+          break;
+        } else {
+          double val = REAL(col)[i];
+          setTimeBuffer(j, val * (types_[j] == MY_DATE ? 86400 : 1));
+          bindings_[j].buffer_length = sizeof(MYSQL_TIME);
+          bindings_[j].buffer = &timeBuffers_[j];
+        }
+        break;
+      case MY_FACTOR:
         Rcpp::stop("Not yet supported");
       case MY_INT64:
       case MY_TIME:
@@ -111,6 +123,17 @@ public:
     bindings_[j].buffer_length = size;
     bindings_[j].buffer_type = type;
     bindings_[j].is_null = &isNull_[j];
+  }
+
+  void setTimeBuffer(int j, time_t time) {
+    struct tm* tm = gmtime(&time);
+
+    timeBuffers_[j].year = tm->tm_year + 1900;
+    timeBuffers_[j].month = tm->tm_mon + 1 ;
+    timeBuffers_[j].day = tm->tm_mday;
+    timeBuffers_[j].hour = tm->tm_hour;
+    timeBuffers_[j].minute = tm->tm_min;
+    timeBuffers_[j].second = tm->tm_sec;
   }
 
 };

@@ -134,7 +134,7 @@ public:
     t.tm_min = mytime->minute;
     t.tm_sec = mytime->second;
 
-    return mktime(&t);
+    return timegm(&t);
   }
 
   int valueDate(int j) {

@@ -26,14 +26,15 @@ public:
   {
 
     pConn_ = mysql_init(NULL);
+    // Enable LOCAL INFILE for fast data ingest
+    mysql_options(pConn_, MYSQL_OPT_LOCAL_INFILE, 0);
+    // Default to UTF-8
     mysql_options(pConn_, MYSQL_SET_CHARSET_NAME, "UTF8");
     if (groups != "")
       mysql_options(pConn_, MYSQL_READ_DEFAULT_GROUP, groups.c_str());
     if (default_file != "")
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE, default_file.c_str());
 
-    // Enable LOCAL INFILE for fast data ingest
-    mysql_options(pConn_, MYSQL_OPT_LOCAL_INFILE, 0);
 
     if (!mysql_real_connect(pConn_, host.c_str(), user.c_str(),
         password.c_str(), db == "" ? NULL : db.c_str(), port,

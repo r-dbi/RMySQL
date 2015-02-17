@@ -107,17 +107,17 @@ inline MyFieldType variableType(Rcpp::RObject type) {
   case LGLSXP:
     return MY_LGL;
   case INTSXP:
-    if (klass == "")        return MY_INT32;
     if (klass == "factor")  return MY_FACTOR;
-    if (klass == "Date")    return MY_DATE;
+    return MY_INT32;
   case REALSXP:
-    if (klass == "")        return MY_DBL;
+    if (klass == "Date")    return MY_DATE;
     if (klass == "POSIXct") return MY_DATE_TIME;
+    return MY_DBL;
   case STRSXP:
     return MY_STR;
   }
 
-  Rcpp::stop("Unsupport column type %s", Rf_type2char(TYPEOF(type)));
+  Rcpp::stop("Unsupported column type %s", Rf_type2char(TYPEOF(type)));
   return MY_STR;
 }
 

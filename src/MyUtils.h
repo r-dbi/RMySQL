@@ -4,6 +4,9 @@
 #include <Rcpp.h>
 #include "MyTypes.h"
 
+// In timegm.cpp
+time_t timegm(struct tm *tm);
+
 // Generic data frame utils ----------------------------------------------------
 
 Rcpp::List inline dfResize(const Rcpp::List& df, int n) {
@@ -41,7 +44,6 @@ void inline dfS3(const Rcpp::List& df,
 
   }
 }
-
 
 Rcpp::List inline dfCreate(const std::vector<MyFieldType>& types,
                            const std::vector<std::string>& names,

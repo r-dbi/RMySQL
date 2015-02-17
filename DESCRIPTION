@@ -7,7 +7,8 @@ Authors@R: c(person("Jeroen", "Ooms", email = "jeroen.ooms@stat.ucla.edu", role 
     person("Saikat", "DebRoy", role = "aut"),
     person("Hadley", "Wickham", email = "hadley@rstudio.com", role = "aut"),
     person("Jeffrey", "Horner", role = "aut"),
-    person("RStudio", role = "cph"))
+    person("RStudio", role = "cph"),
+    person("Kungliga Tekniska Högskolan", role = "ctb", comment = "Source code for timegm"))
 Depends:
     R (>= 2.8.0),
     DBI (>= 0.3.1)
