@@ -52,7 +52,8 @@ setMethod("dbReadTable", c("MySQLConnection", "character"),
 #' @param overwrite a logical specifying whether to overwrite an existing table
 #'   or not. Its default is \code{FALSE}. (See the BUGS section below)
 #' @param append a logical specifying whether to append to an existing table
-#'   in the DBMS.  Its default is \code{FALSE}.
+#'   in the DBMS.  If appending, then the table (or temporary table)
+#'   must exist, otherwise an error is reported. Its default is \code{FALSE}.
 #' @param allow.keywords DEPRECATED.
 #' @export
 #' @rdname mysql-tables
@@ -78,6 +79,9 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
     }
     if (found && overwrite) {
       dbRemoveTable(conn, name)
+    }
+    if (!found && append) {
+      stop("Table ", name, " does not exists when appending")
     }
 
     if (!found || overwrite) {
@@ -155,6 +159,9 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
     if (found && overwrite) {
       dbRemoveTable(conn, name)
     }
+    if (!found && append) {
+      stop("Table ", name, " does not exists when appending")
+    }
 
     if (!found || overwrite) {
       if (is.null(field.types)) {
@@ -196,7 +203,14 @@ setMethod("dbListTables", "MySQLConnection", function(conn, ...) {
 #' @rdname mysql-tables
 setMethod("dbExistsTable", c("MySQLConnection", "character"),
   function(conn, name, ...) {
-    name %in% dbListTables(conn)
+    tryCatch({
+      dbGetQuery(conn, paste0(
+        "SELECT NULL FROM ", dbQuoteIdentifier(conn, name), " WHERE FALSE"
+      ))
+      TRUE
+    }, error = function(...) {
+      FALSE
+    })
   }
 )
 
