@@ -38,4 +38,4 @@ Collate:
     'transaction.R'
 Suggests:
     testthat
-LinkingTo: Rcpp
+LinkingTo: Rcpp, BH
