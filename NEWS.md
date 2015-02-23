@@ -1,3 +1,13 @@
+# Version 0.10.2
+ 
+ *  Backport fixes from Rcpp branch.
+ 
+ *  Configure script now uses `mysql_config` if available.
+
+ *  MariaDB windows libraries have been updated to 2.1.0
+
+ *  Add SSL support to MariaDB windows libraries.
+
 # Version 0.10.1
 
  *  Fix configure script for OSX 10.6 Snow Leopard
