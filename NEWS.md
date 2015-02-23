@@ -1,4 +1,4 @@
-# Version 0.10.1.9000
+# Version 0.11.0.9000
 
  *  RMySQL fully supports DATE and DATETIME columns. On output, DATE columns
     will be converted to vectors of `Date`s and DATETIME will be converted
