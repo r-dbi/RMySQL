@@ -1,5 +1,5 @@
-PKG_CPPFLAGS= -I../windows/mariadb-client-2.0/include
-PKG_LIBS= -L../windows/mariadb-client-2.0/lib${R_ARCH} -lmariadbclient -lz -lws2_32
+PKG_CPPFLAGS= -I../windows/libmariadbclient-2.1.0/include
+PKG_LIBS= -L../windows/libmariadbclient-2.1.0/lib${R_ARCH} -lmariadbclient -lssl -lcrypto -lgdi32 -lz -lws2_32
 
 SOURCES = $(wildcard *.c)
 
