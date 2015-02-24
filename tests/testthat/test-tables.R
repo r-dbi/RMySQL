@@ -1,21 +1,19 @@
 context("tables")
 
-test_that("basic roundtrip is succesful", {
-  if (!mysqlHasDefault()) skip("Test database not available")
+types <- list(
+  logical = c(TRUE, FALSE, NA),
+  integer = c(1:5, NA),
+  double = c(runif(5), NA),
+  character = c("a", "b", NA),
+  date = Sys.Date() + c(1:2, NA),
+  time = as.POSIXct(Sys.Date()) + c(1:2, NA)
+)
 
-  myDF <- data.frame(
-    x = paste("x", 1:5, sep = ""),
-    y = paste("y", 1:5, sep = ""),
-    row.names = letters[1:5],
-    stringsAsFactors = FALSE)
-
-  conn <- dbConnect(RMySQL::MySQL(), dbname = "test")
-  dbRemoveTable(conn, "myDF")
-  dbWriteTable(conn, name = "myDF", value = myDF)
-
-  expect_equal(dbReadTable(conn, "myDF"), myDF)
-
-  dbRemoveTable(conn, "myDF")
-  dbDisconnect(conn)
+test_that("can round trip atomic vectors", {
+  expect_equal(roundTrip(types$logical), as.integer(types$logical))
+  expect_equal(roundTrip(types$integer), types$integer)
+  expect_equal(roundTrip(types$double), types$double)
+  expect_equal(roundTrip(types$character), types$character)
+  expect_equal(roundTrip(types$date), types$date)
+  expect_equal(roundTrip(types$time), types$time)
 })
-

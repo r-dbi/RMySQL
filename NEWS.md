@@ -1,4 +1,43 @@
-# Version 0.10.1.9000
+# Version 0.11.0.9000
+
+ *  RMySQL fully supports DATE and DATETIME columns. On output, DATE columns
+    will be converted to vectors of `Date`s and DATETIME will be converted
+    to `POSIXct`. To faciliate correct computation of time zone, RMySQL
+    always sets the session timezone to UTC.
+
+ *  RMySQL has been rewritten (essentially from scratch) in C++ with
+    Rcpp. This has considerably reduced the amount of code, and allow us to
+    take advantage of the more sophisticated memory management tools available in
+    Rcpp. This rewrite should yield some minor performance improvements, but 
+    most importantly protect against memory leaks and crashes. It also provides
+    a better base for future development.
+
+ *  Support for prepared queries: create prepared query with `dbSendQuery()` 
+    and bind values with `dbBind()`. `dbSendQuery()` and `dbGetQuery()` also 
+    support inline parameterised queries, like 
+    `dbGetQuery(mysqlDefault(), "SELECT * FROM mtcars WHERE cyl = :cyl", 
+    params = list(cyl = 4))`. This has no performance benefits but protects you 
+    from SQL injection attacks.
+
+ * `dbListFields()` has been removed. Please use `dbColumnInfo()` instead.
+
+ * `dbGetInfo()` has been removed. Please use the individual metadata 
+    functions.
+
+ *  Information formerly contain in `summary()` methods has now been integrated
+    into `show()` methods.
+
+ *  `make.db.names()` has been deprecated. Use `dbQuoteIdentifier()` instead.
+ 
+ *  `isIdCurrent()` has been deprecated. Use `dbIsValid()` instead.
+
+ *  `dbApply()`, `dbMoreResults()` and `dbNextResults()` have been removed.
+    These were always flagged as experimental, and now the experiment is over.
+
+ *  `dbEscapeStrings()` has been deprecated. Please use `dbQuoteStrings()`
+    instead.
+
+ *  dbObjectId compatibility shim removed
 
  *  Add SSL support on Windows.
 

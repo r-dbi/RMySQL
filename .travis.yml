@@ -27,10 +27,13 @@ matrix:
 before_install:
   - sudo apt-get install libmysqlclient-dev
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - sudo apt-get install r-bioc-biobase r-cran-rjava
   - chmod 755 ./travis-tool.sh
   - ./travis-tool.sh bootstrap
+  - sudo apt-get install r-bioc-biobase r-cran-rjava
 install:
+  - ./travis-tool.sh install_github RcppCore/Rcpp
+  - ./travis-tool.sh install_github rstats-db/DBI
+  - ./travis-tool.sh install_github rstats-db/SQL
   - ./travis-tool.sh install_deps
 
 before_script:

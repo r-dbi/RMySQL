@@ -1,18 +1,22 @@
 Package: RMySQL
-Version: 0.10.1.9000
+Version: 0.11.0.9000
 Title: Database Interface and MySQL Driver for R
+Encoding: UTF-8
 Description: Implements DBI-compliant Interface to MySQL and MariaDB Databases.
 Authors@R: c(person("Jeroen", "Ooms", email = "jeroen.ooms@stat.ucla.edu", role = c("aut", "cre")),
     person("David", "James", role = "aut"),
     person("Saikat", "DebRoy", role = "aut"),
     person("Hadley", "Wickham", email = "hadley@rstudio.com", role = "aut"),
     person("Jeffrey", "Horner", role = "aut"),
-    person("RStudio", role = "cph"))
+    person("RStudio", role = "cph"),
+    person("Kungliga Tekniska Högskolan", role = "ctb", comment = "Source code for timegm"))
 Depends:
     R (>= 2.8.0),
     DBI (>= 0.3.1)
 Imports:
-    methods
+    methods,
+    SQL,
+    Rcpp
 License: GPL-2
 URL: https://github.com/rstats-db/rmysql,
     https://downloads.mariadb.org/connector-c/
@@ -21,17 +25,17 @@ SystemRequirements: MySQL/MariaDB client headers and libraries, except on
     Windows. E.g. libmysqlclient-dev (Debian/Ubuntu), mariadb-devel (Fedora).
 NeedsCompilation: yes
 Collate:
-    'mysql.R'
-    'driver.R'
-    'connection.R'
-    'data-type.R'
+    'MySQLConnection.R'
+    'MySQLDriver.R'
+    'MySQLResult.R'
+    'RcppExports.R'
+    'connect.R'
     'default.R'
-    'escaping.R'
-    'result.R'
-    'extension.R'
-    'is-valid.R'
+    'deprecated.R'
+    'query.R'
+    'quote.R'
     'table.R'
     'transaction.R'
-    'zzz_compatibility.R'
 Suggests:
     testthat
+LinkingTo: Rcpp, BH
