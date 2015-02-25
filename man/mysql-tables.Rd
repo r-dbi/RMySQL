@@ -51,15 +51,22 @@ converted to valid R identifiers.}
 
 \item{...}{Unused, needed for compatiblity with generic.}
 
+\item{value}{A data frame.}
+
+\item{field.types}{Optional, overrides default choices of field types,
+derived from the classes of the columns in the data frame.}
+
 \item{overwrite}{a logical specifying whether to overwrite an existing table
 or not. Its default is \code{FALSE}. (See the BUGS section below)}
 
 \item{append}{a logical specifying whether to append to an existing table
-in the DBMS.  Its default is \code{FALSE}.}
+in the DBMS.  If appending, then the table (or temporary table)
+must exist, otherwise an error is reported. Its default is \code{FALSE}.}
 
 \item{allow.keywords}{DEPRECATED.}
 
-\item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
+\item{temporary}{If \code{TRUE}, creates a temporary table that expires
+when the connection is closed.}
 
 \item{header}{logical, does the input file have a header line? Default is the
 same heuristic used by \code{read.table}, i.e., \code{TRUE} if the first

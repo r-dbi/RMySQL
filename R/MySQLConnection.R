@@ -15,20 +15,20 @@ setClass("MySQLConnection",
 )
 
 #' @export
-#' @rdname dbConnect-MySQLDriver-method
+#' @rdname MySQLConnection-class
 setMethod("dbDisconnect", "MySQLConnection", function(conn, ...) {
   connection_release(conn@ptr)
   TRUE
 })
 
 #' @export
-#' @rdname dbConnect-MySQLDriver-method
+#' @rdname MySQLConnection-class
 setMethod("dbGetInfo", "MySQLConnection", function(dbObj, what="", ...) {
   connection_info(dbObj@ptr)
 })
 
 #' @export
-#' @rdname dbConnect-MySQLDriver-method
+#' @rdname MySQLConnection-class
 setMethod("show", "MySQLConnection", function(object) {
   info <- dbGetInfo(object)
   cat("<MySQLConnection>\n")
@@ -42,7 +42,7 @@ setMethod("show", "MySQLConnection", function(object) {
 })
 
 #' @export
-#' @rdname dbConnect-MySQLDriver-method
+#' @rdname MySQLConnection-class
 setMethod("dbIsValid", "MySQLConnection", function(dbObj) {
   connection_valid(dbObj@ptr)
 })

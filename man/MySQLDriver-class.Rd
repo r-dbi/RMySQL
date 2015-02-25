@@ -3,13 +3,13 @@
 \docType{class}
 \name{MySQLDriver-class}
 \alias{MySQLDriver-class}
+\alias{dbIsValid,MySQLDriver-method}
 \alias{dbUnloadDriver,MySQLDriver-method}
-\alias{show,MySQLDriver-method}
 \title{Class MySQLDriver with constructor MySQL.}
 \usage{
 \S4method{dbUnloadDriver}{MySQLDriver}(drv, ...)
 
-\S4method{show}{MySQLDriver}(object)
+\S4method{dbIsValid}{MySQLDriver}(dbObj)
 }
 \description{
 An MySQL driver implementing the R database (DBI) API.

@@ -200,7 +200,9 @@ public:
   }
 
   bool complete() {
-    return complete_;
+    return
+      (pSpec_ == NULL) || // query doesn't have results
+      complete_;          // we've fetched all available results
   }
 
   bool active() {
@@ -222,7 +224,6 @@ private:
 
     for (int i = 0; i < nCols_; ++i) {
       names_.push_back(fields[i].name);
-
 
       bool binary = fields[i].charsetnr == 63;
       MyFieldType type = variableType(fields[i].type, binary);

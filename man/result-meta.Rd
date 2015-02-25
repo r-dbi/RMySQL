@@ -18,7 +18,7 @@
 \S4method{dbHasCompleted}{MySQLResult}(res, ...)
 }
 \arguments{
-\item{res,conn,object}{An object of class \code{\linkS4class{MySQLResult}}}
+\item{res}{An object of class \code{\linkS4class{MySQLResult}}}
 
 \item{...}{Ignored. Needed for compatibility with generic}
 }

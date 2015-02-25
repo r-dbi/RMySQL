@@ -4,11 +4,8 @@
 \name{MySQLResult-class}
 \alias{MySQLResult-class}
 \alias{dbIsValid,MySQLResult-method}
-\alias{show,MySQLResult-method}
 \title{Class MySQLResult}
 \usage{
-\S4method{show}{MySQLResult}(object)
-
 \S4method{dbIsValid}{MySQLResult}(dbObj)
 }
 \description{

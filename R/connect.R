@@ -8,7 +8,6 @@ NULL
 #'
 #' @param drv an object of class \code{MySQLDriver}, or the character string
 #'   "MySQL" or an \code{MySQLConnection}.
-#' @param conn an \code{MySQLConnection} object as produced by \code{dbConnect}.
 #' @param username,password Username and password. If username omitted,
 #'   defaults to the current user. If password is ommitted, only users
 #'   without a password can log in.

@@ -5,7 +5,6 @@
 \alias{dbBind,MySQLResult-method}
 \alias{dbClearResult,MySQLResult-method}
 \alias{dbFetch,MySQLResult,numeric-method}
-\alias{dbGetQuery,MySQLConnection,character-method}
 \alias{dbGetStatement,MySQLResult-method}
 \alias{dbSendQuery,MySQLConnection,character-method}
 \title{Execute a SQL statement on a database connection.}
@@ -15,9 +14,6 @@
 \S4method{dbSendQuery}{MySQLConnection,character}(conn, statement,
   params = NULL, ...)
 
-\S4method{dbGetQuery}{MySQLConnection,character}(conn, statement, ...,
-  params = NULL, row.names = NA)
-
 \S4method{dbBind}{MySQLResult}(res, params, ...)
 
 \S4method{dbClearResult}{MySQLResult}(res, ...)
@@ -25,7 +21,9 @@
 \S4method{dbGetStatement}{MySQLResult}(res, ...)
 }
 \arguments{
-\item{res,dbObj}{A  \code{\linkS4class{MySQLResult}} object.}
+\item{res}{A  \code{\linkS4class{MySQLResult}} object.}
+
+\item{n}{Number of rows to retrieve. Use -1 to retrieve all rows.}
 
 \item{...}{Unused. Needed for compatibility with generic.}
 
@@ -73,7 +71,6 @@ data <- dbFetch(res, n = 2)
 data
 dbHasCompleted(res)
 
-dbListResults(con)
 dbClearResult(res)
 dbRemoveTable(con, "arrests")
 dbDisconnect(con)

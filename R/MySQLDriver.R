@@ -17,8 +17,8 @@ setMethod("dbUnloadDriver", "MySQLDriver", function(drv, ...) {
 
 #' @rdname MySQLDriver-class
 #' @export
-setMethod("show", "MySQLDriver", function(object) {
-  cat("<MySQLDriver>\n")
+setMethod("dbIsValid", "MySQLDriver", function(dbObj) {
+  TRUE
 })
 
 #' MySQL Check for Compiled Versus Loaded Client Library Versions

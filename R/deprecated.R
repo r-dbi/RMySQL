@@ -114,12 +114,12 @@ setGeneric("dbEscapeStrings", function(con, strings, ...) {
 mysqlBuildTableDefinition <- function(dbObj, name, obj, field.types = NULL,
   row.names = TRUE, ...) {
 
-  warning("Deprecated. Please use SQL::sqlTableCreate instead.")
+  warning("Deprecated. Please use DBI::sqlCreateTable instead.")
 
   if (!is.data.frame(obj)) {
     obj <- as.data.frame(obj)
   }
-  value <- explict_rownames(obj, row.names)
+  value <- columnToRownames(obj, row.names)
 
   if (is.null(field.types)) {
     field.types <- vapply(value, dbDataType, dbObj = dbObj,

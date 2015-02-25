@@ -3,7 +3,20 @@
 \docType{class}
 \name{MySQLConnection-class}
 \alias{MySQLConnection-class}
+\alias{dbDisconnect,MySQLConnection-method}
+\alias{dbGetInfo,MySQLConnection-method}
+\alias{dbIsValid,MySQLConnection-method}
+\alias{show,MySQLConnection-method}
 \title{Class MySQLConnection.}
+\usage{
+\S4method{dbDisconnect}{MySQLConnection}(conn, ...)
+
+\S4method{dbGetInfo}{MySQLConnection}(dbObj, what = "", ...)
+
+\S4method{show}{MySQLConnection}(object)
+
+\S4method{dbIsValid}{MySQLConnection}(dbObj)
+}
 \description{
 \code{MySQLConnection.} objects are usually created by
 \code{\link[DBI]{dbConnect}}

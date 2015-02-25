@@ -13,8 +13,9 @@ NULL
 #' \code{dbFetch()} instead.
 #'
 #' @param conn an \code{\linkS4class{MySQLConnection}} object.
-#' @param res,dbObj A  \code{\linkS4class{MySQLResult}} object.
-#' @inheritParams SQL::rownamesToColumn
+#' @param res A  \code{\linkS4class{MySQLResult}} object.
+#' @inheritParams DBI::rownamesToColumn
+#' @param n Number of rows to retrieve. Use -1 to retrieve all rows.
 #' @param params A list of query parameters to be substituted into
 #'   a parameterised query.
 #' @param statement a character vector of length one specifying the SQL
@@ -36,7 +37,6 @@ NULL
 #' data
 #' dbHasCompleted(res)
 #'
-#' dbListResults(con)
 #' dbClearResult(res)
 #' dbRemoveTable(con, "arrests")
 #' dbDisconnect(con)
@@ -44,7 +44,7 @@ NULL
 #' @rdname query
 setMethod("dbFetch", c("MySQLResult", "numeric"),
   function(res, n = -1, ..., row.names = NA) {
-    SQL::columnToRownames(result_fetch(res@ptr, n), row.names)
+    columnToRownames(result_fetch(res@ptr, n), row.names)
   }
 )
 
@@ -64,17 +64,6 @@ setMethod("dbSendQuery", c("MySQLConnection", "character"),
     }
 
     rs
-  }
-)
-
-#' @export
-#' @rdname query
-setMethod("dbGetQuery", signature("MySQLConnection", "character"),
-  function(conn, statement, ..., params = NULL, row.names = NA) {
-    rs <- dbSendQuery(conn, statement, ..., params = params)
-    on.exit(dbClearResult(rs))
-
-    dbFetch(rs, n = -1, ..., row.names = row.names)
   }
 )
 
@@ -102,7 +91,7 @@ setMethod("dbGetStatement", "MySQLResult", function(res, ...) {
 #'
 #' See documentation of generics for more details.
 #'
-#' @param res,conn,object An object of class \code{\linkS4class{MySQLResult}}
+#' @param res An object of class \code{\linkS4class{MySQLResult}}
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' if (mysqlHasDefault()) {

@@ -16,7 +16,7 @@ NULL
 #' @param name a character string specifying a table name.
 #' @param check.names If \code{TRUE}, the default, column names will be
 #'   converted to valid R identifiers.
-#' @inheritParams SQL::rownamesToColumn
+#' @inheritParams DBI::rownamesToColumn
 #' @param ... Unused, needed for compatiblity with generic.
 #' @examples
 #' if (mysqlHasDefault()) {
@@ -47,13 +47,17 @@ setMethod("dbReadTable", c("MySQLConnection", "character"),
   }
 )
 
-#' @inheritParams SQL::rownamesToColumn
-#' @inheritParams SQL::sqlTableCreate
+#' @inheritParams DBI::rownamesToColumn
 #' @param overwrite a logical specifying whether to overwrite an existing table
 #'   or not. Its default is \code{FALSE}. (See the BUGS section below)
 #' @param append a logical specifying whether to append to an existing table
 #'   in the DBMS.  If appending, then the table (or temporary table)
 #'   must exist, otherwise an error is reported. Its default is \code{FALSE}.
+#' @param value A data frame.
+#' @param field.types Optional, overrides default choices of field types,
+#'   derived from the classes of the columns in the data frame.
+#' @param temporary If \code{TRUE}, creates a temporary table that expires
+#'   when the connection is closed.
 #' @param allow.keywords DEPRECATED.
 #' @export
 #' @rdname mysql-tables
@@ -85,7 +89,7 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
     }
 
     if (!found || overwrite) {
-      sql <- SQL::sqlTableCreate(conn, name, value, row.names = row.names,
+      sql <- sqlCreateTable(conn, name, value, row.names = row.names,
         temporary = temporary)
       dbGetQuery(conn, sql)
     }
@@ -115,9 +119,8 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
   }
 )
 
-#' @importFrom SQL sqlData
 setMethod("sqlData", "MySQLConnection", function(con, value, row.names = NA, ...) {
-  value <- SQL::rownamesToColumn(value, row.names)
+  value <- rownamesToColumn(value, row.names)
 
   # Convert factors to strings
   is_factor <- vapply(value, is.factor, logical(1))
@@ -173,7 +176,7 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
           FUN.VALUE = character(1))
       }
 
-      sql <- SQL::sqlTableCreate(conn, name, field.types,
+      sql <- sqlCreateTable(conn, name, field.types,
         row.names = row.names, temporary = temporary)
       dbGetQuery(conn, sql)
     }
