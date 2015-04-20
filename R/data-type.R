@@ -1,6 +1,3 @@
-#' @include driver.R connection.R
-NULL
-
 #' Determine the SQL Data Type of an S object
 #'
 #' This method is a straight-forward implementation of the corresponding
@@ -19,7 +16,7 @@ setMethod("dbDataType", c("MySQLDriver", "ANY"), function(dbObj, obj) {
 })
 
 #' @export
-#' @rdname dbDataType-MySQLDriver-method
+#' @rdname dbDataType-MySQLDriver-ANY-method
 setMethod("dbDataType", c("MySQLConnection", "ANY"), function(dbObj, obj) {
   mysqlDataType(obj)
 })

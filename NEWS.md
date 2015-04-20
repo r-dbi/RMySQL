@@ -1,3 +1,11 @@
+# Version 0.10.3
+
+ *  Fix the RPostgreSQL conflict
+ 
+ *  Remove the workaround for the bug in TSMySQL
+ 
+ *  Update URL to MariaDB client in DESCRIPTION
+
 # Version 0.10.2
  
  *  Backport fixes from Rcpp branch.
