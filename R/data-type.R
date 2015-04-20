@@ -16,7 +16,7 @@ setMethod("dbDataType", c("MySQLDriver", "ANY"), function(dbObj, obj) {
 })
 
 #' @export
-#' @rdname dbDataType-MySQLDriver-ANY-method
+#' @rdname dbDataType-MySQLDriver-method
 setMethod("dbDataType", c("MySQLConnection", "ANY"), function(dbObj, obj) {
   mysqlDataType(obj)
 })
