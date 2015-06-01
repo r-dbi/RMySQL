@@ -138,6 +138,7 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
     sql <- paste0(
       "LOAD DATA LOCAL INFILE ", dbQuoteString(conn, fn),
       "  INTO TABLE ", dbQuoteIdentifier(conn, name),
+      "  FIELDS TERMINATED BY '\t' ",
       "  LINES TERMINATED BY '\n' ",
       "  (", paste(dbQuoteIdentifier(conn, names(value)), collapse=", "), ");"
     )
