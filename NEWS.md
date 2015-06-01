@@ -1,3 +1,5 @@
+ *  Fix dbWriteTable bug with MySQL-based Infobright database
+
 # Version 0.10.3
 
  *  Fix the RPostgreSQL conflict
