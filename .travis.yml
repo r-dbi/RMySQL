@@ -33,6 +33,7 @@ before_install:
 install:
   - ./travis-tool.sh install_github RcppCore/Rcpp
   - ./travis-tool.sh install_github rstats-db/DBI
+  - ./travis-tool.sh install_github jimhester/covr
   - ./travis-tool.sh install_deps
 
 before_script:
@@ -43,6 +44,9 @@ script: ./travis-tool.sh run_tests
 
 after_failure:
   - ./travis-tool.sh dump_logs
+
+after_success:
+  - Rscript -e 'covr::codecov()"
 
 notifications:
   email:
