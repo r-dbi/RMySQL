@@ -25,6 +25,7 @@ setClass("MySQLDriver",
 #'   default.)
 #' @export
 #' @import methods DBI
+#' @importFrom utils packageVersion read.table write.table
 #' @useDynLib RMySQL
 #' @rdname MySQLDriver-class
 #' @examples

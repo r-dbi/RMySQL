@@ -1,4 +1,10 @@
+# Version 0.10.4
+
  *  Fix dbWriteTable bug with MySQL-based Infobright database
+ 
+ *  Use mariadb_config if available
+ 
+ *  Properly import used utils functions
 
 # Version 0.10.3
 

@@ -26,6 +26,16 @@ if [ $(command -v mysql_config) ]; then
   exit 0
 fi
 
+# If the mariadb_config command is availble, use that
+if [ $(command -v mariadb_config) ]; then
+  echo "Found mariadb_config"
+  MYSQL_CFLAGS=$(mariadb_config --cflags)
+  MYSQL_LIBS=$(mariadb_config --libs)
+  echo "PKG_CPPFLAGS=$MYSQL_CFLAGS" > src/Makevars
+  echo "PKG_LIBS=$MYSQL_LIBS" >> src/Makevars
+  exit 0
+fi
+
 # Force static linking on OSX to support redistributable binary packages.
 if [ $(echo "$OSTYPE" | grep "darwin") ]; then
 
