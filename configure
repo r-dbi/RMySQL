@@ -71,7 +71,7 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
 
   # Use system 'brew' if available
   if [ $(command -v brew) ]; then
-    MYSQLBREWDIR="$(brew --prefix)/Cellar/mysql-connector-c/6.1.3";
+    MYSQLBREWDIR="$(brew --prefix)/Cellar/mysql-connector-c/6.1.6";
     if [ ! -r "$MYSQLBREWDIR/include/mysql.h" ]; then
       echo "Brewing libmysql...";
       brew install ./tools/mysql-connector-c.rb;
@@ -94,13 +94,13 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
   if [ ! -r "$LOCALBREW/bin/brew" ]; then
      mkdir -p $LOCALBREW && curl -fsSL https://github.com/Homebrew/homebrew/tarball/master | tar xz --strip 1 -C $LOCALBREW
   fi
-  if [ ! -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/mysql.h" ]; then
+  if [ ! -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/mysql.h" ]; then
      HOMEBREW_CACHE="/tmp" $LOCALBREW/bin/brew install ./tools/mysql-connector-c.rb;
   fi
-  if [ -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/mysql.h" ]; then
+  if [ -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/mysql.h" ]; then
     echo "Using local brew from $LOCALBREW."
-    echo "PKG_CPPFLAGS= -I../$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/" > src/Makevars
-    cp -f $LOCALBREW/Cellar/mysql-connector-c/6.1.3/lib/libmysqlclient.a ./src/libmysqlstatic.a
+    echo "PKG_CPPFLAGS= -I../$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/" > src/Makevars
+    cp -f $LOCALBREW/Cellar/mysql-connector-c/6.1.6/lib/libmysqlclient.a ./src/libmysqlstatic.a
     echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
     exit 0;
   fi
