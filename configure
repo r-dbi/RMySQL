@@ -16,6 +16,16 @@ if [ "$MYSQL_INC" ]; then
   exit 0
 fi
 
+# If the mariadb_config command is availble, use that
+if [ $(command -v mariadb_config) ]; then
+  echo "Found mariadb_config"
+  MYSQL_CFLAGS=$(mariadb_config --cflags)
+  MYSQL_LIBS=$(mariadb_config --libs)
+  echo "PKG_CPPFLAGS=$MYSQL_CFLAGS" > src/Makevars
+  echo "PKG_LIBS=$MYSQL_LIBS" >> src/Makevars
+  exit 0
+fi
+
 # If the mysql_config command is availble, use that
 if [ $(command -v mysql_config) ]; then
   echo "Found mysql_config"
@@ -61,7 +71,7 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
 
   # Use system 'brew' if available
   if [ $(command -v brew) ]; then
-    MYSQLBREWDIR="$(brew --prefix)/Cellar/mysql-connector-c/6.1.3";
+    MYSQLBREWDIR="$(brew --prefix)/Cellar/mysql-connector-c/6.1.6";
     if [ ! -r "$MYSQLBREWDIR/include/mysql.h" ]; then
       echo "Brewing libmysql...";
       brew install ./tools/mysql-connector-c.rb;
@@ -84,13 +94,13 @@ if [ $(echo "$OSTYPE" | grep "darwin") ]; then
   if [ ! -r "$LOCALBREW/bin/brew" ]; then
      mkdir -p $LOCALBREW && curl -fsSL https://github.com/Homebrew/homebrew/tarball/master | tar xz --strip 1 -C $LOCALBREW
   fi
-  if [ ! -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/mysql.h" ]; then
+  if [ ! -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/mysql.h" ]; then
      HOMEBREW_CACHE="/tmp" $LOCALBREW/bin/brew install ./tools/mysql-connector-c.rb;
   fi
-  if [ -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/mysql.h" ]; then
+  if [ -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/mysql.h" ]; then
     echo "Using local brew from $LOCALBREW."
-    echo "PKG_CPPFLAGS= -I../$LOCALBREW/Cellar/mysql-connector-c/6.1.3/include/" > src/Makevars
-    cp -f $LOCALBREW/Cellar/mysql-connector-c/6.1.3/lib/libmysqlclient.a ./src/libmysqlstatic.a
+    echo "PKG_CPPFLAGS= -I../$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/" > src/Makevars
+    cp -f $LOCALBREW/Cellar/mysql-connector-c/6.1.6/lib/libmysqlclient.a ./src/libmysqlstatic.a
     echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
     exit 0;
   fi
