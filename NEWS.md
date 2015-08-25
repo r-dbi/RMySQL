@@ -1,3 +1,9 @@
+# Version 0.10.5
+
+ * Refactor configure script
+ 
+ * Fix for setInternet2 in R-devel on Windows
+
 # Version 0.10.4
 
  *  Fix dbWriteTable bug with MySQL-based Infobright database
