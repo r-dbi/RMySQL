@@ -1,139 +1,84 @@
-# If $MYSQL_DIR is specified, use that
-if [ "$MYSQL_DIR" ]; then
-  echo "PKG_CPPFLAGS= -I$MYSQL_DIR/include" > src/Makevars
-  echo "PKG_LIBS= -L$MYSQL_DIR/lib -lmysqlclient -lz" >> src/Makevars
-  exit 0
-fi
+#!/bin/bash
+# Anticonf (tm) script by Jeroen Ooms (2015)
+# This script will query 'pkg-config' for the required cflags and ldflags.
+# If pkg-config is unavailable or does not find the library, try setting
+# INCLUDE_DIR and LIB_DIR manually via e.g:
+# R CMD INSTALL --configure-vars='INCLUDE_DIR=/.../include LIB_DIR=/.../lib'
 
-# Else if $MYSQL_INC is set, use that
-if [ "$MYSQL_INC" ]; then
-  echo "PKG_CPPFLAGS= -I$MYSQL_INC" > src/Makevars
-  if [ "$MYSQL_LIB" ]; then
-    echo "PKG_LIBS= -L$MYSQL_LIB -lmysqlclient -lz" >> src/Makevars
-  else
-    echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
-  fi
-  exit 0
-fi
+# Library settings
+PKG_CONFIG_NAME="mysql-connector-c"
+PKG_DEB_NAME="libmysqlclient-dev / libmariadbclient-dev"
+PKG_RPM_NAME="mariadb-devel"
+PKG_CSW_NAME="libmysqlclient15"
+PKG_BREW_NAME="mysql-connector-c"
+PKG_TEST_HEADER="<mysql.h>"
+PKG_LIBS="-lmysqlclient -lz"
 
-# If the mariadb_config command is availble, use that
+# Use xml2-config if available
 if [ $(command -v mariadb_config) ]; then
-  echo "Found mariadb_config"
-  MYSQL_CFLAGS=$(mariadb_config --cflags)
-  MYSQL_LIBS=$(mariadb_config --libs)
-  echo "PKG_CPPFLAGS=$MYSQL_CFLAGS" > src/Makevars
-  echo "PKG_LIBS=$MYSQL_LIBS" >> src/Makevars
-  exit 0
+  PKGCONFIG_CFLAGS=$(mariadb_config --cflags)
+  PKGCONFIG_LIBS=$(mariadb_config --libs)
+elif [ $(command -v mysql_config) ]; then
+  PKGCONFIG_CFLAGS=$(mysql_config --cflags)
+  PKGCONFIG_LIBS=$(mysql_config --libs)
 fi
 
-# If the mysql_config command is availble, use that
-if [ $(command -v mysql_config) ]; then
-  echo "Found mysql_config"
-  MYSQL_CFLAGS=$(mysql_config --cflags)
-  MYSQL_LIBS=$(mysql_config --libs)
-  echo "PKG_CPPFLAGS=$MYSQL_CFLAGS" > src/Makevars
-  echo "PKG_LIBS=$MYSQL_LIBS" >> src/Makevars
-  exit 0
-fi
-
-# Force static linking on OSX to support redistributable binary packages.
-if [ $(echo "$OSTYPE" | grep "darwin") ]; then
-
-  # Check for the presence of the Mac OS X 'native' package
-  NATIVEPKG=$(echo /usr/local/mysql-connector-c-*)
-  if [ -r $NATIVEPKG/include/mysql.h ]; then
-      echo "Using native mysqlclient from $NATIVEPKG";
-      echo "PKG_CPPFLAGS= -I$NATIVEPKG/include" > src/Makevars
-
-      # Copy the static library
-      cp -f $NATIVEPKG/lib/libmysqlclient.a ./src/libmysqlstatic.a
-      echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
-      exit 0
-  else
-    echo "No native mysqlclient package found."
-  fi
-
-  # Check for mariadb brew package
-  MARIADBPKG=$(echo /usr/local/Cellar/mariadb/*/)
-  if [ -r $MARIADBPKG/include/mysql/mysql.h ]; then
-      echo "Found mariadb in $MARIADBPKG.";
-      echo "PKG_CPPFLAGS= -I$MARIADBPKG/include/mysql" > src/Makevars
-
-      # Copy the static library
-      cp -f $MARIADBPKG/lib/libmysqlclient.a ./src/libmysqlstatic.a
-
-      # This one is dynamically linked against libssl
-      echo "PKG_LIBS= -L. -lz -lmysqlstatic -lssl" >> src/Makevars
-      exit 0
-  else
-    echo "No mariadb found."
-  fi
-
-  # Use system 'brew' if available
+# Note that cflags may be empty in case of success
+if [ "$INCLUDE_DIR" ] || [ "$LIB_DIR" ]; then
+  echo "Found INCLUDE_DIR and/or LIB_DIR!"
+  PKG_CFLAGS="-I$INCLUDE_DIR $PKG_CFLAGS"
+  PKG_LIBS="-L$LIB_DIR $PKG_LIBS"
+elif [ "$PKGCONFIG_CFLAGS" ] || [ "$PKGCONFIG_LIBS" ]; then
+  echo "Found mysql_config cflags and libs!"
+  PKG_CFLAGS=${PKGCONFIG_CFLAGS}
+  PKG_LIBS=${PKGCONFIG_LIBS}
+elif [[ "$OSTYPE" == "darwin"* ]]; then
   if [ $(command -v brew) ]; then
-    MYSQLBREWDIR="$(brew --prefix)/Cellar/mysql-connector-c/6.1.6";
-    if [ ! -r "$MYSQLBREWDIR/include/mysql.h" ]; then
-      echo "Brewing libmysql...";
-      brew install ./tools/mysql-connector-c.rb;
-    fi
-    if [ -r "$MYSQLBREWDIR/include/mysql.h" ]; then
-      echo "Brewed libmysql found in $MYSQLBREWDIR";
-      echo "PKG_CPPFLAGS= -I$MYSQLBREWDIR/include" > src/Makevars
-
-      # Force using the static library
-      cp -f $MYSQLBREWDIR/lib/libmysqlclient.a ./src/libmysqlstatic.a
-      echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
-      exit 0
-    fi
+    BREWDIR=$(brew --prefix)
   else
-    echo "No system brew found."
+    echo "Auto-brewing $PKG_BREW_NAME..."
+    BREWDIR="/tmp/homebrew"
+    HOMEBREW_CACHE="/tmp"
+    if [ ! -r "$BREWDIR/bin/brew" ]; then
+       mkdir -p $BREWDIR && curl -fsSL https://github.com/Homebrew/homebrew/tarball/master | tar xz --strip 1 -C $BREWDIR
+    fi
+    $BREWDIR/bin/brew install $PKG_BREW_NAME 2>&1 | sed 's/Warning/Note/g'
+    rm -f $BREWDIR/opt/$PKG_BREW_NAME/lib/*.dylib
   fi
-
-  # Try brewing locally
-  LOCALBREW="homebrew"
-  if [ ! -r "$LOCALBREW/bin/brew" ]; then
-     mkdir -p $LOCALBREW && curl -fsSL https://github.com/Homebrew/homebrew/tarball/master | tar xz --strip 1 -C $LOCALBREW
-  fi
-  if [ ! -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/mysql.h" ]; then
-     HOMEBREW_CACHE="/tmp" $LOCALBREW/bin/brew install ./tools/mysql-connector-c.rb;
-  fi
-  if [ -r "$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/mysql.h" ]; then
-    echo "Using local brew from $LOCALBREW."
-    echo "PKG_CPPFLAGS= -I../$LOCALBREW/Cellar/mysql-connector-c/6.1.6/include/" > src/Makevars
-    cp -f $LOCALBREW/Cellar/mysql-connector-c/6.1.6/lib/libmysqlclient.a ./src/libmysqlstatic.a
-    echo "PKG_LIBS= -L. -lz -lmysqlstatic" >> src/Makevars
-    exit 0;
-  fi
-  echo "Failed to install mysql-connector-c."
-
-  # Fix for CRAN OSX 10.6
-  if [ -r /usr/local/mysql/include/mysql.h ]; then
-    echo "Found mysql /usr/local/mysql. Lets try that then."
-    echo "PKG_CPPFLAGS= -I/usr/local/mysql/include/" > src/Makevars
-    echo "PKG_LIBS= -L/usr/local/mysql/lib -lmysqlclient" >> src/Makevars
-    exit 0
-  fi
-  # Fall through on general methods
+  PKG_CFLAGS="-I$BREWDIR/opt/$PKG_BREW_NAME/include"
+  PKG_LIBS="-L$BREWDIR/opt/$PKG_BREW_NAME/lib $PKG_LIBS"
 fi
 
-# Check for presence of system libraires on Linux and friends:
-if [ -r /usr/include/mysql/mysql.h ]; then
-  echo "PKG_CPPFLAGS= -I/usr/include/mysql/" > src/Makevars
-elif [ -r /usr/local/include/mysql/mysql.h ]; then
-  echo "PKG_CPPFLAGS= -I/usr/local/include/mysql/" > src/Makevars
-elif [ -r /usr/local/mysql/include/mysql.h ]; then
-  echo "PKG_CPPFLAGS= -I/usr/local/mysql/include/" > src/Makevars
-else
-  echo "File mysql.h not found. Please install mysql development library, e.g: libmysqlclient-dev (deb) or mariadb-devel (rpm)."
-  exit 1
+# Find compiler
+CC=$(${R_HOME}/bin/R CMD config CC)
+CFLAGS=$(${R_HOME}/bin/R CMD config CFLAGS)
+CPPFLAGS=$(${R_HOME}/bin/R CMD config CPPFLAGS)
+
+# For debugging
+echo "Using PKG_CFLAGS=$PKG_CFLAGS"
+echo "Using PKG_LIBS=$PKG_LIBS"
+
+# Test configuration
+echo "#include $PKG_TEST_HEADER" | ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E -xc - >/dev/null 2>&1 || R_CONFIG_ERROR=1;
+
+# Customize the error
+if [ $R_CONFIG_ERROR ]; then
+  echo "------------------------- ANTICONF ERROR ---------------------------"
+  echo "Configuration failed because $PKG_CONFIG_NAME was not found. Try installing:"
+  echo " * deb: $PKG_DEB_NAME (Debian, Ubuntu)"
+  echo " * rpm: $PKG_RPM_NAME (Fedora, CentOS, RHEL)"
+  echo " * csw: $PKG_CSW_NAME (Solaris)"
+  echo " * brew: $PKG_BREW_NAME (OSX)"
+  echo "If $PKG_CONFIG_NAME is already installed, check that 'pkg-config' is in your"
+  echo "PATH and PKG_CONFIG_PATH contains a $PKG_CONFIG_NAME.pc file. If pkg-config"
+  echo "is unavailable you can set INCLUDE_DIR and LIB_DIR manually via:"
+  echo "R CMD INSTALL --configure-vars='INCLUDE_DIR=... LIB_DIR=...'"
+  echo "--------------------------------------------------------------------"
+  exit 1;
 fi
 
-if [ -r /usr/lib/mysql ]; then
-  echo "PKG_LIBS= -L/usr/lib/mysql -lmysqlclient -lz" >> src/Makevars
-elif [ -r /usr/lib64/mysql ]; then
-  echo "PKG_LIBS= -L/usr/lib64/mysql -lmysqlclient -lz" >> src/Makevars
-elif [ -r /usr/local/mysql/lib ]; then
-  echo "PKG_LIBS= -L/usr/local/mysql/lib -lmysqlclient -lz" >> src/Makevars
-else
-  echo "PKG_LIBS= -lmysqlclient -lz" >> src/Makevars
-fi
+# Write to Makevars
+sed -e "s|@cflags@|$PKG_CFLAGS|" -e "s|@libs@|$PKG_LIBS|" src/Makevars.in > src/Makevars
+
+# Success
+exit 0
