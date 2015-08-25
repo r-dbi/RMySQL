@@ -17,8 +17,8 @@ License: GPL-2
 URL: https://github.com/rstats-db/rmysql,
     https://downloads.mariadb.org/connector-c/
 BugReports: https://github.com/rstats-db/rmysql/issues
-SystemRequirements: libmariadb-client-lgpl-dev or libmysqlclient-dev (deb),
-    mariadb-devel (rpm), mariadb or mysql-connector-c (brew).
+SystemRequirements: libmariadb-client-dev / libmysqlclient-dev (deb),
+    mariadb-devel (rpm), mariadb or mysql-connector-c (brew), mysql56_dev (csw)
 NeedsCompilation: yes
 Collate:
     'mysql.R'
