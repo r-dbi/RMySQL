@@ -1,8 +1,8 @@
 #!/bin/bash
-# Anticonf (tm) script by Jeroen Ooms (2015)
-# This script will query 'pkg-config' for the required cflags and ldflags.
-# If pkg-config is unavailable or does not find the library, try setting
-# INCLUDE_DIR and LIB_DIR manually via e.g:
+# Anticonf script by Jeroen Ooms (2015)
+# The script will try 'mariadb_config' and 'mysql_config' to find required
+# cflags and ldflags. Make sure this executable is in PATH when installing
+# the package. Alternatively, you can set INCLUDE_DIR and LIB_DIR manually:
 # R CMD INSTALL --configure-vars='INCLUDE_DIR=/.../include LIB_DIR=/.../lib'
 
 # Library settings
