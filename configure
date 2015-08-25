@@ -14,7 +14,7 @@ PKG_BREW_NAME="mysql-connector-c"
 PKG_TEST_HEADER="<mysql.h>"
 PKG_LIBS="-lmysqlclient -lz"
 
-# Use xml2-config if available
+# Use mysql_config if available
 if [ $(command -v mariadb_config) ]; then
   PKGCONFIG_CFLAGS=$(mariadb_config --cflags)
   PKGCONFIG_LIBS=$(mariadb_config --libs)
