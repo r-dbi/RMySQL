@@ -1,3 +1,7 @@
+# Version 0.10.6
+
+ * Fix configure script for OSX
+
 # Version 0.10.5
 
  * Refactor configure script
