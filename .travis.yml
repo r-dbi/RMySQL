@@ -5,6 +5,7 @@
 #   https://github.com/craigcitro/r-travis/wiki
 
 language: c
+sudo: required
 services: MySQL
 
 env:
