@@ -97,7 +97,7 @@ public:
       }
       case MY_DATE:
       case MY_DATE_TIME:
-        if (isnan(REAL(col)[i])) {
+        if (ISNAN(REAL(col)[i])) {
           missing = true;
           break;
         } else {
