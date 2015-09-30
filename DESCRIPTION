@@ -16,6 +16,10 @@ Depends:
 Imports:
     methods,
     Rcpp
+Suggests:
+    testthat,
+    DBItest
+LinkingTo: Rcpp, BH
 License: GPL-2
 URL: https://github.com/rstats-db/rmysql,
     https://downloads.mariadb.org/connector-c/
@@ -35,6 +39,3 @@ Collate:
     'quote.R'
     'table.R'
     'transaction.R'
-Suggests:
-    testthat
-LinkingTo: Rcpp, BH
