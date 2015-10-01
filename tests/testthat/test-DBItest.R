@@ -1,2 +1,2 @@
 DBItest::make_context(MySQL(), NULL)
-DBItest::test_all()
+DBItest::test_all("constructor_strict")
