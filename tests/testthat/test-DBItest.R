@@ -1,2 +1,9 @@
 DBItest::make_context(MySQL(), list(dbname = "test"))
-DBItest::test_all(c("constructor_strict", "show", "get_info", "invalid_query", "data_logical", "data_64_bit"))
+DBItest::test_all(c(
+  "constructor_strict", # relaxed version of constructor check still active
+  "show",               # rstats-db/RPostgres#49
+  "get_info",           # to be discussed
+  "invalid_query",      # #91
+  "data_logical",       # not an error: no logical data type
+  "data_64_bit"         # rstats-db/RPostgres#51
+))
