@@ -7,8 +7,9 @@ DBItest::test_all(c(
   "data_logical",          # not an error: no logical data type
   "data_64_bit",           # rstats-db/RPostgres#51
   "data_character",        # #93
-  "data_time",             # #94
-  "data_time_parens",      # #94
+  "data_time",             # #95
+  "data_time_parens",      # #95
+  "data_timestamp_utc",    # syntax not supported
   "data_timestamp_parens", # syntax not supported
   NULL
 ))
