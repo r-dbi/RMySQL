@@ -6,7 +6,7 @@
 # R CMD INSTALL --configure-vars='INCLUDE_DIR=/.../include LIB_DIR=/.../lib'
 
 # Library settings
-PKG_CONFIG_NAME="mysql-connector-c"
+PKG_CONFIG_NAME="libmysqlclient"
 PKG_DEB_NAME="libmysqlclient-dev | libmariadbclient-dev"
 PKG_DEB_NAME_DEBIAN="libmysqlclient-dev | libmariadb-client-lgpl-dev-compat"
 PKG_RPM_NAME="mariadb-devel | mysql-devel"
