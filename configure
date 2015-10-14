@@ -8,7 +8,7 @@
 # Library settings
 PKG_CONFIG_NAME="libmysqlclient"
 PKG_DEB_NAME="libmysqlclient-dev | libmariadbclient-dev"
-PKG_DEB_NAME_DEBIAN="libmysqlclient-dev | libmariadb-client-lgpl-dev-compat"
+PKG_DEB_NAME_DEBIAN="libmysqlclient-dev | libmariadb-client-lgpl-dev"
 PKG_RPM_NAME="mariadb-devel | mysql-devel"
 PKG_CSW_NAME="mysql56_dev"
 PKG_BREW_NAME="mysql-connector-c"
