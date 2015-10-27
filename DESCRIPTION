@@ -36,5 +36,6 @@ Collate:
     'table.R'
     'transaction.R'
 Suggests:
-    testthat
+    testthat,
+    DBItest
 LinkingTo: Rcpp, BH
