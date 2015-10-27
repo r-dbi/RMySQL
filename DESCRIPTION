@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.10.6.9000
+Version: 0.10.7
 Title: Database Interface and 'MySQL' Driver for R
 Description: Implements 'DBI' Interface to 'MySQL' and 'MariaDB' Databases.
 Authors@R: c(person("Jeroen", "Ooms", email = "jeroen.ooms@stat.ucla.edu", role = c("aut", "cre")),
@@ -17,8 +17,8 @@ License: GPL-2
 URL: https://github.com/rstats-db/rmysql,
     https://downloads.mariadb.org/connector-c/
 BugReports: https://github.com/rstats-db/rmysql/issues
-SystemRequirements: libmariadb-client-dev / libmysqlclient-dev (deb),
-    mariadb-devel (rpm), mariadb or mysql-connector-c (brew), mysql56_dev (csw)
+SystemRequirements: libmariadb-client-dev | libmariadb-client-lgpl-dev | libmysqlclient-dev (deb),
+    mariadb-devel (rpm), mariadb | mysql-connector-c (brew), mysql56_dev (csw)
 NeedsCompilation: yes
 Collate:
     'mysql.R'
