@@ -11,5 +11,8 @@ DBItest::test_all(c(
   "data_time_parens",      # #95
   "data_timestamp_utc",    # syntax not supported
   "data_timestamp_parens", # syntax not supported
+  "write_table",           # #91
+  "read_table",            # #91
+  "list_tables",           # #91
   NULL
 ))
