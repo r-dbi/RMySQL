@@ -12,5 +12,6 @@ DBItest::test_all(c(
   "data_timestamp_parens", # syntax not supported
   "roundtrip_quotes",      # #101
   "roundtrip_logical",     # not an error: no logical data type
+  "roundtrip_64_bit",      # rstats-db/DBI#48
   NULL
 ))
