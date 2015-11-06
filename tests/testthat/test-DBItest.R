@@ -14,6 +14,7 @@ DBItest::test_all(c(
   "write_table",           # #91
   "read_table",            # #91
   "list_tables",           # #91
+  "roundtrip_keywords",    # #91
   "roundtrip_quotes",      # #101
   NULL
 ))
