@@ -36,18 +36,6 @@ test_that("rownames preserved", {
   dbDisconnect(con)
 })
 
-test_that("can roundtrip special field names", {
-  con <- mysqlDefault()
-
-  local <- data.frame(x = 1:3, select = 1:3, `,` = 1:3, check.names = FALSE)
-  dbWriteTable(con, "torture", local, overwrite = TRUE)
-  remote <- dbReadTable(con, "torture", check.names = FALSE)
-
-  expect_equal(local, remote)
-
-  dbDisconnect(con)
-})
-
 test_that("can read file from disk", {
   con <- mysqlDefault()
 
