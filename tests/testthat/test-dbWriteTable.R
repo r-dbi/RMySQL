@@ -35,19 +35,6 @@ test_that("rownames preserved", {
   dbDisconnect(con)
 })
 
-test_that("commas in fields are preserved", {
-  con <- mysqlDefault()
-
-  df <- data.frame(
-    x = c("ABC, Inc.","DEF Holdings"),
-    stringsAsFactors = FALSE
-  )
-  dbWriteTable(con, "t1", df, overwrite = TRUE)
-  expect_equal(dbReadTable(con, "t1"), df)
-
-  dbDisconnect(con)
-})
-
 test_that("can roundtrip special field names", {
   con <- mysqlDefault()
 
