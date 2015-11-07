@@ -36,6 +36,7 @@ test_that("rownames preserved", {
   dbDisconnect(con)
 })
 
+# Available only in MySQL
 test_that("can read file from disk", {
   con <- mysqlDefault()
 
