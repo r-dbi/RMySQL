@@ -9,6 +9,7 @@ context("dbWriteTable")
 #   dbDisconnect(con)
 # })
 
+# Not generic enough for DBItest
 test_that("throws error if constraint violated", {
   con <- mysqlDefault()
 
