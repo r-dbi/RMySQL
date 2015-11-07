@@ -13,5 +13,7 @@ DBItest::test_all(c(
   "roundtrip_quotes",      # #101
   "roundtrip_logical",     # not an error: no logical data type
   "roundtrip_64_bit",      # rstats-db/DBI#48
+  "roundtrip_character",   # #93
+  "roundtrip_timestamp",   # #104
   NULL
 ))
