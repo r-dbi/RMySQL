@@ -40,25 +40,6 @@ test_that("can read file from disk", {
   dbDisconnect(con)
 })
 
-test_that("appending is error if table does not exist", {
-  con <- mysqlDefault()
-
-  df <- data.frame(
-    str = letters[1:5],
-    num = 1:5,
-    stringsAsFactors = FALSE
-  )
-  dbWriteTable(con, "dat", df, overwrite = TRUE)
-
-  expect_error(
-    dbWriteTable(con, "dat", df, overwrite = FALSE, append = FALSE),
-    "Table dat exists"
-  )
-
-  dbRemoveTable(con, "dat")
-  dbDisconnect(con)
-})
-
 test_that("temporary tables work properly", {
   con <- mysqlDefault()
 
