@@ -23,19 +23,6 @@ test_that("throws error if constraint violated", {
   dbDisconnect(con)
 })
 
-test_that("rownames preserved", {
-  con <- mysqlDefault()
-
-  df <- data.frame(x = 1:10)
-  row.names(df) <- paste(letters[1:10], 1:10, sep="")
-
-  dbWriteTable(con, "t1", df, overwrite = TRUE)
-  t1 <- dbReadTable(con, "t1")
-  expect_equal(rownames(t1), rownames(df))
-
-  dbDisconnect(con)
-})
-
 # Available only in MySQL
 test_that("can read file from disk", {
   con <- mysqlDefault()
