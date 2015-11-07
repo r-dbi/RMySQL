@@ -48,21 +48,6 @@ test_that("can roundtrip special field names", {
   dbDisconnect(con)
 })
 
-test_that("can round-trip utf-8", {
-  angstrom <- enc2utf8("\u00e5")
-  con <- mysqlDefault()
-
-  dbGetQuery(con, "CREATE TEMPORARY TABLE test1 (x TEXT)")
-  # charToRaw(angstrom)
-  dbGetQuery(con, "INSERT INTO test1 VALUES (0xc3a5)")
-
-  expect_equal(dbGetQuery(con, "SELECT * FROM test1")$x, angstrom)
-  expect_equal(dbGetQuery(con, "SELECT * FROM test1 WHERE x = 0xc3a5")$x,
-    angstrom)
-
-  dbDisconnect(con)
-})
-
 test_that("can read file from disk", {
   con <- mysqlDefault()
 
