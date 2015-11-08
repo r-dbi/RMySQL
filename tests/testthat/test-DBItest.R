@@ -25,5 +25,6 @@ DBItest::test_all(c(
   "roundtrip_64_bit",      # rstats-db/DBI#48
   "roundtrip_character",   # #93
   "roundtrip_timestamp",   # #104
+  "get_exception",         # #106
   NULL
 ))
