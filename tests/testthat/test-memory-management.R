@@ -1,15 +1,5 @@
 context("Memory management")
 
-test_that("accessing cleared result throws error", {
-  con <- mysqlDefault()
-  rs <- dbSendQuery(con, "SELECT 1;")
-  dbClearResult(rs)
-
-  expect_error(dbFetch(rs), "not valid")
-
-  dbDisconnect(con)
-})
-
 test_that("opening query cancels existing query", {
   con <- RMySQL::mysqlDefault()
   rs1 <- dbSendQuery(con, "SHOW TABLES")
