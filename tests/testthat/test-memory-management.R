@@ -1,12 +1,5 @@
 context("Memory management")
 
-test_that("querying closed connection throws error", {
-  db <- mysqlDefault()
-  dbDisconnect(db)
-
-  expect_error(dbGetQuery(db, "select * from foo"), "not valid")
-})
-
 test_that("accessing cleared result throws error", {
   con <- mysqlDefault()
   rs <- dbSendQuery(con, "SELECT 1;")
