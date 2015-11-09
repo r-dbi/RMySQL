@@ -5,6 +5,7 @@
 #   https://github.com/craigcitro/r-travis/wiki
 
 language: c
+sudo: required
 services: MySQL
 
 env:
@@ -25,6 +26,7 @@ matrix:
 
 
 before_install:
+  - mysql -e "create database IF NOT EXISTS test;" -uroot
   - sudo apt-get install libmysqlclient-dev
   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
   - sudo apt-get install r-bioc-biobase r-cran-rjava
