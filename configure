@@ -6,8 +6,9 @@
 # R CMD INSTALL --configure-vars='INCLUDE_DIR=/.../include LIB_DIR=/.../lib'
 
 # Library settings
-PKG_CONFIG_NAME="mysql-connector-c"
+PKG_CONFIG_NAME="libmysqlclient"
 PKG_DEB_NAME="libmysqlclient-dev | libmariadbclient-dev"
+PKG_DEB_NAME_DEBIAN="libmysqlclient-dev | libmariadb-client-lgpl-dev"
 PKG_RPM_NAME="mariadb-devel | mysql-devel"
 PKG_CSW_NAME="mysql56_dev"
 PKG_BREW_NAME="mysql-connector-c"
@@ -36,11 +37,11 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   if [ $(command -v brew) ]; then
     BREWDIR=$(brew --prefix)
   else
-    echo "Auto-brewing $PKG_BREW_NAME..."
     BREWDIR="/tmp/homebrew"
-    if [ ! -r "$BREWDIR/bin/brew" ]; then
-       mkdir -p $BREWDIR && curl -fsSL https://github.com/Homebrew/homebrew/tarball/master | tar xz --strip 1 -C $BREWDIR
-    fi
+    rm -Rf $BREWDIR
+    mkdir -p $BREWDIR
+    echo "Auto-brewing $PKG_BREW_NAME in $BREWDIR..."
+    curl -fsSL https://github.com/Homebrew/homebrew/tarball/master | tar xz --strip 1 -C $BREWDIR
     HOMEBREW_CACHE="/tmp" $BREWDIR/bin/brew install $PKG_BREW_NAME 2>&1 | sed 's/Warning/Note/g'
     rm -f $BREWDIR/opt/$PKG_BREW_NAME/lib/*.dylib
   fi
@@ -64,7 +65,8 @@ echo "#include $PKG_TEST_HEADER" | ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E 
 if [ $R_CONFIG_ERROR ]; then
   echo "------------------------- ANTICONF ERROR ---------------------------"
   echo "Configuration failed because $PKG_CONFIG_NAME was not found. Try installing:"
-  echo " * deb: $PKG_DEB_NAME (Debian, Ubuntu)"
+  echo " * deb: $PKG_DEB_NAME_DEBIAN (Debian)"
+  echo "        $PKG_DEB_NAME (Ubuntu)"
   echo " * rpm: $PKG_RPM_NAME (Fedora, CentOS, RHEL)"
   echo " * csw: $PKG_CSW_NAME (Solaris)"
   echo " * brew: $PKG_BREW_NAME (OSX)"
