@@ -33,6 +33,7 @@ DBItest::test_all(c(
   "bind_character_positional_qm", # #93
   "bind_timestamp_lt_positional_qm", # #110
   "bind_raw_positional_qm", # #110
+  "bind_.*_positional_dollar", # not an error: named binding not supported
   "bind_.*_named_.*",      # not an error: named binding not supported
   NULL
 ))
