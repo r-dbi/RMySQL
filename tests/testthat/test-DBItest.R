@@ -26,6 +26,7 @@ DBItest::test_all(c(
   "roundtrip_numeric_special", # #105
   "roundtrip_64_bit",      # rstats-db/DBI#48
   "roundtrip_character",   # #93
+  "roundtrip_raw",         # #111
   "roundtrip_timestamp",   # #104
   "get_exception",         # #106
   "bind_logical_positional_qm", # not an error: no logical data type
