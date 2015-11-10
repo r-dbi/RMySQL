@@ -11,6 +11,8 @@ DBItest::test_all(c(
   "data_64_bit_null",      # rstats-db/RPostgres#51
   "data_character",        # #93
   "data_character_null",   # #93
+  "data_raw",              # not an error: can't cast to blob type
+  "data_raw_null",         # not an error: can't cast to blob type
   "data_time",             # #95
   "data_time_null",        # #95
   "data_time_parens",      # #95
