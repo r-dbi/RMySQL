@@ -1,8 +1,8 @@
 DBItest::make_context(MySQL(), list(dbname = "test"))
 DBItest::test_all(c(
   "constructor_strict",    # relaxed version of constructor check still active
-  "show",                  # rstats-db/RPostgres#49
-  "get_info",              # to be discussed
+  "get_info_driver",       # rstats-db/RSQLite#117
+  "get_info_connection",   # rstats-db/RSQLite#117
   "data_logical",          # not an error: no logical data type
   "data_logical_null",     # not an error: no logical data type
   "data_logical_int",      # not an error: no logical data type
