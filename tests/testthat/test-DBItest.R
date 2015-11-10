@@ -26,5 +26,10 @@ DBItest::test_all(c(
   "roundtrip_character",   # #93
   "roundtrip_timestamp",   # #104
   "get_exception",         # #106
+  "bind_logical_positional", # not an error: no logical data type
+  "bind_character_positional", # #93
+  "bind_timestamp_lt_positional", # #110
+  "bind_raw_positional",   # #110
+  "bind_.*_named_.*",      # not an error: named binding not supported
   NULL
 ))
