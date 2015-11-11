@@ -17,6 +17,8 @@ DBItest::test_all(c(
   "data_time_null",        # #95
   "data_time_parens",      # #95
   "data_time_parens_null", # #95
+  "data_timestamp",        # #113
+  "data_timestamp_null",   # #113
   "data_timestamp_utc",    # syntax not supported
   "data_timestamp_utc_null", # syntax not supported
   "data_timestamp_parens", # syntax not supported
