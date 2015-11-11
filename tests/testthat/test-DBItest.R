@@ -7,8 +7,8 @@ DBItest::test_all(c(
   "data_logical_null",     # not an error: no logical data type
   "data_logical_int",      # not an error: no logical data type
   "data_logical_int_null", # not an error: no logical data type
-  "data_64_bit",           # rstats-db/RPostgres#51
-  "data_64_bit_null",      # rstats-db/RPostgres#51
+  "data_64_bit",           # #77
+  "data_64_bit_null",      # #77
   "data_character",        # #93
   "data_character_null",   # #93
   "data_raw",              # not an error: can't cast to blob type
