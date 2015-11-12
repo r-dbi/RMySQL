@@ -23,6 +23,7 @@ DBItest::test_all(c(
   "data_timestamp_utc_null", # syntax not supported
   "data_timestamp_parens", # syntax not supported
   "data_timestamp_parens_null", # syntax not supported
+  "quote_string",          # #115
   "roundtrip_quotes",      # #101
   "roundtrip_logical",     # not an error: no logical data type
   "roundtrip_numeric_special", # #105
