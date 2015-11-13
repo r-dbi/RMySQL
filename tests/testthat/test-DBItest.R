@@ -4,25 +4,25 @@ DBItest::test_all(c(
   "get_info_driver",       # rstats-db/RSQLite#117
   "get_info_connection",   # rstats-db/RSQLite#117
   "data_logical",          # not an error: no logical data type
-  "data_logical_null",     # not an error: no logical data type
+  "data_logical_null_.*",     # not an error: no logical data type
   "data_logical_int",      # not an error: no logical data type
-  "data_logical_int_null", # not an error: no logical data type
+  "data_logical_int_null_.*", # not an error: no logical data type
   "data_64_bit",           # #77
-  "data_64_bit_null",      # #77
+  "data_64_bit_null_.*",      # #77
   "data_character",        # #93
-  "data_character_null",   # #93
+  "data_character_null_.*",   # #93
   "data_raw",              # not an error: can't cast to blob type
-  "data_raw_null",         # not an error: can't cast to blob type
+  "data_raw_null_.*",         # not an error: can't cast to blob type
   "data_time",             # #95
-  "data_time_null",        # #95
+  "data_time_null_.*",        # #95
   "data_time_parens",      # #95
-  "data_time_parens_null", # #95
+  "data_time_parens_null_.*", # #95
   "data_timestamp",        # #113
-  "data_timestamp_null",   # #113
+  "data_timestamp_null_.*",   # #113
   "data_timestamp_utc",    # syntax not supported
-  "data_timestamp_utc_null", # syntax not supported
+  "data_timestamp_utc_null_.*", # syntax not supported
   "data_timestamp_parens", # syntax not supported
-  "data_timestamp_parens_null", # syntax not supported
+  "data_timestamp_parens_null_.*", # syntax not supported
   "quote_string",          # #115
   "quote_identifier_not_vectorized", # rstats-db/DBI#24
   "roundtrip_quotes",      # #101
