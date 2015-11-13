@@ -24,6 +24,7 @@ DBItest::test_all(c(
   "data_timestamp_parens", # syntax not supported
   "data_timestamp_parens_null", # syntax not supported
   "quote_string",          # #115
+  "quote_identifier_not_vectorized", # rstats-db/DBI#24
   "roundtrip_quotes",      # #101
   "roundtrip_logical",     # not an error: no logical data type
   "roundtrip_numeric_special", # #105
@@ -32,6 +33,8 @@ DBItest::test_all(c(
   "roundtrip_raw",         # #111
   "roundtrip_timestamp",   # #104
   "get_exception",         # #106
+  "bind_empty_positional_qm", # #116
+  "bind_return_value_positional_qm", # #116
   "bind_logical_positional_qm", # not an error: no logical data type
   "bind_character_positional_qm", # #93
   "bind_timestamp_lt_positional_qm", # #110
