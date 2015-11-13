@@ -7,20 +7,20 @@
 using namespace Rcpp;
 
 // connection_create
-XPtr<MyConnectionPtr> connection_create(std::string host, std::string user, std::string password, std::string db, unsigned int port, std::string unix_socket, unsigned long client_flag, std::string groups, std::string default_file);
+XPtr<MyConnectionPtr> connection_create(Rcpp::Nullable < std::string > host, Rcpp::Nullable < std::string > user, Rcpp::Nullable < std::string > password, Rcpp::Nullable < std::string > db, unsigned int port, Rcpp::Nullable < std::string > unix_socket, unsigned long client_flag, Rcpp::Nullable < std::string > groups, Rcpp::Nullable < std::string > default_file);
 RcppExport SEXP RMySQL_connection_create(SEXP hostSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP dbSEXP, SEXP portSEXP, SEXP unix_socketSEXP, SEXP client_flagSEXP, SEXP groupsSEXP, SEXP default_fileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< std::string >::type host(hostSEXP);
-    Rcpp::traits::input_parameter< std::string >::type user(userSEXP);
-    Rcpp::traits::input_parameter< std::string >::type password(passwordSEXP);
-    Rcpp::traits::input_parameter< std::string >::type db(dbSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable < std::string > >::type host(hostSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable < std::string > >::type user(userSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable < std::string > >::type password(passwordSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable < std::string > >::type db(dbSEXP);
     Rcpp::traits::input_parameter< unsigned int >::type port(portSEXP);
-    Rcpp::traits::input_parameter< std::string >::type unix_socket(unix_socketSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable < std::string > >::type unix_socket(unix_socketSEXP);
     Rcpp::traits::input_parameter< unsigned long >::type client_flag(client_flagSEXP);
-    Rcpp::traits::input_parameter< std::string >::type groups(groupsSEXP);
-    Rcpp::traits::input_parameter< std::string >::type default_file(default_fileSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable < std::string > >::type groups(groupsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable < std::string > >::type default_file(default_fileSEXP);
     __result = Rcpp::wrap(connection_create(host, user, password, db, port, unix_socket, client_flag, groups, default_file));
     return __result;
 END_RCPP

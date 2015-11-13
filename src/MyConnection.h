@@ -18,10 +18,15 @@ class MyConnection : boost::noncopyable {
 
 public:
 
-  MyConnection(std::string host, std::string user, std::string password,
-               std::string db, unsigned int port, std::string unix_socket,
-               unsigned long client_flag, std::string groups,
-               std::string default_file) :
+  MyConnection(Rcpp::Nullable < std::string > host,
+               Rcpp::Nullable < std::string > user,
+               Rcpp::Nullable < std::string > password,
+               Rcpp::Nullable < std::string > db,
+               unsigned int port,
+               Rcpp::Nullable < std::string > unix_socket,
+               unsigned long client_flag,
+               Rcpp::Nullable < std::string > groups,
+               Rcpp::Nullable < std::string > default_file) :
     pCurrentResult_(NULL)
   {
 
@@ -30,15 +35,21 @@ public:
     mysql_options(pConn_, MYSQL_OPT_LOCAL_INFILE, 0);
     // Default to UTF-8
     mysql_options(pConn_, MYSQL_SET_CHARSET_NAME, "UTF8");
-    if (groups != "")
-      mysql_options(pConn_, MYSQL_READ_DEFAULT_GROUP, groups.c_str());
-    if (default_file != "")
-      mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE, default_file.c_str());
+    if (!groups.isNull())
+      mysql_options(pConn_, MYSQL_READ_DEFAULT_GROUP,
+                    Rcpp::as<std::string>(groups).c_str());
+    if (!default_file.isNull())
+      mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE,
+                    Rcpp::as<std::string>(default_file).c_str());
 
-
-    if (!mysql_real_connect(pConn_, host.c_str(), user.c_str(),
-        password.c_str(), db == "" ? NULL : db.c_str(), port,
-        unix_socket == "" ? NULL : unix_socket.c_str(), client_flag)) {
+    if (!mysql_real_connect(pConn_,
+        host.isNull() ? NULL : Rcpp::as<std::string>(host).c_str(),
+        user.isNull() ? NULL : Rcpp::as<std::string>(user).c_str(),
+        password.isNull() ? NULL : Rcpp::as<std::string>(password).c_str(),
+        db.isNull() ? NULL : Rcpp::as<std::string>(db).c_str(),
+        port,
+        unix_socket.isNull() ? NULL : Rcpp::as<std::string>(unix_socket).c_str(),
+        client_flag)) {
       mysql_close(pConn_);
       Rcpp::stop("Failed to connect: %s", mysql_error(pConn_));
     }
