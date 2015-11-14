@@ -1,16 +1,5 @@
 context("queries")
 
-test_that("correctly computes affected rows", {
-  conn <- mysqlDefault()
-  dbWriteTable(conn, 'iris', datasets::iris, temporary = TRUE)
-  rs <- dbSendQuery(conn, "DELETE FROM iris WHERE Species = 'versicolor'")
-
-  expect_equal(dbGetRowsAffected(rs), sum(iris$Species == 'versicolor'))
-
-  dbClearResult(rs)
-  dbDisconnect(conn)
-})
-
 # Can't test this in a generic fashion
 test_that("setting parameter query is always complete", {
   conn <- mysqlDefault()
