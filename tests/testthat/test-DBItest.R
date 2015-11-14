@@ -3,6 +3,7 @@ DBItest::test_all(c(
   "constructor_strict",    # relaxed version of constructor check still active
   "get_info_driver",       # rstats-db/RSQLite#117
   "get_info_connection",   # rstats-db/RSQLite#117
+  "get_query_empty_.*",    # syntax not supported
   "data_logical",          # not an error: no logical data type
   "data_logical_null_.*",     # not an error: no logical data type
   "data_logical_int",      # not an error: no logical data type
