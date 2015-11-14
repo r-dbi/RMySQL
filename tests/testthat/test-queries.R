@@ -1,22 +1,5 @@
 context("queries")
 
-test_that("query returns expected number of rows", {
-  conn <- mysqlDefault()
-  dbWriteTable(conn, 'iris', datasets::iris, temporary = TRUE)
-  rs <- dbSendQuery(conn, "SELECT * FROM iris WHERE Species='versicolor'")
-
-  x <- dbFetch(rs, n = 2)
-  expect_equal(nrow(x), 2)
-  expect_equal(dbGetRowCount(rs), 2)
-
-  x <- dbFetch(rs, n = 2)
-  expect_equal(nrow(x), 2)
-  expect_equal(dbGetRowCount(rs), 4)
-
-  dbClearResult(rs)
-  dbDisconnect(conn)
-})
-
 test_that("correctly computes affected rows", {
   conn <- mysqlDefault()
   dbWriteTable(conn, 'iris', datasets::iris, temporary = TRUE)
