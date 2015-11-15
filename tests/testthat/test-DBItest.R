@@ -1,8 +1,15 @@
 DBItest::make_context(MySQL(), list(dbname = "test"))
 DBItest::test_all(c(
+  # getting_started
   "constructor_strict",                         # relaxed version of constructor check still active
+
+  # driver
   "get_info_driver",                            # rstats-db/RSQLite#117
+
+  # connection
   "get_info_connection",                        # rstats-db/RSQLite#117
+
+  # result
   "get_query_empty_.*",                         # syntax not supported
   "data_logical",                               # not an error: no logical data type
   "data_logical_null_.*",                       # not an error: no logical data type
@@ -24,6 +31,8 @@ DBItest::test_all(c(
   "data_timestamp_utc_null_.*",                 # syntax not supported
   "data_timestamp_parens",                      # syntax not supported
   "data_timestamp_parens_null_.*",              # syntax not supported
+
+  # sql
   "quote_string",                               # #115
   "quote_identifier_not_vectorized",            # rstats-db/DBI#24
   "roundtrip_quotes",                           # #101
@@ -34,6 +43,8 @@ DBItest::test_all(c(
   "roundtrip_factor",                           # #93
   "roundtrip_raw",                              # #111
   "roundtrip_timestamp",                        # #104
+
+  # meta
   "get_exception",                              # #106
   "bind_empty_positional_qm",                   # #116
   "bind_return_value_positional_qm",            # #116
@@ -43,6 +54,8 @@ DBItest::test_all(c(
   "bind_raw_positional_qm",                     # #110
   "bind_.*_positional_dollar",                  # not an error: named binding not supported
   "bind_.*_named_.*",                           # not an error: named binding not supported
+
+  # compliance
   "compliance",                                 # #112
   "read_only",                                  # default connection is read-write
   NULL
