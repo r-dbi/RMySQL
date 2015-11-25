@@ -1,9 +1,9 @@
 PKG_CPPFLAGS= -I../windows/libmariadbclient-2.1.0/include
 PKG_LIBS= -L../windows/libmariadbclient-2.1.0/lib${R_ARCH} -lmariadbclient -lssl -lcrypto -lgdi32 -lz -lws2_32
 
-SOURCES = $(wildcard *.c)
+SOURCES = $(wildcard *.cpp)
 
-OBJECTS = $(SOURCES:.c=.o)
+OBJECTS = $(SOURCES:.cpp=.o)
 
 all: clean winlibs $(OBJECTS)
 

@@ -4,6 +4,8 @@
 
 #include <mysql.h>
 
+extern "C" {
+
 void R_init_RMySQL(DllInfo *info){
   mysql_library_init(0,NULL,NULL);
 
@@ -28,3 +30,5 @@ void R_init_RMySQL(DllInfo *info){
 void R_unload_RMySQL(DllInfo *info){
   mysql_library_end();
 }
+
+};
