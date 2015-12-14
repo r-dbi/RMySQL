@@ -188,10 +188,10 @@ public:
 private:
   void fetchBuffer(int j) {
     unsigned long length = lengths_[j];
+    buffers_[j].resize(length);
     if (length == 0)
       return;
 
-    buffers_[j].resize(length);
     bindings_[j].buffer = &buffers_[j][0]; // might have moved
     bindings_[j].buffer_length = length;
 
