@@ -3,15 +3,16 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-XPtr<MyConnectionPtr> connection_create(std::string host,
-                                        std::string user,
-                                        std::string password,
-                                        std::string db,
-                                        unsigned int port,
-                                        std::string unix_socket,
-                                        unsigned long client_flag,
-                                        std::string groups,
-                                        std::string default_file) {
+XPtr<MyConnectionPtr> connection_create(
+    Rcpp::Nullable < std::string > host,
+    Rcpp::Nullable < std::string > user,
+    Rcpp::Nullable < std::string > password,
+    Rcpp::Nullable < std::string > db,
+    unsigned int port,
+    Rcpp::Nullable < std::string > unix_socket,
+    unsigned long client_flag,
+    Rcpp::Nullable < std::string > groups,
+    Rcpp::Nullable < std::string > default_file) {
   MyConnectionPtr* pConn = new MyConnectionPtr(
     new MyConnection(host, user, password, db, port, unix_socket, client_flag,
       groups, default_file)

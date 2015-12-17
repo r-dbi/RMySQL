@@ -50,17 +50,17 @@ NULL
 #' }
 #' @export
 setMethod("dbConnect", "MySQLDriver",
-  function(drv, dbname = "", username = "", password = "", host = "",
-    unix.socket = "", port = 0, client.flag = 0,
-    groups = "rs-dbi", default.file = "", ...) {
+  function(drv, dbname = NULL, username = NULL, password = NULL, host = NULL,
+    unix.socket = NULL, port = 0, client.flag = 0,
+    groups = "rs-dbi", default.file = NULL, ...) {
 
     ptr <- connection_create(host, username, password, dbname, port, unix.socket,
       client.flag, groups, default.file)
 
     con <- new("MySQLConnection",
       ptr = ptr,
-      host = host,
-      db = dbname
+      host = if(is.null(host)) NA_character_ else host,
+      db = if(is.null(dbname)) NA_character_ else dbname
     )
 
     dbGetQuery(con, 'SET time_zone = "+00:00"')
