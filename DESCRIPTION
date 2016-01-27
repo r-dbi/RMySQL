@@ -11,10 +11,10 @@ Authors@R: c(person("Jeroen", "Ooms", email = "jeroen.ooms@stat.ucla.edu", role 
     person("RStudio", role = "cph"),
     person("Kungliga Tekniska Högskolan", role = "ctb", comment = "Source code for timegm"))
 Depends:
-    R (>= 2.8.0),
-    DBI (>= 0.3.1.9007)
+    R (>= 2.8.0)
 Imports:
     methods,
+    DBI (>= 0.3.1.9007),
     Rcpp
 Suggests:
     testthat,
