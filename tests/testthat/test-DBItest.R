@@ -8,6 +8,7 @@ DBItest::test_all(c(
 
   # connection
   "get_info_connection",                        # rstats-db/RSQLite#117
+  "cannot_disconnect_twice",                    # TODO
 
   # result
   "get_query_empty_.*",                         # syntax not supported
