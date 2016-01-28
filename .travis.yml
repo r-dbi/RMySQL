@@ -9,7 +9,7 @@ warnings_are_errors: true
 services:
   - mysql
 
-r_check_revdep: true
+#r_check_revdep: true
 
 apt_packages:
  - libmysqlclient-dev
