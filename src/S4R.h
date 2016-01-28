@@ -1,23 +1,4 @@
-/*
- * ----
- * The name of the project is RMySQL, not RSMySQL, so at some point we
- * will inevitably break compatibility with Splus.
- *
- * FAIR WARNING!
- *
- * Jeff Horner Wed Jan 28 10:14:02 CST 2009
- * ----
- *
- * S4 (Splus5+) and R portability macros.
- *
- * This file provides additional macros to the ones in Rdefines.h (in R)
- * and S4/Splus5 S.h (see Appendix A of the green book) to
- * allow portability between R > 1.0.0, S4, and Splus5+ at the C source
- * level.  In addition to the macros in Rdefines.h and Appendix A,
- * we have macros to do x[[i][j] and x[[i]][j] <- val inside C functions,
- * macros to test for primitive data types, plus macros to test and
- * set NA's portably.
- * TODO: Macros to build and eval functions portably?
+/* Jeroen 2016: Removed #include S.h as requested by BDR.
  */
 
 #ifndef S4R_H
@@ -27,7 +8,7 @@
 extern "C" {
 #endif
 
-#  include "S.h"
+#  include "Rinternals.h"
 #  include "Rdefines.h"
 
 /* We simplify one- and two-level access to object and list

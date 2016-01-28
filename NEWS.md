@@ -1,3 +1,7 @@
+# Version 0.10.8
+
+ * Replace #include S.h with R.h as required by BDR 
+
 # Version 0.10.6
 
  * Fix configure script for OSX
