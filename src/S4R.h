@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#  include "Rinternals.h"
+#  include "R.h"
 #  include "Rdefines.h"
 
 /* We simplify one- and two-level access to object and list
