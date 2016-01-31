@@ -1,3 +1,7 @@
+# Version 0.10.9
+
+ * CRAN binary packages now use mariadb-connector-c instead of mysql-connector-c
+
 # Version 0.10.8
 
  * Replace #include S.h with R.h as required by BDR 
