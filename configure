@@ -11,9 +11,10 @@ PKG_DEB_NAME="libmysqlclient-dev | libmariadbclient-dev"
 PKG_DEB_NAME_DEBIAN="libmysqlclient-dev | libmariadb-client-lgpl-dev"
 PKG_RPM_NAME="mariadb-devel | mysql-devel"
 PKG_CSW_NAME="mysql56_dev"
-PKG_BREW_NAME="mysql-connector-c"
+PKG_BREW_NAME="mariadb-connector-c"
 PKG_TEST_HEADER="<mysql.h>"
-PKG_LIBS="-lmysqlclient -lz"
+PKG_LIBS="-lmysqlclient"
+PKG_LIBS_STATIC="-lmysqlclient -lssl -lcrypto -lz"
 
 # Use mysql_config (on Solaris /opt/csw/bin must be in PATH)
 if [ $(command -v mariadb_config) ]; then
@@ -42,11 +43,12 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     mkdir -p $BREWDIR
     echo "Auto-brewing $PKG_BREW_NAME in $BREWDIR..."
     curl -fsSL https://github.com/Homebrew/homebrew/tarball/master | tar xz --strip 1 -C $BREWDIR
-    HOMEBREW_CACHE="/tmp" $BREWDIR/bin/brew install $PKG_BREW_NAME 2>&1 | sed 's/Warning/Note/g'
-    rm -f $BREWDIR/opt/$PKG_BREW_NAME/lib/*.dylib
+    HOMEBREW_CACHE="/tmp" $BREWDIR/bin/brew install --force-bottle openssl mariadb-connector-c 2>&1 | perl -pe 's/Warning/Note/gi'
+    rm -f $BREWDIR/opt/*/lib/*/*.dylib
+    rm -f $BREWDIR/opt/*/lib/*.dylib
   fi
-  PKG_CFLAGS="-I$BREWDIR/opt/$PKG_BREW_NAME/include"
-  PKG_LIBS="-L$BREWDIR/opt/$PKG_BREW_NAME/lib $PKG_LIBS"
+  PKG_CFLAGS="-I$BREWDIR/opt/mariadb-connector-c/include/mariadb"
+  PKG_LIBS="-L$BREWDIR/opt/{openssl/lib,mariadb-connector-c/lib/mariadb} $PKG_LIBS_STATIC"
 fi
 
 # Find compiler
