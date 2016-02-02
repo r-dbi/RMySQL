@@ -22,7 +22,7 @@ devtools::install_github("rstats-db/DBI")
 devtools::install_github("rstats-db/RMySQL")
 ```
 
-The package has been setup to statically link against [libmysqlcient](http://dev.mysql.com/downloads/connector/c/) on Windows and OSX. No run-time dependencies are required.
+The package has been setup to statically link against [libmysqlclient](http://dev.mysql.com/downloads/connector/c/) on Windows and OSX. No run-time dependencies are required.
 
 ## Basic usage
 
