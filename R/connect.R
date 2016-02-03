@@ -50,9 +50,9 @@ NULL
 #' }
 #' @export
 setMethod("dbConnect", "MySQLDriver",
-  function(drv, dbname = "", username = "", password = "", host = "",
-    unix.socket = "", port = 0, client.flag = 0,
-    groups = "rs-dbi", default.file = "", ...) {
+  function(drv, dbname = NULL, username = NULL, password = NULL, host = NULL,
+    unix.socket = NULL, port = 0, client.flag = 0,
+    groups = "rs-dbi", default.file = NULL, ...) {
 
     ptr <- connection_create(host, username, password, dbname, port, unix.socket,
       client.flag, groups, default.file)
