@@ -38,3 +38,4 @@ Collate:
 Suggests:
     testthat
 LinkingTo: Rcpp, BH
+RoxygenNote: 5.0.1
