@@ -87,6 +87,7 @@ setMethod("isSQLKeyword", c("MySQLConnection", "character"),
 #' @return a logical scalar.
 #' @export
 #' @examples
+#' library(DBI)
 #' dbIsValid(MySQL())
 isIdCurrent <- function(obj)  {
   .Deprecated("dbIsValid")
