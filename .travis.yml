@@ -21,7 +21,4 @@ r_github_packages:
 
 before_install:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
-
-before_script:
-  - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';"
-  - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
+  - mysql -e "GRANT ALL PRIVILEGES ON test.* TO 'travis'@'localhost'; FLUSH PRIVILEGES;" -uroot
