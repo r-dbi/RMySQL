@@ -25,6 +25,7 @@ NULL
 #' @export
 #' @examples
 #' if (mysqlHasDefault()) {
+#' library(DBI)
 #' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #' dbWriteTable(con, "arrests", datasets::USArrests, overwrite = TRUE)
 #'
@@ -95,6 +96,7 @@ setMethod("dbGetStatement", "MySQLResult", function(res, ...) {
 #' @param ... Ignored. Needed for compatibility with generic
 #' @examples
 #' if (mysqlHasDefault()) {
+#' library(DBI)
 #' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #' dbWriteTable(con, "t1", datasets::USArrests, overwrite = TRUE)
 #'
