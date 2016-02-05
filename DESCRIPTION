@@ -39,3 +39,4 @@ Collate:
     'quote.R'
     'table.R'
     'transaction.R'
+RoxygenNote: 5.0.1
