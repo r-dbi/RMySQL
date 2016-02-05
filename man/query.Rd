@@ -59,6 +59,7 @@ fetches and clears for you.
 }
 \examples{
 if (mysqlHasDefault()) {
+library(DBI)
 con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 dbWriteTable(con, "arrests", datasets::USArrests, overwrite = TRUE)
 

@@ -22,6 +22,7 @@ This method is a straight-forward implementation of the corresponding
 generic function.
 }
 \examples{
+library(DBI)
 dbDataType(RMySQL::MySQL(), "a")
 dbDataType(RMySQL::MySQL(), 1:3)
 dbDataType(RMySQL::MySQL(), 2.5)
