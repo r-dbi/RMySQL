@@ -1,58 +1,27 @@
-# Sample .travis.yml for R projects.
-#
-# See README.md for instructions, or for more configuration options,
-# see the wiki:
-#   https://github.com/craigcitro/r-travis/wiki
+# Info:
+# https://docs.travis-ci.com/user/languages/r/
+# https://docs.travis-ci.com/user/database-setup/#MySQL
 
-language: c
+language: r
 sudo: required
-services: MySQL
+warnings_are_errors: true
 
-env:
-  - BOOTSTRAP_LATEX="1"
-  - BOOTSTRAP_LATEX="1" R_CHECK_REVDEP="1" # checks reverse depends
+services:
+  - mysql
 
-# Create a build matrix that will test a regular check
-# and also check the reverse dependencies
-matrix:
-  # http://docs.travis-ci.com/user/build-configuration/#Fast-finishing
-  # allows the build to "pass" when the non-failure-able builds are done
-  fast_finish: true
+#r_check_revdep: true
 
-  # http://docs.travis-ci.com/user/build-configuration/#Rows-That-are-Allowed-To-Fail
-  allow_failures:
-    # allows the revdep build to fail and still "pass" within travis
-    - env: BOOTSTRAP_LATEX="1" R_CHECK_REVDEP="1"
+apt_packages:
+ - libmysqlclient-dev
 
+r_github_packages:
+ - RcppCore/Rcpp
+ - rstats-db/DBI
+ - rstats-db/DBItest@production
 
 before_install:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
-  - sudo apt-get install libmysqlclient-dev
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
-  - sudo apt-get install r-bioc-biobase r-cran-rjava
-
-install:
-  - ./travis-tool.sh install_github RcppCore/Rcpp
-  - ./travis-tool.sh install_github rstats-db/DBI
-  - ./travis-tool.sh install_github jimhester/covr
-  - ./travis-tool.sh install_github rstats-db/DBItest@production
-  - ./travis-tool.sh install_deps
 
 before_script:
   - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';"
   - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
-
-script: ./travis-tool.sh run_tests
-
-after_failure:
-  - ./travis-tool.sh dump_logs
-
-after_success:
-  - Rscript -e 'covr::codecov()'
-
-notifications:
-  email:
-    on_success: change
-    on_failure: change
