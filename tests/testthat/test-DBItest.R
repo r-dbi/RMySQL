@@ -48,6 +48,7 @@ DBItest::test_all(c(
 
   # meta
   "get_exception",                              # #106
+  "get_info_result",                            # rstats-db/DBI#55
   "bind_empty_positional_qm",                   # #116
   "bind_return_value_positional_qm",            # #116
   "bind_logical_positional_qm",                 # not an error: no logical data type
