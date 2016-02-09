@@ -36,6 +36,7 @@ DBItest::test_all(c(
   # sql
   "quote_string",                               # #115
   "quote_identifier_not_vectorized",            # rstats-db/DBI#24
+  "list_fields",                                # #137
   "roundtrip_quotes",                           # #101
   "roundtrip_logical",                          # not an error: no logical data type
   "roundtrip_numeric_special",                  # #105
