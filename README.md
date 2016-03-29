@@ -1,7 +1,7 @@
 RMySQL
 ======
 
-[![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=master)](https://travis-ci.org/rstats-db/RMySQL)
+[![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=master)](https://travis-ci.org/rstats-db/RMySQL) [![Coverage Status](https://img.shields.io/codecov/c/github/rstats-db/RMySQL/master.svg)](https://codecov.io/github/rstats-db/RMySQL?branch=master)
 
 RMySQL is a database interface and MySQL driver for R. This version complies with the database interface definition as implemented in the package DBI 0.2-2. 
 
@@ -17,10 +17,12 @@ The development version from github:
 
 ```R
 # install.packages("devtools")
+devtools::install_github("RcppCore/Rcpp")
+devtools::install_github("rstats-db/DBI")
 devtools::install_github("rstats-db/RMySQL")
 ```
 
-The package has been setup to statically link against [libmysqlcient](http://dev.mysql.com/downloads/connector/c/) on Windows and OSX. No run-time dependencies are required.
+The package has been setup to statically link against [libmysqlclient](http://dev.mysql.com/downloads/connector/c/) on Windows and OSX. No run-time dependencies are required.
 
 ## Basic usage
 
