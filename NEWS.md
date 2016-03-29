@@ -1,3 +1,8 @@
+# RMySQL 0.11-2 (2016-03-29)
+
+- Use the `DBItest` package for testing (#100).
+
+
 # RMySQL 0.11-1 (2016-03-24)
 
  *  RMySQL fully supports DATE and DATETIME columns. On output, DATE columns
