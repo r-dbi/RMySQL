@@ -4,6 +4,7 @@
 
 language: r
 cache: packages
+sudo: false
 
 services:
   - mysql
