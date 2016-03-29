@@ -5,6 +5,9 @@
 language: r
 cache: packages
 
+# because of apt_packages
+sudo: required
+
 services:
   - mysql
 
