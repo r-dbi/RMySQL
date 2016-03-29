@@ -13,7 +13,14 @@ install:
 # Adapt as necessary starting from here
 
 environment:
-  GCC_PATH: mingw_32
+  global:
+    WARNINGS_ARE_ERRORS: 1
+
+  matrix:
+  - R_VERSION: devel
+  - GCC_PATH: mingw_32
+
+  - R_VERSION: patched
 
 build_script:
   - travis-tool.sh install_github rstats-db/DBI
@@ -23,7 +30,8 @@ test_script:
   - travis-tool.sh run_tests
 
 on_failure:
-  - travis-tool.sh dump_logs
+  - 7z a failure.zip *.Rcheck\*
+  - appveyor PushArtifact failure.zip
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
