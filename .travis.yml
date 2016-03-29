@@ -3,6 +3,7 @@
 # https://docs.travis-ci.com/user/database-setup/#MySQL
 
 language: r
+cache: packages
 
 services:
   - mysql
