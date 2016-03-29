@@ -46,3 +46,6 @@ setMethod("show", "MySQLConnection", function(object) {
 setMethod("dbIsValid", "MySQLConnection", function(dbObj) {
   connection_valid(dbObj@ptr)
 })
+
+#' @export
+DBI::dbGetQuery

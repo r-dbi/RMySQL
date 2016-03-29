@@ -136,6 +136,7 @@ public:
       throwError();
     case MYSQL_NO_DATA:
       complete_ = true;
+      rowsFetched_++;
       return false;
     }
     return false;
