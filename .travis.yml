@@ -17,6 +17,7 @@ apt_packages:
 r_github_packages:
  - RcppCore/Rcpp
  - rstats-db/DBI
+ - rstats-db/DBItest@production
 
 before_install:
   - mysql -e "create database IF NOT EXISTS test;" -uroot

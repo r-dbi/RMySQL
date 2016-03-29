@@ -11,11 +11,15 @@ Authors@R: c(person("Jeroen", "Ooms", email = "jeroen.ooms@stat.ucla.edu", role 
     person("RStudio", role = "cph"),
     person("Kungliga Tekniska Högskolan", role = "ctb", comment = "Source code for timegm"))
 Depends:
-    R (>= 2.8.0),
-    DBI (>= 0.3.1.9007)
+    R (>= 2.8.0)
 Imports:
     methods,
+    DBI (>= 0.3.1.9007),
     Rcpp (>= 0.12.1)
+Suggests:
+    testthat,
+    DBItest
+LinkingTo: Rcpp, BH
 License: GPL-2
 URL: https://github.com/rstats-db/rmysql,
     https://downloads.mariadb.org/connector-c/
@@ -35,7 +39,4 @@ Collate:
     'quote.R'
     'table.R'
     'transaction.R'
-Suggests:
-    testthat
-LinkingTo: Rcpp, BH
 RoxygenNote: 5.0.1
