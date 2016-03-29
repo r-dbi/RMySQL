@@ -10,11 +10,11 @@ services:
 #r_check_revdep: true
 
 apt_packages:
- - libmysqlclient-dev
+  - libmysqlclient-dev
 
 r_github_packages:
- - rstats-db/DBI
- - rstats-db/DBItest@production
+  - rstats-db/DBI
+  - rstats-db/DBItest@production
 
 before_install:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
