@@ -5,16 +5,14 @@
 language: r
 cache: packages
 
-# because of apt_packages
-sudo: required
-
 services:
   - mysql
+addons:
+  apt:
+    packages:
+      - libmysqlclient-dev
 
 #r_check_revdep: true
-
-apt_packages:
-  - libmysqlclient-dev
 
 r_github_packages:
   - rstats-db/DBI
