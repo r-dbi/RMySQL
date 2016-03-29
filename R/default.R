@@ -9,7 +9,6 @@
 #' @export
 #' @examples
 #' if (mysqlHasDefault()) {
-#'   library(DBI)
 #'   db <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #'   dbListTables(db)
 #'   dbDisconnect(db)

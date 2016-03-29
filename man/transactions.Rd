@@ -27,7 +27,6 @@ be rolled back.
 }
 \examples{
 if (mysqlHasDefault()) {
-library(DBI)
 con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 df <- data.frame(id = 1:5)
 

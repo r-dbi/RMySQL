@@ -28,7 +28,6 @@ NULL
 #' @export
 #' @examples
 #' \dontrun{
-#' library(DBI)
 #' # Connect to a MySQL database running locally
 #' con <- dbConnect(RMySQL::MySQL(), dbname = "mydb")
 #' # Connect to a remote database with username and password
@@ -79,7 +78,6 @@ setMethod("dbConnect", "MySQLDriver",
 #' @rdname dbConnect-MySQLDriver-method
 #' @examples
 #' if (mysqlHasDefault()) {
-#' library(DBI)
 #' # connect to a database and load some data
 #' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #' dbWriteTable(con, "USArrests", datasets::USArrests, overwrite = TRUE)

@@ -98,7 +98,6 @@ primitive data, e.g., it does not coerce character data to factors.
 }
 \examples{
 if (mysqlHasDefault()) {
-library(DBI)
 con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 
 # By default, row names are written in a column to row_names, and

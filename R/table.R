@@ -20,7 +20,6 @@ NULL
 #' @param ... Unused, needed for compatiblity with generic.
 #' @examples
 #' if (mysqlHasDefault()) {
-#' library(DBI)
 #' con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 #'
 #' # By default, row names are written in a column to row_names, and
@@ -238,7 +237,6 @@ setMethod("dbRemoveTable", c("MySQLConnection", "character"),
 #' @param \dots any other parameters that individual methods may need.
 #' @export
 #' @examples
-#' library(DBI)
 #' dbDataType(RMySQL::MySQL(), "a")
 #' dbDataType(RMySQL::MySQL(), 1:3)
 #' dbDataType(RMySQL::MySQL(), 2.5)

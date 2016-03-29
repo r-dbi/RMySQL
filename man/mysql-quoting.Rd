@@ -16,7 +16,6 @@ In MySQL, identifiers are enclosed in backticks, e.g. \code{`x`}.
 }
 \examples{
 if (mysqlHasDefault()) {
-  library(DBI)
   con <- dbConnect(RMySQL::MySQL())
   dbQuoteIdentifier(con, c("a b", "a`b"))
   dbQuoteString(con, c("a b", "a'b"))

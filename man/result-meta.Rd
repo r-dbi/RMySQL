@@ -27,7 +27,6 @@ See documentation of generics for more details.
 }
 \examples{
 if (mysqlHasDefault()) {
-library(DBI)
 con <- dbConnect(RMySQL::MySQL(), dbname = "test")
 dbWriteTable(con, "t1", datasets::USArrests, overwrite = TRUE)
 

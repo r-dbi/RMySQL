@@ -13,7 +13,6 @@ a logical scalar.
 DEPRECATED
 }
 \examples{
-library(DBI)
 dbIsValid(MySQL())
 }
 \keyword{internal}
