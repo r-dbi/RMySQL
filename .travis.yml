@@ -13,7 +13,6 @@ apt_packages:
  - libmysqlclient-dev
 
 r_github_packages:
- - RcppCore/Rcpp
  - rstats-db/DBI
  - rstats-db/DBItest@production
 
