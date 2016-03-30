@@ -8,9 +8,9 @@ XPtr<MyConnectionPtr> connection_create(
     const Rcpp::Nullable<std::string>& user,
     const Rcpp::Nullable<std::string>& password,
     const Rcpp::Nullable<std::string>& db,
-    const unsigned int& port,
+    unsigned int port,
     const Rcpp::Nullable<std::string>& unix_socket,
-    const unsigned long& client_flag,
+    unsigned long client_flag,
     const Rcpp::Nullable<std::string>& groups,
     const Rcpp::Nullable<std::string>& default_file) {
   MyConnectionPtr* pConn = new MyConnectionPtr(
