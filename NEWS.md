@@ -1,4 +1,9 @@
-# Version 0.11.0.9000
+# RMySQL 0.11-2 (2016-03-29)
+
+- Use the `DBItest` package for testing (#100).
+
+
+# RMySQL 0.11-1 (2016-03-24)
 
  *  RMySQL fully supports DATE and DATETIME columns. On output, DATE columns
     will be converted to vectors of `Date`s and DATETIME will be converted
@@ -40,6 +45,15 @@
  *  dbObjectId compatibility shim removed
 
  *  Add SSL support on Windows.
+
+ *  Fix repetition of strings in subsequent rows (@peternowee, #125).
+
+ *  Always set connection character set to utf-8
+
+ *  Backport build system improvements from stable branch
+
+ *  Reenable Travis-CI, switch to R Travis, collect coverage
+
 
 # Version 0.10.1
 

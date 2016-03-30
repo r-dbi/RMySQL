@@ -3,24 +3,31 @@
 # https://docs.travis-ci.com/user/database-setup/#MySQL
 
 language: r
-sudo: required
-warnings_are_errors: true
+cache: packages
+sudo: false
 
 services:
-  - mysql
+  - MySQL
+addons:
+  apt:
+    packages:
+      - libmysqlclient-dev
 
 #r_check_revdep: true
 
-apt_packages:
- - libmysqlclient-dev
-
 r_github_packages:
- - RcppCore/Rcpp
- - rstats-db/DBI
+  - rstats-db/DBI
+  - jimhester/covr
+  - rstats-db/DBItest@production
 
 before_install:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
+  - mysql -e "GRANT ALL PRIVILEGES ON test.* TO 'travis'@'localhost'; FLUSH PRIVILEGES;" -uroot
 
-before_script:
-  - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';"
-  - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
+after_success:
+  - Rscript -e 'covr::codecov()'
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
