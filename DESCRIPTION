@@ -15,7 +15,7 @@ Depends:
 Imports:
     methods,
     DBI (>= 0.3.1.9007),
-    Rcpp (>= 0.12.1)
+    Rcpp (>= 0.12.4)
 Suggests:
     testthat,
     DBItest
