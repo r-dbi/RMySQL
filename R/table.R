@@ -260,19 +260,3 @@ setMethod("dbDataType", "MySQLDriver", function(dbObj, obj, ...) {
     stop("Unsupported type", call. = FALSE)
   )
 })
-
-roundTrip <- function(x) {
-  con <- mysqlDefault()
-
-  # Turn into a list avoiding all coercions
-  df <- list(x)
-  names(df) <- "x"
-  attr(df, "row.names") <- .set_row_names(length(x))
-  class(df) <- "data.frame"
-
-  dbWriteTable(con, "round_trip_test", df, temporary = TRUE)
-  y <- dbReadTable(con, "round_trip_test")[[1]]
-  dbDisconnect(con)
-
-  y
-}
