@@ -57,9 +57,9 @@ public:
 
   Rcpp::List connectionInfo() {
     return Rcpp::List::create(
-      Rcpp::_["host"] = mysql_get_host_info(pConn_),
-      Rcpp::_["server"] = mysql_get_server_info(pConn_),
-      Rcpp::_["client"] = mysql_get_client_info()
+      Rcpp::_["host"] = std::string(mysql_get_host_info(pConn_)),
+      Rcpp::_["server"] = std::string(mysql_get_server_info(pConn_)),
+      Rcpp::_["client"] = std::string(mysql_get_client_info())
     );
   }
 
