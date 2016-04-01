@@ -14,7 +14,7 @@ NULL
 #'
 #' @param conn an \code{\linkS4class{MySQLConnection}} object.
 #' @param res A  \code{\linkS4class{MySQLResult}} object.
-#' @inheritParams DBI::rownamesToColumn
+#' @inheritParams DBI::sqlRownamesToColumn
 #' @param n Number of rows to retrieve. Use -1 to retrieve all rows.
 #' @param params A list of query parameters to be substituted into
 #'   a parameterised query.
