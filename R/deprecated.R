@@ -119,7 +119,7 @@ mysqlBuildTableDefinition <- function(dbObj, name, obj, field.types = NULL,
   if (!is.data.frame(obj)) {
     obj <- as.data.frame(obj)
   }
-  value <- columnToRownames(obj, row.names)
+  value <- sqlColumnToRownames(obj, row.names)
 
   if (is.null(field.types)) {
     field.types <- vapply(value, dbDataType, dbObj = dbObj,
