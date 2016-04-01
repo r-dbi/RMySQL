@@ -44,7 +44,7 @@ NULL
 #' @rdname query
 setMethod("dbFetch", c("MySQLResult", "numeric"),
   function(res, n = -1, ..., row.names = NA) {
-    columnToRownames(result_fetch(res@ptr, n), row.names)
+    sqlColumnToRownames(result_fetch(res@ptr, n), row.names)
   }
 )
 
