@@ -42,6 +42,9 @@ public:
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE,
                     Rcpp::as<std::string>(default_file).c_str());
 
+    /* Required to enable SSL, which may be set in the default file */
+    mysql_ssl_set(pConn_, NULL, NULL, NULL, NULL, NULL);
+
     if (!mysql_real_connect(pConn_,
         host.isNull() ? NULL : Rcpp::as<std::string>(host).c_str(),
         user.isNull() ? NULL : Rcpp::as<std::string>(user).c_str(),
