@@ -6,9 +6,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
-const char* as_api_string(const Rcpp::Nullable<std::string>& cpp_string) {
-  return cpp_string.isNull() ? NULL : Rcpp::as<std::string>(cpp_string).c_str();
-}
+#define AS_API_STRING(X) (X.isNull() ? NULL : Rcpp::as<std::string>(X).c_str())
 
 class MyResult;
 
@@ -45,31 +43,31 @@ public:
     mysql_options(pConn_, MYSQL_SET_CHARSET_NAME, "UTF8");
 
     if (!groups.isNull())
-      mysql_options(pConn_, MYSQL_READ_DEFAULT_GROUP, as_api_string(groups));
+      mysql_options(pConn_, MYSQL_READ_DEFAULT_GROUP, AS_API_STRING(groups));
 
     if (!default_file.isNull())
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE,
-                    as_api_string(default_file));
+                    AS_API_STRING(default_file));
 
     if (!ssl_key.isNull() || !ssl_cert.isNull() || !ssl_ca.isNull() ||
         !ssl_capath.isNull() || !ssl_cipher.isNull()) {
       mysql_ssl_set(
         pConn_,
-        as_api_string(ssl_key),
-        as_api_string(ssl_cert),
-        as_api_string(ssl_ca),
-        as_api_string(ssl_capath),
-        as_api_string(ssl_cipher)
+        AS_API_STRING(ssl_key),
+        AS_API_STRING(ssl_cert),
+        AS_API_STRING(ssl_ca),
+        AS_API_STRING(ssl_capath),
+        AS_API_STRING(ssl_cipher)
       );
     }
 
     if (!mysql_real_connect(pConn_,
-        as_api_string(host),
-        as_api_string(user),
-        as_api_string(password),
-        as_api_string(db),
+        AS_API_STRING(host),
+        AS_API_STRING(user),
+        AS_API_STRING(password),
+        AS_API_STRING(db),
         port,
-        as_api_string(unix_socket),
+        AS_API_STRING(unix_socket),
         client_flag)) {
       mysql_close(pConn_);
       Rcpp::stop("Failed to connect: %s", mysql_error(pConn_));
