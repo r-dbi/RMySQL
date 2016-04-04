@@ -24,6 +24,7 @@ NULL
 #'   for setting authentication parameters (see \code{\link{MySQL}}).
 #' @param default.file string of the filename with MySQL client options.
 #'   Defaults to \code{\$HOME/.my.cnf}
+#' @param ssl.ca (optional) string of the filename of an SSL CA to use.
 #' @param ... Unused, needed for compatibility with generic.
 #' @export
 #' @examples
@@ -52,10 +53,10 @@ NULL
 setMethod("dbConnect", "MySQLDriver",
   function(drv, dbname = NULL, username = NULL, password = NULL, host = NULL,
     unix.socket = NULL, port = 0, client.flag = 0,
-    groups = "rs-dbi", default.file = NULL, ...) {
+    groups = "rs-dbi", default.file = NULL, ssl.ca = NULL, ...) {
 
     ptr <- connection_create(host, username, password, dbname, port, unix.socket,
-      client.flag, groups, default.file)
+      client.flag, groups, default.file, ssl.ca)
 
     con <- new("MySQLConnection",
       ptr = ptr,

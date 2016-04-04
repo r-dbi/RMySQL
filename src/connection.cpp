@@ -12,10 +12,11 @@ XPtr<MyConnectionPtr> connection_create(
     const Rcpp::Nullable<std::string>& unix_socket,
     unsigned long client_flag,
     const Rcpp::Nullable<std::string>& groups,
-    const Rcpp::Nullable<std::string>& default_file) {
+    const Rcpp::Nullable<std::string>& default_file,
+    const Rcpp::Nullable<std::string>& ssl_ca) {
   MyConnectionPtr* pConn = new MyConnectionPtr(
     new MyConnection(host, user, password, db, port, unix_socket, client_flag,
-      groups, default_file)
+      groups, default_file, ssl_ca)
   );
   return XPtr<MyConnectionPtr>(pConn, true);
 }

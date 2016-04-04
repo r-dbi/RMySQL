@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // connection_create
-XPtr<MyConnectionPtr> connection_create(const Rcpp::Nullable<std::string>& host, const Rcpp::Nullable<std::string>& user, const Rcpp::Nullable<std::string>& password, const Rcpp::Nullable<std::string>& db, unsigned int port, const Rcpp::Nullable<std::string>& unix_socket, unsigned long client_flag, const Rcpp::Nullable<std::string>& groups, const Rcpp::Nullable<std::string>& default_file);
-RcppExport SEXP RMySQL_connection_create(SEXP hostSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP dbSEXP, SEXP portSEXP, SEXP unix_socketSEXP, SEXP client_flagSEXP, SEXP groupsSEXP, SEXP default_fileSEXP) {
+XPtr<MyConnectionPtr> connection_create(const Rcpp::Nullable<std::string>& host, const Rcpp::Nullable<std::string>& user, const Rcpp::Nullable<std::string>& password, const Rcpp::Nullable<std::string>& db, unsigned int port, const Rcpp::Nullable<std::string>& unix_socket, unsigned long client_flag, const Rcpp::Nullable<std::string>& groups, const Rcpp::Nullable<std::string>& default_file, const Rcpp::Nullable<std::string>& ssl_ca);
+RcppExport SEXP RMySQL_connection_create(SEXP hostSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP dbSEXP, SEXP portSEXP, SEXP unix_socketSEXP, SEXP client_flagSEXP, SEXP groupsSEXP, SEXP default_fileSEXP, SEXP ssl_caSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -21,7 +21,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< unsigned long >::type client_flag(client_flagSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type groups(groupsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type default_file(default_fileSEXP);
-    __result = Rcpp::wrap(connection_create(host, user, password, db, port, unix_socket, client_flag, groups, default_file));
+    Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type ssl_ca(ssl_caSEXP);
+    __result = Rcpp::wrap(connection_create(host, user, password, db, port, unix_socket, client_flag, groups, default_file, ssl_ca));
     return __result;
 END_RCPP
 }
