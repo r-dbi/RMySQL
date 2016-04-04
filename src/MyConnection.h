@@ -46,8 +46,8 @@ public:
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE,
                     Rcpp::as<std::string>(default_file).c_str());
 
-    if (!ssl_key.isNull() | !ssl_cert.isNull() | !ssl_ca.isNull() |
-        !ssl_capath.isNull() | !ssl_cipher.isNull()) {
+    if (!ssl_key.isNull() || !ssl_cert.isNull() || !ssl_ca.isNull() ||
+        !ssl_capath.isNull() || !ssl_cipher.isNull()) {
       mysql_ssl_set(
         pConn_,
         ssl_key.isNull() ? NULL : Rcpp::as<std::string>(ssl_key).c_str(),
