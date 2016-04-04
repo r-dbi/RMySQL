@@ -60,11 +60,11 @@ public:
       Rcpp::_["host"] = std::string(pConn_->host),
       Rcpp::_["user"] = std::string(pConn_->user),
       Rcpp::_["dbname"] = std::string(pConn_->db),
-      Rcpp::_["conType"] = mysql_get_host_info(pConn_),
-      Rcpp::_["serverVersion"] = mysql_get_server_info(pConn_),
+      Rcpp::_["conType"] = std::string(mysql_get_host_info(pConn_)),
+      Rcpp::_["serverVersion"] = std::string(mysql_get_server_info(pConn_)),
       Rcpp::_["protocolVersion"] = (int) mysql_get_proto_info(pConn_),
       Rcpp::_["threadId"] = (int) mysql_thread_id(pConn_),
-      Rcpp::_["client"] = mysql_get_client_info()
+      Rcpp::_["client"] = std::string(mysql_get_client_info())
     );
   }
 

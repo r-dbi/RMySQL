@@ -8,10 +8,17 @@ sudo: false
 
 services:
   - MySQL
-addons:
-  apt:
-    packages:
-      - libmysqlclient-dev
+
+matrix:
+  include:
+    - addons:
+        apt:
+          packages:
+            - libmysqlclient-dev
+    - addons:
+        apt:
+          packages:
+            - libmariadb-client-lgpl-dev
 
 #r_check_revdep: true
 
