@@ -26,10 +26,14 @@ public:
                const Rcpp::Nullable<std::string>& unix_socket,
                unsigned long client_flag,
                const Rcpp::Nullable<std::string>& groups,
-               const Rcpp::Nullable<std::string>& default_file) :
+               const Rcpp::Nullable<std::string>& default_file,
+               const Rcpp::Nullable<std::string>& ssl_key,
+               const Rcpp::Nullable<std::string>& ssl_cert,
+               const Rcpp::Nullable<std::string>& ssl_ca,
+               const Rcpp::Nullable<std::string>& ssl_capath,
+               const Rcpp::Nullable<std::string>& ssl_cipher) :
     pCurrentResult_(NULL)
   {
-
     pConn_ = mysql_init(NULL);
     // Enable LOCAL INFILE for fast data ingest
     mysql_options(pConn_, MYSQL_OPT_LOCAL_INFILE, 0);
@@ -41,6 +45,18 @@ public:
     if (!default_file.isNull())
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE,
                     Rcpp::as<std::string>(default_file).c_str());
+
+    if (!ssl_key.isNull() || !ssl_cert.isNull() || !ssl_ca.isNull() ||
+        !ssl_capath.isNull() || !ssl_cipher.isNull()) {
+      mysql_ssl_set(
+        pConn_,
+        ssl_key.isNull() ? NULL : Rcpp::as<std::string>(ssl_key).c_str(),
+        ssl_cert.isNull() ? NULL : Rcpp::as<std::string>(ssl_cert).c_str(),
+        ssl_ca.isNull() ? NULL : Rcpp::as<std::string>(ssl_ca).c_str(),
+        ssl_capath.isNull() ? NULL : Rcpp::as<std::string>(ssl_capath).c_str(),
+        ssl_cipher.isNull() ? NULL : Rcpp::as<std::string>(ssl_cipher).c_str()
+      );
+    }
 
     if (!mysql_real_connect(pConn_,
         host.isNull() ? NULL : Rcpp::as<std::string>(host).c_str(),
