@@ -12,26 +12,7 @@ RMySQL
 
 RMySQL is a database interface and MySQL driver for R. This version complies with the database interface definition as implemented in the package DBI 0.2-2. 
 
-## Installation
-
-The released version from CRAN:
-
-```R
-install.packages("RMySQL")
-```
-
-The development version from github:
-
-```R
-# install.packages("devtools")
-devtools::install_github("RcppCore/Rcpp")
-devtools::install_github("rstats-db/DBI")
-devtools::install_github("rstats-db/RMySQL")
-```
-
-The package has been setup to statically link against [libmysqlclient](http://dev.mysql.com/downloads/connector/c/) on Windows and OSX. No run-time dependencies are required.
-
-## Basic usage
+## Hello World
 
 ```R
 library(DBI)
@@ -62,6 +43,43 @@ dbClearResult(res)
 # Disconnect from the database
 dbDisconnect(con)
 ```
+
+## Installation
+
+Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
+
+```r
+install.packages("RMySQL")
+```
+
+The development version from github:
+
+```R
+# install.packages("devtools")
+devtools::install_github("rstats-db/DBI")
+devtools::install_github("rstats-db/RMySQL")
+```
+
+Installation from source on Linux or OSX requires [`MariaDB Connector/C`](https://downloads.mariadb.org/connector-c/). On some older platforms you can also link against Oracle's [libmysqlclient](https://packages.debian.org/testing/libmysqlclient-dev) driver but the mariadb implementation is much better.
+
+On recent __Debian or Ubuntu__ install [libmariadb-client-lgpl-dev](https://packages.debian.org/testing/libmariadb-client-lgpl-dev). In Ubuntu 14.04 this was called [libmariadbclient-dev](http://packages.ubuntu.com/trusty/libmariadbclient-dev).
+
+```
+sudo apt-get install -y libhunspell-dev
+```
+
+On __Fedora__,  __CentOS or RHEL__ we need [mariadb-devel](https://apps.fedoraproject.org/packages/mariadb-devel):
+
+```
+sudo yum install mariadb-devel
+````
+
+On __OS-X__ use [mariadb-connector-c](https://github.com/Homebrew/homebrew-core/blob/master/Formula/mariadb-connector-c.rb) from Homebrew:
+
+```
+brew install mariadb-connector-c
+```
+
 
 ## MySQL configuration file
 
