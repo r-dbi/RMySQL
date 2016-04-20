@@ -65,7 +65,7 @@ Installation from source on Linux or OSX requires [`MariaDB Connector/C`](https:
 On recent __Debian or Ubuntu__ install [libmariadb-client-lgpl-dev](https://packages.debian.org/testing/libmariadb-client-lgpl-dev). In Ubuntu 14.04 this was called [libmariadbclient-dev](http://packages.ubuntu.com/trusty/libmariadbclient-dev).
 
 ```
-sudo apt-get install -y libhunspell-dev
+sudo apt-get install -y libmariadb-client-lgpl-dev
 ```
 
 On __Fedora__,  __CentOS or RHEL__ we need [mariadb-devel](https://apps.fedoraproject.org/packages/mariadb-devel):
