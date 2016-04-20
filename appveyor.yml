@@ -12,9 +12,6 @@ install:
 
 # Adapt as necessary starting from here
 
-r_github_packages:
-  - rstats-db/DBI
-
 build_script:
   - travis-tool.sh install_deps
 
