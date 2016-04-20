@@ -7,8 +7,8 @@
 
 # Library settings
 PKG_CONFIG_NAME="libmysqlclient"
-PKG_DEB_NAME="libmysqlclient-dev | libmariadbclient-dev"
-PKG_DEB_NAME_DEBIAN="libmysqlclient-dev | libmariadb-client-lgpl-dev"
+PKG_DEB_NAME="libmariadbclient-dev"
+PKG_DEB_NAME_DEBIAN="libmariadb-client-lgpl-dev"
 PKG_RPM_NAME="mariadb-devel | mysql-devel"
 PKG_CSW_NAME="mysql56_dev"
 PKG_BREW_NAME="mariadb-connector-c"
@@ -67,8 +67,8 @@ echo "#include $PKG_TEST_HEADER" | ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E 
 if [ $R_CONFIG_ERROR ]; then
   echo "------------------------- ANTICONF ERROR ---------------------------"
   echo "Configuration failed because $PKG_CONFIG_NAME was not found. Try installing:"
-  echo " * deb: $PKG_DEB_NAME_DEBIAN (Debian)"
-  echo "        $PKG_DEB_NAME (Ubuntu)"
+  echo " * deb: $PKG_DEB_NAME_DEBIAN (Debian, Ubuntu 16.04)"
+  echo "        $PKG_DEB_NAME (Ubuntu 14.04)"
   echo " * rpm: $PKG_RPM_NAME (Fedora, CentOS, RHEL)"
   echo " * csw: $PKG_CSW_NAME (Solaris)"
   echo " * brew: $PKG_BREW_NAME (OSX)"
