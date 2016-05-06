@@ -259,7 +259,7 @@ SEXP RS_MySQL_fetch(SEXP rsHandle, SEXP max_rec) {
   result = RS_DBI_getResultSet(rsHandle);
   flds = result->fields;
   if(!flds)
-    error("corrupt resultSet, missing fieldDescription");
+    return R_NilValue;
   num_rec = asInteger(max_rec);
   expand = (num_rec < 0);   // dyn expand output to accommodate all rows
   if(expand || num_rec == 0){
