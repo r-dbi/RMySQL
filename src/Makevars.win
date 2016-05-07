@@ -1,10 +1,10 @@
 PKG_CPPFLAGS= -I../windows/libmariadbclient-2.1.0/include
 PKG_LIBS= -L../windows/libmariadbclient-2.1.0/lib${R_ARCH} -lmariadbclient -lssl -lcrypto -lgdi32 -lz -lws2_32
 
-all: clean winlibs $(OBJECTS)
-
-clean:
-	rm -f $(OBJECTS) $(SHLIB)
+all: clean winlibs
 
 winlibs:
 	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
+
+clean:
+	rm -f $(OBJECTS) $(SHLIB)
