@@ -1,6 +1,6 @@
 # Version 0.10.9
 
- * CRAN binary packages now use mariadb-connector-c instead of mysql-connector-c
+ * OSX binary packages for OSX now use mariadb-connector-c instead of mysql-connector-c
  
  * CMD check fix for DBI 0.4
 
