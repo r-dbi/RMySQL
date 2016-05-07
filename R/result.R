@@ -16,6 +16,8 @@ setAs("MySQLResult", "MySQLConnection", function(from) {
 
 mysqlFetch <- function(res, n, ...) {
   rel <- .Call(RS_MySQL_fetch, res@Id, nrec = as.integer(n))
+  if (is.null(rel))
+    return(data.frame())
 
   if (length(rel) > 0) {
     n <- length(rel[[1]])
