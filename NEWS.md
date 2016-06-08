@@ -1,3 +1,15 @@
+# RMySQL 0.11-3 (2016-06-08)
+
+- Fix failing compilation on Linux if a  function is declared elsewhere.
+- More robust check for numeric `NA` values.
+- New SSL-related arguments to `dbConnect()`: `ssl.key`, `ssl.cert`, `ssl.ca`, `ssl.capath`, `ssl.cipher` (#131, #148, @adamchainz).
+- Add `TAGS` file to .gitignore (@sambrightman, #78).
+- Can build with MariaDB libraries on Ubuntu (#145).
+- Use new `sqlRownamesToColumn()` and `sqlColumnToRownames()` (rstats-db/DBI#91).
+- Use `const&` for `Rcpp::Nullable` (@peternowee, #129).
+- Use container-based builds on Travis (#143).
+
+
 # RMySQL 0.11-2 (2016-03-29)
 
 - Use the `DBItest` package for testing (#100).
