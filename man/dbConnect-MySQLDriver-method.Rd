@@ -8,7 +8,9 @@
 \usage{
 \S4method{dbConnect}{MySQLDriver}(drv, dbname = NULL, username = NULL,
   password = NULL, host = NULL, unix.socket = NULL, port = 0,
-  client.flag = 0, groups = "rs-dbi", default.file = NULL, ...)
+  client.flag = 0, groups = "rs-dbi", default.file = NULL,
+  ssl.key = NULL, ssl.cert = NULL, ssl.ca = NULL, ssl.capath = NULL,
+  ssl.cipher = NULL, ...)
 
 MySQL(max.con = 16, fetch.default.rec = 500)
 }
@@ -39,6 +41,20 @@ for setting authentication parameters (see \code{\link{MySQL}}).}
 
 \item{default.file}{string of the filename with MySQL client options.
 Defaults to \code{\$HOME/.my.cnf}}
+
+\item{ssl.key}{(optional) string of the filename of the SSL key file to use.}
+
+\item{ssl.cert}{(optional) string of the filename of the SSL certificate to
+use.}
+
+\item{ssl.ca}{(optional) string of the filename of an SSL certificate
+authority file to use.}
+
+\item{ssl.capath}{(optional) string of the path to a directory containing
+the trusted SSL CA certificates in PEM format.}
+
+\item{ssl.cipher}{(optional) string list of permitted ciphers to use for SSL
+encryption.}
 
 \item{...}{Unused, needed for compatibility with generic.}
 

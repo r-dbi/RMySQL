@@ -4,18 +4,23 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 XPtr<MyConnectionPtr> connection_create(
-    Rcpp::Nullable < std::string > host,
-    Rcpp::Nullable < std::string > user,
-    Rcpp::Nullable < std::string > password,
-    Rcpp::Nullable < std::string > db,
+    const Rcpp::Nullable<std::string>& host,
+    const Rcpp::Nullable<std::string>& user,
+    const Rcpp::Nullable<std::string>& password,
+    const Rcpp::Nullable<std::string>& db,
     unsigned int port,
-    Rcpp::Nullable < std::string > unix_socket,
+    const Rcpp::Nullable<std::string>& unix_socket,
     unsigned long client_flag,
-    Rcpp::Nullable < std::string > groups,
-    Rcpp::Nullable < std::string > default_file) {
+    const Rcpp::Nullable<std::string>& groups,
+    const Rcpp::Nullable<std::string>& default_file,
+    const Rcpp::Nullable<std::string>& ssl_key,
+    const Rcpp::Nullable<std::string>& ssl_cert,
+    const Rcpp::Nullable<std::string>& ssl_ca,
+    const Rcpp::Nullable<std::string>& ssl_capath,
+    const Rcpp::Nullable<std::string>& ssl_cipher) {
   MyConnectionPtr* pConn = new MyConnectionPtr(
     new MyConnection(host, user, password, db, port, unix_socket, client_flag,
-      groups, default_file)
+      groups, default_file, ssl_key, ssl_cert, ssl_ca, ssl_capath, ssl_cipher)
   );
   return XPtr<MyConnectionPtr>(pConn, true);
 }

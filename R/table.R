@@ -16,7 +16,7 @@ NULL
 #' @param name a character string specifying a table name.
 #' @param check.names If \code{TRUE}, the default, column names will be
 #'   converted to valid R identifiers.
-#' @inheritParams DBI::rownamesToColumn
+#' @inheritParams DBI::sqlRownamesToColumn
 #' @param ... Unused, needed for compatiblity with generic.
 #' @examples
 #' if (mysqlHasDefault()) {
@@ -47,7 +47,7 @@ setMethod("dbReadTable", c("MySQLConnection", "character"),
   }
 )
 
-#' @inheritParams DBI::rownamesToColumn
+#' @inheritParams DBI::sqlRownamesToColumn
 #' @param overwrite a logical specifying whether to overwrite an existing table
 #'   or not. Its default is \code{FALSE}. (See the BUGS section below)
 #' @param append a logical specifying whether to append to an existing table
@@ -120,7 +120,7 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
 )
 
 setMethod("sqlData", "MySQLConnection", function(con, value, row.names = NA, ...) {
-  value <- rownamesToColumn(value, row.names)
+  value <- sqlRownamesToColumn(value, row.names)
 
   # Convert factors to strings
   is_factor <- vapply(value, is.factor, logical(1))
@@ -244,7 +244,6 @@ setMethod("dbDataType", "MySQLConnection", function(dbObj, obj, ...) {
   dbDataType(MySQL(), obj, ...)
 })
 
-#' @rdname dbDataType-MySQLConnection-ANY-method
 #' @export
 setMethod("dbDataType", "MySQLDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")

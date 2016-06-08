@@ -4,8 +4,10 @@
 #include <Rcpp.h>
 #include "MyTypes.h"
 
+#ifdef WIN32
 // In timegm.cpp
 time_t timegm(struct tm *tm);
+#endif
 
 // Generic data frame utils ----------------------------------------------------
 

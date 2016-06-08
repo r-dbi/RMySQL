@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.11-2
+Version: 0.11-3
 Title: Database Interface and MySQL Driver for R
 Encoding: UTF-8
 Description: Implements DBI-compliant Interface to MySQL and MariaDB Databases.
@@ -15,7 +15,7 @@ Depends:
 Imports:
     methods,
     DBI (>= 0.3.1.9007),
-    Rcpp (>= 0.12.1)
+    Rcpp (>= 0.12.4)
 Suggests:
     testthat,
     DBItest
