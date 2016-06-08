@@ -74,7 +74,7 @@ public:
         bindings_[j].buffer = &INTEGER(col)[i];
         break;
       case MY_DBL:
-        if (REAL(col)[i] == NA_REAL) {
+        if (ISNA(REAL(col)[i])) {
           missing = true;
           break;
         }
