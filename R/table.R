@@ -244,7 +244,6 @@ setMethod("dbDataType", "MySQLConnection", function(dbObj, obj, ...) {
   dbDataType(MySQL(), obj, ...)
 })
 
-#' @rdname dbDataType-MySQLConnection-ANY-method
 #' @export
 setMethod("dbDataType", "MySQLDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
