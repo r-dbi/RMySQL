@@ -84,8 +84,6 @@ setMethod("dbConnect", "MySQLDriver",
 #' @param fetch.default.rec DEPRECATED
 #' @export
 #' @import methods DBI
-#' @importFrom Rcpp sourceCpp
-#' @useDynLib RMySQL
 #' @rdname dbConnect-MySQLDriver-method
 #' @examples
 #' if (mysqlHasDefault()) {
