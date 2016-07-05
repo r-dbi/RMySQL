@@ -1,18 +1,40 @@
-# Info:
-# https://docs.travis-ci.com/user/languages/r/
-# https://docs.travis-ci.com/user/database-setup/#MySQL
-
 language: r
-sudo: required
-warnings_are_errors: true
+cache: packages
 
 services:
   - mysql
 
+matrix:
+  include:
+    - os: linux
+      dist: precise
+      sudo: false
+    - os: linux
+      dist: trusty
+      env: R_CODECOV=true
+    - os: osx
+      osx_image: xcode7.2
+      brew_packages: mariadb-connector-c
+      latex: false
+    - os: osx
+      osx_image: beta-xcode6.1
+      disable_homebrew: true
+
+addons:
+  apt:
+    packages:
+      - libmariadbclient-dev
+
+r_github_packages:
+  - jimhester/covr
+
+warnings_are_errors: true
 #r_check_revdep: true
 
-apt_packages:
- - libmysqlclient-dev
+notifications:
+  email:
+    on_success: change
+    on_failure: change
 
 before_install:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
@@ -20,3 +42,6 @@ before_install:
 before_script:
   - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';"
   - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
+
+after_success:
+  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
