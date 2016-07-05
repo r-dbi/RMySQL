@@ -1,9 +1,6 @@
 language: r
 cache: packages
 
-services:
-  - mysql
-
 matrix:
   include:
     - os: linux
@@ -21,6 +18,7 @@ matrix:
       disable_homebrew: true
 
 addons:
+  mariadb
   apt:
     packages:
       - libmariadbclient-dev
