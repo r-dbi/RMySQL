@@ -18,7 +18,7 @@ matrix:
       disable_homebrew: true
 
 addons:
-  mariadb
+  mariadb: true
   apt:
     packages:
       - libmariadbclient-dev
