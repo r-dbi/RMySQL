@@ -1,40 +1,47 @@
-# Info:
-# https://docs.travis-ci.com/user/languages/r/
-# https://docs.travis-ci.com/user/database-setup/#MySQL
-
 language: r
 cache: packages
-sudo: false
 
 services:
-  - MySQL
+  - mysql
 
 matrix:
   include:
-    - addons:
-        apt:
-          packages:
-            - libmysqlclient-dev
-    - addons:
-        apt:
-          packages:
-            - libmariadb-client-lgpl-dev
+    - os: linux
+      dist: precise
+      sudo: false
+    - os: linux
+      dist: trusty
+      env: R_CODECOV=true
+    - os: osx
+      osx_image: xcode7.2
+      brew_packages: mariadb-connector-c
+      latex: false
+    - os: osx
+      osx_image: beta-xcode6.1
+      disable_homebrew: true
 
-#r_check_revdep: true
+addons:
+  apt:
+    packages:
+      - libmariadbclient-dev
 
 r_github_packages:
-  - rstats-db/DBI
   - jimhester/covr
-  - rstats-db/DBItest@production
 
-before_install:
-  - mysql -e "create database IF NOT EXISTS test;" -uroot
-  - mysql -e "GRANT ALL PRIVILEGES ON test.* TO 'travis'@'localhost'; FLUSH PRIVILEGES;" -uroot
-
-after_success:
-  - Rscript -e 'covr::codecov()'
+warnings_are_errors: true
+#r_check_revdep: true
 
 notifications:
   email:
     on_success: change
     on_failure: change
+
+before_install:
+  - mysql -e "create database IF NOT EXISTS test;" -uroot
+
+before_script:
+  - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';"
+  - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
+
+after_success:
+  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
