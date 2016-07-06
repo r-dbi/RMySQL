@@ -135,6 +135,7 @@ setMethod("sqlData", "MySQLConnection", function(con, value, row.names = NA, ...
 
 #' @export
 #' @rdname mysql-tables
+#' @importFrom utils read.table
 #' @param sep field separator character
 #' @param eol End-of-line separator
 #' @param skip number of lines to skip before reading data in the input file.

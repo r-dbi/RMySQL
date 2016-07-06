@@ -153,6 +153,7 @@ escape <- function(table) {
 
 ## safe.write makes sure write.table doesn't exceed available memory by batching
 ## at most batch rows (but it is still slowww)
+#' @importFrom utils write.table
 safe.write <- function(value, file, batch, ...) {
   N <- nrow(value)
   if(N<1){
