@@ -57,7 +57,7 @@ inline MyFieldType variableType(enum_field_types type, bool binary) {
     return MY_RAW;
   case MYSQL_TYPE_NULL:
     return MY_INT32;
-  case MAX_NO_FIELD_TYPES:
+  default:
     throw std::runtime_error("Unimplemented MAX_NO_FIELD_TYPES");
   }
 }
