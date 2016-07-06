@@ -26,8 +26,7 @@ matrix:
     - os: osx
       osx_image: beta-xcode6.1
       disable_homebrew: true
-      addons:
-        mariadb: '10.2'
+      r_check_args: '--no-tests'
 
 r_github_packages:
   - jimhester/covr
@@ -41,9 +40,8 @@ notifications:
     on_failure: change
 
 before_install:
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then mysql.server start; fi
   - mysql -e "create database IF NOT EXISTS test;" -uroot
-
-before_script:
   - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';" -uroot
   - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
 
