@@ -17,11 +17,14 @@ matrix:
             - libmariadbclient-dev
     - os: osx
       osx_image: xcode7.2
-      brew_packages: mysql
+      brew_packages:
+        - mysql
+        - mysql-connector-c
       latex: false
     - os: osx
       osx_image: xcode7.2
       brew_packages: mariadb
+      env: 'startmysql=true'
       latex: false
     - os: osx
       osx_image: beta-xcode6.1
@@ -40,7 +43,7 @@ notifications:
     on_failure: change
 
 before_install:
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then mysql.server start; fi
+  - if [ "${startmysql}" ]; then mysql.server start; fi
   - mysql -e "create database IF NOT EXISTS test;" -uroot
   - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';" -uroot
   - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
