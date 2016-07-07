@@ -25,7 +25,8 @@ URL: https://github.com/rstats-db/rmysql,
     https://downloads.mariadb.org/connector-c/
 BugReports: https://github.com/rstats-db/rmysql/issues
 SystemRequirements: libmariadb-client-lgpl-dev or libmysqlclient-dev (deb),
-    mariadb-devel (rpm), mariadb or mysql-connector-c (brew).
+    mariadb-connector-c-devel or mariadb-devel (rpm),
+    mariadb-connector-c or mysql-connector-c (brew)
 NeedsCompilation: yes
 Collate:
     'MySQLConnection.R'
