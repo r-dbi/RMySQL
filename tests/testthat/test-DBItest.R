@@ -1,10 +1,3 @@
-DBItest::make_context(
-  MySQL(),
-  list(dbname = "test", username = "", password = ""),
-  tweaks = DBItest::tweaks(
-    constructor_relax_args = TRUE
-  ),
-  name = "RMySQL")
 DBItest::test_all(c(
   # getting_started
   "constructor_strict",                         # relaxed version of constructor check still active
