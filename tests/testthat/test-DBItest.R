@@ -58,6 +58,10 @@ DBItest::test_all(c(
   "bind_.*_positional_dollar",                  # not an error: named binding not supported
   "bind_.*_named_.*",                           # not an error: named binding not supported
 
+  # transactions
+  "commit_without_begin",                       # 167
+  "begin_begin",                                # 167
+
   # compliance
   "compliance",                                 # #112
   "read_only",                                  # default connection is read-write
