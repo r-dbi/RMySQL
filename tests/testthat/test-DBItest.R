@@ -49,12 +49,12 @@ DBItest::test_all(c(
   # meta
   "get_exception",                              # #106
   "get_info_result",                            # rstats-db/DBI#55
-  "bind_empty_positional_qm",                   # #116
-  "bind_return_value_positional_qm",            # #116
-  "bind_logical_positional_qm",                 # not an error: no logical data type
-  "bind_character_positional_qm",               # #93
-  "bind_timestamp_lt_positional_qm",            # #110
-  "bind_raw_positional_qm",                     # #110
+  "bind_empty.*",                               # #116
+  "bind_return_value.*",                        # #116
+  "bind_logical.*",                             # not an error: no logical data type
+  "bind_character.*",                           # #93
+  "bind_timestamp_lt.*",                        # #110
+  "bind_raw.*",                                 # #110
   "bind_.*_positional_dollar",                  # not an error: named binding not supported
   "bind_.*_named_.*",                           # not an error: named binding not supported
 
