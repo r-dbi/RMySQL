@@ -51,7 +51,7 @@ DBItest::test_all(c(
   "get_info_result",                            # rstats-db/DBI#55
   "bind_empty.*",                               # #116
   "bind_return_value.*",                        # #116
-  "bind_multi_row",                             # #170
+  "bind_multi_row.*",                           # #170
   "bind_logical.*",                             # not an error: no logical data type
   "bind_character.*",                           # #93
   "bind_timestamp_lt.*",                        # #110
