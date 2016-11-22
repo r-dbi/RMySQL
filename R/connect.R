@@ -9,10 +9,10 @@ NULL
 #' @param drv an object of class \code{MySQLDriver}, or the character string
 #'   "MySQL" or an \code{MySQLConnection}.
 #' @param username,password Username and password. If username omitted,
-#'   defaults to the current user. If password is ommitted, only users
+#'   defaults to the current user. If password is omitted, only users
 #'   without a password can log in.
 #' @param dbname string with the database name or NULL. If not NULL, the
-#'   connection sets the default daabase to this value.
+#'   connection sets the default database to this value.
 #' @param host string identifying the host machine running the MySQL server or
 #'   NULL. If NULL or the string \code{"localhost"}, a connection to the local
 #'   host is assumed.
