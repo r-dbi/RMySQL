@@ -4,6 +4,7 @@
 \name{RMySQL}
 \alias{RMySQL}
 \alias{RMySQL-package}
+\alias{RMySQL-package}
 \title{RMySQL: Database Interface and MySQL Driver for R}
 \description{
 Implements a DBI interface to MySQL and MariaDB databases.
@@ -11,4 +12,3 @@ Implements a DBI interface to MySQL and MariaDB databases.
 \seealso{
 the \href{https://cran.r-project.org/web/packages/RMySQL/RMySQL.pdf}{package documentation}.
 }
-
