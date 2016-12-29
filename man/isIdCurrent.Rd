@@ -16,4 +16,3 @@ DEPRECATED
 dbIsValid(MySQL())
 }
 \keyword{internal}
-

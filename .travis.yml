@@ -1,40 +1,61 @@
-# Info:
-# https://docs.travis-ci.com/user/languages/r/
-# https://docs.travis-ci.com/user/database-setup/#MySQL
-
 language: r
 cache: packages
-sudo: false
-
-services:
-  - MySQL
 
 matrix:
   include:
-    - addons:
+    - os: linux
+      dist: precise
+      sudo: false
+      service: mysql
+    - os: linux
+      dist: trusty
+      sudo: required
+      env: R_CODECOV=true
+      addons:
         apt:
           packages:
-            - libmysqlclient-dev
-    - addons:
-        apt:
-          packages:
-            - libmariadb-client-lgpl-dev
-
-#r_check_revdep: true
+            - mariadb-server
+            - libmariadbclient-dev
+    - os: osx
+      osx_image: xcode8.1
+      before_install:
+        - brew install mariadb
+        - mysql.server start
+      latex: false
+    - os: osx
+      osx_image: xcode8.1
+      before_install:
+        - brew install mysql
+        - mysql.server start
+      latex: false
+    - os: osx
+      osx_image: xcode8.1
+      disable_homebrew: true
+      r_check_args: '--no-tests'
+      before_script: 'echo no sql server, only testing build'
+    - os: osx
+      osx_image: beta-xcode6.1
+      disable_homebrew: true
+      r_check_args: '--no-tests'
+      before_script: 'echo no sql server, only testing build'
 
 r_github_packages:
   - rstats-db/DBI
   - jimhester/covr
   - rstats-db/DBItest@production
 
-before_install:
-  - mysql -e "create database IF NOT EXISTS test;" -uroot
-  - mysql -e "GRANT ALL PRIVILEGES ON test.* TO 'travis'@'localhost'; FLUSH PRIVILEGES;" -uroot
-
-after_success:
-  - Rscript -e 'covr::codecov()'
+warnings_are_errors: true
+#r_check_revdep: true
 
 notifications:
   email:
     on_success: change
     on_failure: change
+
+before_script:
+  - mysql -e "create database IF NOT EXISTS test;" -uroot
+  - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';" -uroot
+  - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
+
+after_success:
+  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi

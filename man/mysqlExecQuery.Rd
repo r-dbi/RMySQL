@@ -19,4 +19,3 @@ query interface even if you have zero parameter. However, some queries
 paramaterised interface. This function allows you to submit those queries
 directly.
 }
-

@@ -3,9 +3,12 @@
 \docType{methods}
 \name{dbDataType,MySQLConnection-method}
 \alias{dbDataType,MySQLConnection-method}
+\alias{dbDataType,MySQLDriver-method}
 \title{Determine the SQL Data Type of an S object}
 \usage{
 \S4method{dbDataType}{MySQLConnection}(dbObj, obj, ...)
+
+\S4method{dbDataType}{MySQLDriver}(dbObj, obj, ...)
 }
 \arguments{
 \item{dbObj}{A \code{MySQLDriver} or \code{MySQLConnection}.}
@@ -23,4 +26,3 @@ dbDataType(RMySQL::MySQL(), "a")
 dbDataType(RMySQL::MySQL(), 1:3)
 dbDataType(RMySQL::MySQL(), 2.5)
 }
-

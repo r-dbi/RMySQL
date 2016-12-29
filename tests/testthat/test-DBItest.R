@@ -1,4 +1,3 @@
-DBItest::make_context(MySQL(), list(dbname = "test", username = "", password = ""), name = "RMySQL")
 DBItest::test_all(c(
   # getting_started
   "constructor_strict",                         # relaxed version of constructor check still active
@@ -50,17 +49,23 @@ DBItest::test_all(c(
   # meta
   "get_exception",                              # #106
   "get_info_result",                            # rstats-db/DBI#55
-  "bind_empty_positional_qm",                   # #116
-  "bind_return_value_positional_qm",            # #116
-  "bind_logical_positional_qm",                 # not an error: no logical data type
-  "bind_character_positional_qm",               # #93
-  "bind_timestamp_lt_positional_qm",            # #110
-  "bind_raw_positional_qm",                     # #110
+  "bind_empty.*",                               # #116
+  "bind_return_value.*",                        # #116
+  "bind_multi_row.*",                           # #170
+  "bind_logical.*",                             # not an error: no logical data type
+  "bind_character.*",                           # #93
+  "bind_timestamp_lt.*",                        # #110
+  "bind_raw.*",                                 # #110
   "bind_.*_positional_dollar",                  # not an error: named binding not supported
   "bind_.*_named_.*",                           # not an error: named binding not supported
 
+  # transactions
+  "commit_without_begin",                       # 167
+  "begin_begin",                                # 167
+
   # compliance
   "compliance",                                 # #112
+  "ellipsis",                                   # #171
   "read_only",                                  # default connection is read-write
   NULL
 ))

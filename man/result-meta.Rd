@@ -2,11 +2,11 @@
 % Please edit documentation in R/query.R
 \docType{methods}
 \name{result-meta}
-\alias{dbColumnInfo,MySQLResult-method}
-\alias{dbGetRowCount,MySQLResult-method}
-\alias{dbGetRowsAffected,MySQLResult-method}
-\alias{dbHasCompleted,MySQLResult-method}
 \alias{result-meta}
+\alias{dbColumnInfo,MySQLResult-method}
+\alias{dbGetRowsAffected,MySQLResult-method}
+\alias{dbGetRowCount,MySQLResult-method}
+\alias{dbHasCompleted,MySQLResult-method}
 \title{Database interface meta-data.}
 \usage{
 \S4method{dbColumnInfo}{MySQLResult}(res, ...)
@@ -45,4 +45,3 @@ dbRemoveTable(con, "t1")
 dbDisconnect(con)
 }
 }
-

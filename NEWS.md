@@ -1,3 +1,10 @@
+## RMySQL 0.11-4 (2016-12-29)
+
+- Adapt to `DBItest` changes.
+- Fix compiler warnings.
+- Improve compatibility with different versions of `libmysql`.
+
+
 # RMySQL 0.11-3 (2016-06-08)
 
 - Fix failing compilation on Linux if a  function is declared elsewhere.

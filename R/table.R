@@ -135,6 +135,7 @@ setMethod("sqlData", "MySQLConnection", function(con, value, row.names = NA, ...
 
 #' @export
 #' @rdname mysql-tables
+#' @importFrom utils read.table
 #' @param sep field separator character
 #' @param eol End-of-line separator
 #' @param skip number of lines to skip before reading data in the input file.
@@ -236,6 +237,7 @@ setMethod("dbRemoveTable", c("MySQLConnection", "character"),
 #' @param obj R/S-Plus object whose SQL type we want to determine.
 #' @param \dots any other parameters that individual methods may need.
 #' @export
+#' @rdname dbDataType
 #' @examples
 #' dbDataType(RMySQL::MySQL(), "a")
 #' dbDataType(RMySQL::MySQL(), 1:3)
@@ -245,6 +247,7 @@ setMethod("dbDataType", "MySQLConnection", function(dbObj, obj, ...) {
 })
 
 #' @export
+#' @rdname dbDataType
 setMethod("dbDataType", "MySQLDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
   if (inherits(obj, "POSIXct")) return("DATETIME")

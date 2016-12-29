@@ -3,8 +3,8 @@
 \docType{class}
 \name{MySQLDriver-class}
 \alias{MySQLDriver-class}
-\alias{dbIsValid,MySQLDriver-method}
 \alias{dbUnloadDriver,MySQLDriver-method}
+\alias{dbIsValid,MySQLDriver-method}
 \title{Class MySQLDriver with constructor MySQL.}
 \usage{
 \S4method{dbUnloadDriver}{MySQLDriver}(drv, ...)
@@ -17,4 +17,3 @@ This class should always be initialized with the \code{MySQL()} function.
 It returns a singleton that allows you to connect to MySQL.
 }
 \keyword{internal}
-
