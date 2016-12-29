@@ -2,9 +2,9 @@
 % Please edit documentation in R/quote.R
 \docType{methods}
 \name{mysql-quoting}
+\alias{mysql-quoting}
 \alias{dbQuoteIdentifier,MySQLConnection,character-method}
 \alias{dbQuoteString,MySQLConnection,character-method}
-\alias{mysql-quoting}
 \title{Quote MySQL strings and identifiers.}
 \usage{
 \S4method{dbQuoteIdentifier}{MySQLConnection,character}(conn, x, ...)
@@ -23,4 +23,3 @@ if (mysqlHasDefault()) {
 }
 }
 \keyword{internal}
-

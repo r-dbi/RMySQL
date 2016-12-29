@@ -26,4 +26,3 @@ dbDataType(RMySQL::MySQL(), "a")
 dbDataType(RMySQL::MySQL(), 1:3)
 dbDataType(RMySQL::MySQL(), 2.5)
 }
-
