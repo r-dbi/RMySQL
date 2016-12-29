@@ -1,3 +1,10 @@
+## RMySQL 0.11-5 (2016-12-29)
+
+- Add package-level documentation (#159, @Ironholds).
+- The `host` and `db` slots of the `MySQLConnection` object now contain actual host and database names, even if they were retrieved from a configuration file (#127, @peternowee).
+- Fix typos in the documentation of `dbConnect()` (#175, @mcol).
+
+
 ## RMySQL 0.11-4 (2016-12-29)
 
 - Adapt to `DBItest` changes.
