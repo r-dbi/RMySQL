@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.11-4
+Version: 0.11-5
 Title: Database Interface and MySQL Driver for R
 Encoding: UTF-8
 Description: Implements DBI-compliant Interface to MySQL and MariaDB Databases.
@@ -32,6 +32,7 @@ Collate:
     'MySQLConnection.R'
     'MySQLDriver.R'
     'MySQLResult.R'
+    'RMySQL.R'
     'RcppExports.R'
     'connect.R'
     'default.R'
