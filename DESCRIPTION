@@ -32,6 +32,7 @@ Collate:
     'MySQLConnection.R'
     'MySQLDriver.R'
     'MySQLResult.R'
+    'RMySQL.R'
     'RcppExports.R'
     'connect.R'
     'default.R'
