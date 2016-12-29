@@ -68,10 +68,12 @@ setMethod("dbConnect", "MySQLDriver",
       client.flag, groups, default.file, ssl.key, ssl.cert, ssl.ca, ssl.capath,
       ssl.cipher)
 
+    info <- connection_info(ptr)
+
     con <- new("MySQLConnection",
       ptr = ptr,
-      host = if(is.null(host)) NA_character_ else host,
-      db = if(is.null(dbname)) NA_character_ else dbname
+      host = info$host,
+      db = info$dbname
     )
 
     dbGetQuery(con, 'SET time_zone = "+00:00"')

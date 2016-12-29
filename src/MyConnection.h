@@ -73,8 +73,13 @@ public:
 
   Rcpp::List connectionInfo() {
     return Rcpp::List::create(
-      Rcpp::_["host"] = std::string(mysql_get_host_info(pConn_)),
-      Rcpp::_["server"] = std::string(mysql_get_server_info(pConn_)),
+      Rcpp::_["host"] = std::string(pConn_->host),
+      Rcpp::_["user"] = std::string(pConn_->user),
+      Rcpp::_["dbname"] = std::string(pConn_->db),
+      Rcpp::_["conType"] = std::string(mysql_get_host_info(pConn_)),
+      Rcpp::_["serverVersion"] = std::string(mysql_get_server_info(pConn_)),
+      Rcpp::_["protocolVersion"] = (int) mysql_get_proto_info(pConn_),
+      Rcpp::_["threadId"] = (int) mysql_thread_id(pConn_),
       Rcpp::_["client"] = std::string(mysql_get_client_info())
     );
   }
