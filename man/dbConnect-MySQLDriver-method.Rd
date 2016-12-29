@@ -2,8 +2,8 @@
 % Please edit documentation in R/connect.R
 \docType{methods}
 \name{dbConnect,MySQLDriver-method}
-\alias{MySQL}
 \alias{dbConnect,MySQLDriver-method}
+\alias{MySQL}
 \title{Connect/disconnect to a MySQL DBMS}
 \usage{
 \S4method{dbConnect}{MySQLDriver}(drv, dbname = NULL, username = NULL,
@@ -107,4 +107,3 @@ dbRemoveTable(con, "USArrests")
 dbDisconnect(con)
 }
 }
-

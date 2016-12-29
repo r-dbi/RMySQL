@@ -5,8 +5,8 @@
 \alias{MySQLConnection-class}
 \alias{dbDisconnect,MySQLConnection-method}
 \alias{dbGetInfo,MySQLConnection-method}
-\alias{dbIsValid,MySQLConnection-method}
 \alias{show,MySQLConnection-method}
+\alias{dbIsValid,MySQLConnection-method}
 \title{Class MySQLConnection.}
 \usage{
 \S4method{dbDisconnect}{MySQLConnection}(conn, ...)
@@ -22,4 +22,3 @@
 \code{\link[DBI]{dbConnect}}
 }
 \keyword{internal}
-

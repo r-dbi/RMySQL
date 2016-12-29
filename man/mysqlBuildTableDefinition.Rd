@@ -11,4 +11,3 @@ mysqlBuildTableDefinition(dbObj, name, obj, field.types = NULL,
 DEPRECATED
 }
 \keyword{internal}
-

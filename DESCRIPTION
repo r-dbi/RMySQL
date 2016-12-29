@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.11-3
+Version: 0.11-4
 Title: Database Interface and MySQL Driver for R
 Encoding: UTF-8
 Description: Implements DBI-compliant Interface to MySQL and MariaDB Databases.
@@ -40,4 +40,4 @@ Collate:
     'quote.R'
     'table.R'
     'transaction.R'
-RoxygenNote: 5.0.1
+RoxygenNote: 5.0.1.9000

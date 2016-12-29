@@ -2,11 +2,11 @@
 % Please edit documentation in R/query.R
 \docType{methods}
 \name{dbFetch,MySQLResult,numeric-method}
+\alias{dbFetch,MySQLResult,numeric-method}
+\alias{dbSendQuery,MySQLConnection,character-method}
 \alias{dbBind,MySQLResult-method}
 \alias{dbClearResult,MySQLResult-method}
-\alias{dbFetch,MySQLResult,numeric-method}
 \alias{dbGetStatement,MySQLResult-method}
-\alias{dbSendQuery,MySQLConnection,character-method}
 \title{Execute a SQL statement on a database connection.}
 \usage{
 \S4method{dbFetch}{MySQLResult,numeric}(res, n = -1, ..., row.names = NA)
@@ -29,14 +29,14 @@
 
 \item{row.names}{Either \code{TRUE}, \code{FALSE}, \code{NA} or a string.
 
-  If \code{TRUE}, always translate row names to a column called "row_names".
-  If \code{FALSE}, never translate row names. If \code{NA}, translate
-  rownames only if they're a character vector.
+If \code{TRUE}, always translate row names to a column called "row_names".
+If \code{FALSE}, never translate row names. If \code{NA}, translate
+rownames only if they're a character vector.
 
-  A string is equivalent to \code{TRUE}, but allows you to override the
-  default name.
+A string is equivalent to \code{TRUE}, but allows you to override the
+default name.
 
-  For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
+For backward compatibility, \code{NULL} is equivalent to \code{FALSE}.}
 
 \item{conn}{an \code{\linkS4class{MySQLConnection}} object.}
 
@@ -76,4 +76,3 @@ dbRemoveTable(con, "arrests")
 dbDisconnect(con)
 }
 }
-
