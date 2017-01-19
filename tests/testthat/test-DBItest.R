@@ -10,7 +10,12 @@ DBItest::test_all(c(
   "cannot_disconnect_twice",                    # TODO
 
   # result
+  "cannot_clear_result_twice_.*",               #
+  "fetch_n_bad",                                #
+  "fetch_n_good_after_bad",                     #
+  "fetch_no_return_value",                      #
   "get_query_empty_.*",                         # syntax not supported
+  "get_query_n_.*",                             #
   "clear_result_return",                        # error: need to warn if closing result twice
   "data_logical",                               # not an error: no logical data type
   "data_logical_null_.*",                       # not an error: no logical data type
