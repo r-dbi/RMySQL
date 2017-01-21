@@ -32,8 +32,6 @@ DBItest::test_all(c(
   "data_time_parens_null_.*",                   # #95
   "data_timestamp",                             # #113
   "data_timestamp_null_.*",                     # #113
-  "data_timestamp_utc",                         # syntax not supported
-  "data_timestamp_utc_typed",                   # syntax not supported
 
   # sql
   "quote_string",                               # #115
