@@ -21,8 +21,7 @@ DBItest::test_all(c(
   "data_logical_null_.*",                       # not an error: no logical data type
   "data_logical_int",                           # not an error: no logical data type
   "data_logical_int_null_.*",                   # not an error: no logical data type
-  "data_64_bit",                                # #77
-  "data_64_bit_null_.*",                        # #77
+  "data_64_bit_.*",                             # #77
   "data_character",                             # #93
   "data_character_null_.*",                     # #93
   "data_raw",                                   # not an error: can't cast to blob type
@@ -34,9 +33,7 @@ DBItest::test_all(c(
   "data_timestamp",                             # #113
   "data_timestamp_null_.*",                     # #113
   "data_timestamp_utc",                         # syntax not supported
-  "data_timestamp_utc_null_.*",                 # syntax not supported
-  "data_timestamp_parens",                      # syntax not supported
-  "data_timestamp_parens_null_.*",              # syntax not supported
+  "data_timestamp_utc_typed",                   # syntax not supported
 
   # sql
   "quote_string",                               # #115
