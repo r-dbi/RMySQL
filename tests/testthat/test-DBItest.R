@@ -34,17 +34,29 @@ DBItest::test_all(c(
   "data_timestamp_null_.*",                     # #113
 
   # sql
-  "quote_string",                               # #115
-  "quote_identifier_not_vectorized",            # rstats-db/DBI#24
+  "quote_string.*",                             # #115
+  "quote_identifier_vectorized",                #
   "list_fields",                                # #137
+  "list_tables",                                #
+  "append_table_new",                           #
   "roundtrip_quotes",                           # #101
-  "roundtrip_logical",                          # not an error: no logical data type
   "roundtrip_numeric_special",                  # #105
   "roundtrip_64_bit",                           # rstats-db/DBI#48
   "roundtrip_character",                        # #93
+  "roundtrip_character_native",                 # #93
   "roundtrip_factor",                           # #93
+  "roundtrip_date",                             #
+  "roundtrip_time",                             #
   "roundtrip_raw",                              # #111
   "roundtrip_timestamp",                        # #104
+  "read_table_error",                           #
+  "read_table_name",                            #
+  "write_table_error",                          #
+  "write_table_name",                           #
+  "exists_table_error",                         #
+  "exists_table_name",                          #
+  "remove_table_name",                          #
+  "remove_table_temporary",                     #
 
   # meta
   "get_exception",                              # #106
