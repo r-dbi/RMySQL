@@ -40,6 +40,7 @@ DBItest::test_all(c(
   "list_tables",                                #
   "append_table_new",                           #
   "roundtrip_quotes",                           # #101
+  "roundtrip_keywords",                         #
   "roundtrip_numeric_special",                  # #105
   "roundtrip_64_bit",                           # rstats-db/DBI#48
   "roundtrip_character",                        # #93
@@ -59,10 +60,13 @@ DBItest::test_all(c(
   "remove_table_temporary",                     #
 
   # meta
+  "rows_affected_query",                        #
+  "get_statement_error",                        #
   "get_exception",                              # #106
   "get_info_result",                            # rstats-db/DBI#55
   "bind_empty.*",                               # #116
   "bind_return_value.*",                        # #116
+  "bind_wrong_name",                            #
   "bind_multi_row.*",                           # #170
   "bind_logical.*",                             # not an error: no logical data type
   "bind_character.*",                           # #93
