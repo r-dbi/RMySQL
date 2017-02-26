@@ -77,7 +77,11 @@ DBItest::test_all(c(
 
   # transactions
   "commit_without_begin",                       # 167
+  "rollback_without_begin",                     # 167
   "begin_begin",                                # 167
+  "begin_write_rollback",                       #
+  "begin_write_disconnect",                     #
+  "with_transaction_.*",                        #
 
   # compliance
   "compliance",                                 # #112
