@@ -252,6 +252,7 @@ setMethod("dbDataType", "MySQLDriver", function(dbObj, obj, ...) {
   if (is.factor(obj)) return("TEXT")
   if (inherits(obj, "POSIXct")) return("DATETIME")
   if (inherits(obj, "Date")) return("DATE")
+  if (is.data.frame(obj)) return(callNextMethod(dbObj, obj))
 
   switch(typeof(obj),
     logical = "TINYINT",
