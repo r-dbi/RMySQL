@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // connection_create
-XPtr<MyConnectionPtr> connection_create(const Rcpp::Nullable<std::string>& host, const Rcpp::Nullable<std::string>& user, const Rcpp::Nullable<std::string>& password, const Rcpp::Nullable<std::string>& db, unsigned int port, const Rcpp::Nullable<std::string>& unix_socket, unsigned long client_flag, const Rcpp::Nullable<std::string>& groups, const Rcpp::Nullable<std::string>& default_file, const Rcpp::Nullable<std::string>& ssl_key, const Rcpp::Nullable<std::string>& ssl_cert, const Rcpp::Nullable<std::string>& ssl_ca, const Rcpp::Nullable<std::string>& ssl_capath, const Rcpp::Nullable<std::string>& ssl_cipher);
-RcppExport SEXP RMySQL_connection_create(SEXP hostSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP dbSEXP, SEXP portSEXP, SEXP unix_socketSEXP, SEXP client_flagSEXP, SEXP groupsSEXP, SEXP default_fileSEXP, SEXP ssl_keySEXP, SEXP ssl_certSEXP, SEXP ssl_caSEXP, SEXP ssl_capathSEXP, SEXP ssl_cipherSEXP) {
+XPtr<MyConnectionPtr> connection_create(const Rcpp::Nullable<std::string>& host, const Rcpp::Nullable<std::string>& user, const Rcpp::Nullable<std::string>& password, const Rcpp::Nullable<std::string>& db, unsigned int port, const Rcpp::Nullable<std::string>& unix_socket, unsigned long client_flag, const Rcpp::Nullable<std::string>& groups, const Rcpp::Nullable<std::string>& default_file, const Rcpp::Nullable<std::string>& ssl, const Rcpp::Nullable<std::string>& ssl_key, const Rcpp::Nullable<std::string>& ssl_cert, const Rcpp::Nullable<std::string>& ssl_ca, const Rcpp::Nullable<std::string>& ssl_capath, const Rcpp::Nullable<std::string>& ssl_cipher);
+RcppExport SEXP RMySQL_connection_create(SEXP hostSEXP, SEXP userSEXP, SEXP passwordSEXP, SEXP dbSEXP, SEXP portSEXP, SEXP unix_socketSEXP, SEXP client_flagSEXP, SEXP groupsSEXP, SEXP default_fileSEXP, SEXP sslSEXP, SEXP ssl_keySEXP, SEXP ssl_certSEXP, SEXP ssl_caSEXP, SEXP ssl_capathSEXP, SEXP ssl_cipherSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -21,12 +21,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< unsigned long >::type client_flag(client_flagSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type groups(groupsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type default_file(default_fileSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type ssl(sslSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type ssl_key(ssl_keySEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type ssl_cert(ssl_certSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type ssl_ca(ssl_caSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type ssl_capath(ssl_capathSEXP);
     Rcpp::traits::input_parameter< const Rcpp::Nullable<std::string>& >::type ssl_cipher(ssl_cipherSEXP);
-    rcpp_result_gen = Rcpp::wrap(connection_create(host, user, password, db, port, unix_socket, client_flag, groups, default_file, ssl_key, ssl_cert, ssl_ca, ssl_capath, ssl_cipher));
+    rcpp_result_gen = Rcpp::wrap(connection_create(host, user, password, db, port, unix_socket, client_flag, groups, default_file, ssl, ssl_key, ssl_cert, ssl_ca, ssl_capath, ssl_cipher));
     return rcpp_result_gen;
 END_RCPP
 }
