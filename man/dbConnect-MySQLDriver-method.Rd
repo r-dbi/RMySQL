@@ -42,6 +42,8 @@ for setting authentication parameters (see \code{\link{MySQL}}).}
 \item{default.file}{string of the filename with MySQL client options.
 Defaults to \code{\$HOME/.my.cnf}}
 
+\item{ssl}{(optional) string with any value to enable SSL.}
+
 \item{ssl.key}{(optional) string of the filename of the SSL key file to use.}
 
 \item{ssl.cert}{(optional) string of the filename of the SSL certificate to
