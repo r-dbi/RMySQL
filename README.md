@@ -4,7 +4,7 @@ RMySQL
 ##### *Database Interface and MySQL Driver for R*
 
 [![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=master)](https://travis-ci.org/rstats-db/RMySQL)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMySQL?branch=master&svg=true)](https://ci.appveyor.com/project/jeroenooms/RMySQL)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMySQL?branch=master&svg=true)](https://ci.appveyor.com/project/jeroen/RMySQL)
 [![Coverage Status](https://codecov.io/github/rstats-db/RMySQL/coverage.svg?branch=master)](https://codecov.io/github/rstats-db/RMySQL?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RMySQL)](http://cran.r-project.org/package=RMySQL)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RMySQL)](http://cran.r-project.org/web/packages/RMySQL/index.html)

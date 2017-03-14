@@ -18,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jeroen Ooms \email{jeroen.ooms@stat.ucla.edu}
+\strong{Maintainer}: Jeroen Ooms \email{jeroen@berkeley.edu}
 
 Authors:
 \itemize{
