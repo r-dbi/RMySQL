@@ -34,7 +34,7 @@ matrix:
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
     - os: osx
-      osx_image: beta-xcode6.1
+      osx_image: beta-xcode6.4
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
