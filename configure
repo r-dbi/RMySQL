@@ -1,5 +1,5 @@
 #!/bin/bash
-# Anticonf script by Jeroen Ooms (2015)
+# Anticonf script by Jeroen Ooms (2017)
 # The script will try 'mariadb_config' and 'mysql_config' to find required
 # cflags and ldflags. Make sure this executable is in PATH when installing
 # the package. Alternatively, you can set INCLUDE_DIR and LIB_DIR manually:
@@ -38,8 +38,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   if [ $(command -v brew) ]; then
     BREWDIR=$(brew --prefix)
   else
-    curl -sOL https://jeroen.github.io/autobrew/mariadb-connector-c
-    source mariadb-connector-c
+    curl -sfL "https://jeroen.github.io/autobrew/$PKG_BREW_NAME" > $TMPDIR/autobrew
+    source $TMPDIR/autobrew
   fi
   PKG_CFLAGS="-I$BREWDIR/opt/mariadb-connector-c/include/mariadb"
   PKG_LIBS="-L$BREWDIR/opt/{openssl/lib,mariadb-connector-c/lib/mariadb} $PKG_LIBS_STATIC"
