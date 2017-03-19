@@ -11,8 +11,8 @@ DEVELOPMENT / [@master](https://github.com/rstats-db/RMySQL/tree/master):
 PRODUCTION / [@stable](https://github.com/rstats-db/RMySQL/tree/stable):
 [![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=stable)](https://travis-ci.org/rstats-db/RMySQL/branches)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMySQL?branch=stable&svg=true)](https://ci.appveyor.com/project/jeroen/RMySQL?branch=stable)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RMySQL)](http://cran.r-project.org/package=RMySQL)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RMySQL)](http://cran.r-project.org/web/packages/RMySQL/index.html)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RMySQL)](https://cran.r-project.org/package=RMySQL)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RMySQL)](https://cran.r-project.org/package=RMySQL)
 [![Coverage Status](https://codecov.io/github/rstats-db/RMySQL/coverage.svg?branch=stable)](https://codecov.io/github/rstats-db/RMySQL?branch=stable)
 
 RMySQL is a database interface and MySQL driver for R. This version complies with the database interface definition as implemented in the package DBI 0.2-2. 
