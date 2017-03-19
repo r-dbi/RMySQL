@@ -6,7 +6,9 @@
 #include "MyTypes.h"
 #include <ctime>
 
+#ifdef WIN32
 #define timegm _mkgmtime
+#endif
 
 class MyRow {
   MYSQL_STMT* pStatement_;
