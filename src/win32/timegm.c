@@ -31,7 +31,11 @@
  * SUCH DAMAGE.
  */
 
-#ifdef WIN32
+
+
+#if defined(WIN32) && !defined(_WIN64)
+
+#include <time.h>
 
 static int
 is_leap(unsigned y) {
@@ -40,7 +44,7 @@ is_leap(unsigned y) {
 }
 
 time_t
-timegm(struct tm *tm) {
+  _mkgmtime32(struct tm *tm) {
 	static const unsigned ndays[2][12] = {
 		{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
 		{31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
