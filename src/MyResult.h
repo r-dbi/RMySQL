@@ -110,7 +110,7 @@ public:
 
   Rcpp::List columnInfo() {
     Rcpp::CharacterVector names(nCols_), types(nCols_);
-    for (int i = 0; i < nCols_; i++) {
+    for (size_t i = 0; i < nCols_; i++) {
       names[i] = names_[i];
       types[i] = typeName(types_[i]);
     }
@@ -171,7 +171,7 @@ public:
         }
       }
 
-      for (int j = 0; j < nCols_; ++j) {
+      for (size_t j = 0; j < nCols_; ++j) {
         // Rcpp::Rcout << i << "," << j << "\n";
         bindingOutput_.setListValue(out[j], i, j);
       }
@@ -223,7 +223,7 @@ private:
     nCols_ = mysql_num_fields(pSpec_);
     MYSQL_FIELD *fields = mysql_fetch_fields(pSpec_);
 
-    for (int i = 0; i < nCols_; ++i) {
+    for (size_t i = 0; i < nCols_; ++i) {
       names_.push_back(fields[i].name);
 
       bool binary = fields[i].charsetnr == 63;

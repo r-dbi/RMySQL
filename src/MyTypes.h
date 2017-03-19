@@ -75,6 +75,7 @@ inline std::string typeName(MyFieldType type) {
   case MY_FACTOR:      return "factor";
   case MY_LGL:         return "logical";
   }
+  throw std::runtime_error("Invalid typeName");
 }
 
 inline SEXPTYPE typeSEXP(MyFieldType type) {
@@ -90,6 +91,7 @@ inline SEXPTYPE typeSEXP(MyFieldType type) {
   case MY_FACTOR:      return INTSXP;
   case MY_LGL:         return LGLSXP;
   }
+  throw std::runtime_error("Invalid typeSEXP");
 }
 
 std::string inline rClass(Rcpp::RObject x) {
