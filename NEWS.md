@@ -1,3 +1,9 @@
+# Version 0.10.10
+ 
+ * Window: update libmariadbclient to v2.3.2
+ 
+ * OSX: extract autobrew script
+
 # Version 0.10.9
 
  * OSX binary packages for OSX now use mariadb-connector-c instead of mysql-connector-c
