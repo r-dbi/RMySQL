@@ -8,9 +8,18 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
-  ps: Bootstrap
+  - ps: Bootstrap
+  - cmd: rm -f *.Rproj
 
 # Adapt as necessary starting from here
+
+# 2017: doesn't seem to work (anymore)
+services:
+  - mysql
+
+environment:
+  MYSQL_USER: root
+  MYSQL_PWD: Password12!
 
 build_script:
   - travis-tool.sh install_github rstats-db/DBI

@@ -11,11 +11,11 @@ matrix:
       dist: trusty
       sudo: required
       env: R_CODECOV=true
+      service: mysql
       addons:
         apt:
           packages:
-            - mariadb-server
-            - libmariadbclient-dev
+            - libmysqlclient-dev
     - os: osx
       osx_image: xcode8.1
       before_install:
