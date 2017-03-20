@@ -33,7 +33,7 @@ test_that("can read file from disk", {
     stringsAsFactors = FALSE
   )
 
-  dbWriteTable(con, "dat", "dat-n.txt", sep = "|", eol = "\n",
+  dbWriteTable(con, "dat", "dat-n.bin", sep = "|", eol = "\n",
                temporary = TRUE, overwrite = TRUE)
   expect_equal(dbReadTable(con, "dat"), expected)
 
