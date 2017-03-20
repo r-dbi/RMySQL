@@ -12,6 +12,6 @@ test_that("options work", {
     stringsAsFactors = FALSE
   )
 
-  dbWriteTable(con, "dat", "dat-n.txt", sep="|", eol="\n", overwrite = TRUE)
+  dbWriteTable(con, "dat", "dat-n.bin", sep="|", eol="\n", overwrite = TRUE)
   expect_equal(dbReadTable(con, "dat"), expected)
 })
