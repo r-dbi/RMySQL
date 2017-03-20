@@ -10,12 +10,12 @@ test_that("basic roundtrip is succesful", {
     stringsAsFactors = FALSE)
 
   conn <- dbConnect(RMySQL::MySQL(), dbname = "test")
-  dbRemoveTable(conn, "myDF")
-  dbWriteTable(conn, name = "myDF", value = myDF)
+  dbRemoveTable(conn, "mydf")
+  dbWriteTable(conn, name = "mydf", value = myDF)
 
-  expect_equal(dbReadTable(conn, "myDF"), myDF)
+  expect_equal(dbReadTable(conn, "mydf"), myDF)
 
-  dbRemoveTable(conn, "myDF")
+  dbRemoveTable(conn, "mydf")
   dbDisconnect(conn)
 })
 
