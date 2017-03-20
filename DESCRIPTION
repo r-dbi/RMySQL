@@ -1,9 +1,9 @@
 Package: RMySQL
 Version: 0.10.10
 Title: Database Interface and 'MySQL' Driver for R
-Description: A 'DBI' interface to 'MySQL' / 'MariaDB'. The CRAN version of this
-    package contains an old branch based on legacy code from S-PLUS. A modern 
-    rewrite of 'RMySQL' based on 'Rcpp' can be obtained from the 'Github' repository.
+Description: A 'DBI' interface to 'MySQL' / 'MariaDB'. The CRAN version of this package
+    contains an old branch based on legacy code from S-PLUS, which being phased out. A
+    modern rewrite based on 'Rcpp' can be obtained from the 'Github' repository.
 Authors@R: c(person("Jeroen", "Ooms", email = "jeroen@berkeley.edu", role = c("aut", "cre")),
     person("David", "James", role = "aut"),
     person("Saikat", "DebRoy", role = "aut"),
