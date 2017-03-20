@@ -6,6 +6,8 @@
 
 void R_init_RMySQL(DllInfo *info){
   mysql_library_init(0,NULL,NULL);
+  R_registerRoutines(info, NULL, NULL, NULL, NULL);
+  R_useDynamicSymbols(info, TRUE);  
 
   /* Test release vs. compiled client library, warning
    * when the major or minor revision number differ. The integer format is XYYZZ
