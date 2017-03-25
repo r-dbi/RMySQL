@@ -87,5 +87,14 @@ DBItest::test_all(c(
   "compliance",                                 # #112
   "ellipsis",                                   # #171
   "read_only",                                  # default connection is read-write
+
+  # visibility
+  "can_disconnect",
+  "write_table_return",
+  "remove_table_return",
+  "begin_commit_return_value",
+  "begin_rollback_return_value",
+  "clear_result_return_.*",
+
   NULL
 ))
