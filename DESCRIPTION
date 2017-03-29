@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.10.10
+Version: 0.10.11
 Title: Database Interface and 'MySQL' Driver for R
 Description: A 'DBI' interface to 'MySQL' / 'MariaDB'. The CRAN version of this package
     contains an old branch based on legacy code from S-PLUS, which being phased out. A

@@ -1,3 +1,7 @@
+# Version 0.10.11
+
+ * Fix for OSX Mavericks
+ 
 # Version 0.10.10
  
  * Window: update libmariadbclient to v2.3.2
