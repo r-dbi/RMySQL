@@ -7,6 +7,7 @@ DBItest::test_all(c(
 
   # connection
   "get_info_connection",                        # rstats-db/RSQLite#117
+  "cannot_forget_disconnect",                   #
   "cannot_disconnect_twice",                    # TODO
 
   # result
@@ -26,6 +27,7 @@ DBItest::test_all(c(
   "data_character_null_.*",                     # #93
   "data_raw",                                   # not an error: can't cast to blob type
   "data_raw_null_.*",                           # not an error: can't cast to blob type
+  "data_date_typed",                            #
   "data_time",                                  # #95
   "data_time_null_.*",                          # #95
   "data_time_parens",                           # #95
@@ -49,6 +51,7 @@ DBItest::test_all(c(
   "roundtrip_date",                             #
   "roundtrip_time",                             #
   "roundtrip_raw",                              # #111
+  "roundtrip_blob",                             # #111
   "roundtrip_timestamp",                        # #104
   "read_table_error",                           #
   "read_table_name",                            #
