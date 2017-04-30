@@ -53,6 +53,8 @@ setMethod("dbReadTable", c("MySQLConnection", "character"),
 #' @param append a logical specifying whether to append to an existing table
 #'   in the DBMS.  If appending, then the table (or temporary table)
 #'   must exist, otherwise an error is reported. Its default is \code{FALSE}.
+#' @param onduplicate What to do in case of duplicate rows. Can be either
+#'   \code{"ignore"} or \code{"replace"}. By default it throws an error.
 #' @param value A data frame.
 #' @param field.types Optional, overrides default choices of field types,
 #'   derived from the classes of the columns in the data frame.
@@ -63,8 +65,8 @@ setMethod("dbReadTable", c("MySQLConnection", "character"),
 #' @rdname mysql-tables
 setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
   function(conn, name, value, field.types = NULL, row.names = NA,
-           overwrite = FALSE, append = FALSE, ..., allow.keywords = FALSE,
-           temporary = FALSE) {
+           overwrite = FALSE, append = FALSE, onduplicate = NULL,
+           ..., allow.keywords = FALSE, temporary = FALSE) {
 
     if (!missing(allow.keywords)) {
       warning("allow.keywords is deprecated.")
@@ -100,9 +102,16 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "data.frame"),
       name <- dbQuoteIdentifier(conn, name)
       fields <- dbQuoteIdentifier(conn, names(values))
       params <- rep("?", length(fields))
-
+      if (is.null(onduplicate)) {
+        method <- "INSERT"
+      } else {
+        method <- switch(onduplicate,
+                         replace = "REPLACE",
+                         ignore = "INSERT IGNORE",
+                         "INSERT")
+      }
       sql <- paste0(
-        "INSERT INTO ", name, " (", paste0(fields, collapse = ", "), ")\n",
+        method, " INTO ", name, " (", paste0(fields, collapse = ", "), ")\n",
         "VALUES (", paste0(params, collapse = ", "), ")"
       )
       rs <- dbSendQuery(conn, sql)
@@ -148,7 +157,8 @@ setMethod("sqlData", "MySQLConnection", function(con, value, row.names = NA, ...
 #'   the input file to create the proper table definition. Default is 50.
 setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
   function(conn, name, value, field.types = NULL, overwrite = FALSE,
-           append = FALSE, header = TRUE, row.names = FALSE, nrows = 50,
+           append = FALSE, onduplicate = NULL,
+           header = TRUE, row.names = FALSE, nrows = 50,
            sep = ",", eol = "\n", skip = 0, quote = '"', temporary = FALSE,
            ...) {
 
@@ -182,10 +192,17 @@ setMethod("dbWriteTable", c("MySQLConnection", "character", "character"),
       dbGetQuery(conn, sql)
     }
 
+    if (!is.null(onduplicate)) {
+      onduplicate <- switch(onduplicate, replace="REPLACE", ignore="IGNORE", "")
+    } else {
+      onduplicate <- ""
+    }
+
     path <- normalizePath(value, winslash = "/", mustWork = TRUE)
     sql <- paste0(
       "LOAD DATA LOCAL INFILE ", dbQuoteString(conn, path), "\n",
-      "INTO TABLE ", dbQuoteIdentifier(conn, name), "\n",
+      onduplicate,
+      " INTO TABLE ", dbQuoteIdentifier(conn, name), "\n",
       "FIELDS TERMINATED BY ", dbQuoteString(conn, sep), "\n",
       "OPTIONALLY ENCLOSED BY ", dbQuoteString(conn, quote), "\n",
       "LINES TERMINATED BY ", dbQuoteString(conn, eol), "\n",
