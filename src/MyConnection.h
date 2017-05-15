@@ -6,6 +6,8 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
+#define AS_API_STRING(X) (X.isNull() ? NULL : Rcpp::as<std::string>(X).c_str())
+
 class MyResult;
 
 // convenience typedef for shared_ptr to PqConnection
@@ -39,32 +41,33 @@ public:
     mysql_options(pConn_, MYSQL_OPT_LOCAL_INFILE, 0);
     // Default to UTF-8
     mysql_options(pConn_, MYSQL_SET_CHARSET_NAME, "UTF8");
+
     if (!groups.isNull())
-      mysql_options(pConn_, MYSQL_READ_DEFAULT_GROUP,
-                    Rcpp::as<std::string>(groups).c_str());
+      mysql_options(pConn_, MYSQL_READ_DEFAULT_GROUP, AS_API_STRING(groups));
+
     if (!default_file.isNull())
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE,
-                    Rcpp::as<std::string>(default_file).c_str());
+                    AS_API_STRING(default_file));
 
     if (!ssl_key.isNull() || !ssl_cert.isNull() || !ssl_ca.isNull() ||
         !ssl_capath.isNull() || !ssl_cipher.isNull()) {
       mysql_ssl_set(
         pConn_,
-        ssl_key.isNull() ? NULL : Rcpp::as<std::string>(ssl_key).c_str(),
-        ssl_cert.isNull() ? NULL : Rcpp::as<std::string>(ssl_cert).c_str(),
-        ssl_ca.isNull() ? NULL : Rcpp::as<std::string>(ssl_ca).c_str(),
-        ssl_capath.isNull() ? NULL : Rcpp::as<std::string>(ssl_capath).c_str(),
-        ssl_cipher.isNull() ? NULL : Rcpp::as<std::string>(ssl_cipher).c_str()
+        AS_API_STRING(ssl_key),
+        AS_API_STRING(ssl_cert),
+        AS_API_STRING(ssl_ca),
+        AS_API_STRING(ssl_capath),
+        AS_API_STRING(ssl_cipher)
       );
     }
 
     if (!mysql_real_connect(pConn_,
-        host.isNull() ? NULL : Rcpp::as<std::string>(host).c_str(),
-        user.isNull() ? NULL : Rcpp::as<std::string>(user).c_str(),
-        password.isNull() ? NULL : Rcpp::as<std::string>(password).c_str(),
-        db.isNull() ? NULL : Rcpp::as<std::string>(db).c_str(),
+        AS_API_STRING(host),
+        AS_API_STRING(user),
+        AS_API_STRING(password),
+        AS_API_STRING(db),
         port,
-        unix_socket.isNull() ? NULL : Rcpp::as<std::string>(unix_socket).c_str(),
+        AS_API_STRING(unix_socket),
         client_flag)) {
       mysql_close(pConn_);
       Rcpp::stop("Failed to connect: %s", mysql_error(pConn_));
