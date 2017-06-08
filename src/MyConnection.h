@@ -31,12 +31,16 @@ public:
                const Rcpp::Nullable<std::string>& ssl_cert,
                const Rcpp::Nullable<std::string>& ssl_ca,
                const Rcpp::Nullable<std::string>& ssl_capath,
-               const Rcpp::Nullable<std::string>& ssl_cipher) :
+               const Rcpp::Nullable<std::string>& ssl_cipher,
+	       unsigned int timeout) :
     pCurrentResult_(NULL)
   {
     pConn_ = mysql_init(NULL);
     // Enable LOCAL INFILE for fast data ingest
     mysql_options(pConn_, MYSQL_OPT_LOCAL_INFILE, 0);
+	// Timeouts
+	mysql_options(pConn_, MYSQL_OPT_READ_TIMEOUT, &timeout);
+	mysql_options(pConn_, MYSQL_OPT_WRITE_TIMEOUT, &timeout);
     // Default to UTF-8
     mysql_options(pConn_, MYSQL_SET_CHARSET_NAME, "UTF8");
     if (!groups.isNull())

@@ -17,10 +17,11 @@ XPtr<MyConnectionPtr> connection_create(
     const Rcpp::Nullable<std::string>& ssl_cert,
     const Rcpp::Nullable<std::string>& ssl_ca,
     const Rcpp::Nullable<std::string>& ssl_capath,
-    const Rcpp::Nullable<std::string>& ssl_cipher) {
+    const Rcpp::Nullable<std::string>& ssl_cipher,
+    unsigned int timeout) {
   MyConnectionPtr* pConn = new MyConnectionPtr(
     new MyConnection(host, user, password, db, port, unix_socket, client_flag,
-      groups, default_file, ssl_key, ssl_cert, ssl_ca, ssl_capath, ssl_cipher)
+      groups, default_file, ssl_key, ssl_cert, ssl_ca, ssl_capath, ssl_cipher, timeout)
   );
   return XPtr<MyConnectionPtr>(pConn, true);
 }

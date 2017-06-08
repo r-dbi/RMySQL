@@ -10,7 +10,7 @@
   password = NULL, host = NULL, unix.socket = NULL, port = 0,
   client.flag = 0, groups = "rs-dbi", default.file = NULL,
   ssl.key = NULL, ssl.cert = NULL, ssl.ca = NULL, ssl.capath = NULL,
-  ssl.cipher = NULL, ...)
+  ssl.cipher = NULL, timeout = 3600, ...)
 
 MySQL(max.con = 16, fetch.default.rec = 500)
 }
@@ -55,6 +55,8 @@ the trusted SSL CA certificates in PEM format.}
 
 \item{ssl.cipher}{(optional) string list of permitted ciphers to use for SSL
 encryption.}
+
+\item{timeout}{(optional) the timeout in seconds for each attempt to read or write from the server.}
 
 \item{...}{Unused, needed for compatibility with generic.}
 
