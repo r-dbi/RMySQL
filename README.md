@@ -1,28 +1,24 @@
-RMySQL
+RMariaDB
 ======
 
-> Database Interface and MySQL Driver for R
+> Database Interface and MariaDB Driver for R
 
-DEVELOPMENT / [@master](https://github.com/rstats-db/RMySQL/tree/master):
-[![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=master)](https://travis-ci.org/rstats-db/RMySQL)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMySQL?branch=master&svg=true)](https://ci.appveyor.com/project/jeroen/RMySQL?branch=master)
-[![Coverage Status](https://codecov.io/github/rstats-db/RMySQL/coverage.svg?branch=master)](https://codecov.io/github/rstats-db/RMySQL?branch=master)
+DEVELOPMENT / [@master](https://github.com/rstats-db/RMariaDB/tree/master):
+[![Build Status](https://travis-ci.org/rstats-db/RMariaDB.svg?branch=master)](https://travis-ci.org/rstats-db/RMariaDB)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMariaDB?branch=master&svg=true)](https://ci.appveyor.com/project/jeroen/RMariaDB?branch=master)
+[![Coverage Status](https://codecov.io/github/rstats-db/RMariaDB/coverage.svg?branch=master)](https://codecov.io/github/rstats-db/RMariaDB?branch=master)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RMariaDB)](http://cran.r-project.org/package=RMariaDB)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RMariaDB)](http://cran.r-project.org/web/packages/RMariaDB/index.html)
+[![Coverage Status](https://codecov.io/github/rstats-db/RMariaDB/coverage.svg?branch=stable)](https://codecov.io/github/rstats-db/RMariaDB?branch=stable)
 
-PRODUCTION / [@stable](https://github.com/rstats-db/RMySQL/tree/stable):
-[![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=stable)](https://travis-ci.org/rstats-db/RMySQL/branches)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMySQL?branch=stable&svg=true)](https://ci.appveyor.com/project/jeroen/RMySQL?branch=stable)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RMySQL)](http://cran.r-project.org/package=RMySQL)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RMySQL)](http://cran.r-project.org/web/packages/RMySQL/index.html)
-[![Coverage Status](https://codecov.io/github/rstats-db/RMySQL/coverage.svg?branch=stable)](https://codecov.io/github/rstats-db/RMySQL?branch=stable)
-
-RMySQL is a database interface and MySQL driver for R. This version complies with the database interface definition as implemented in the package DBI 0.2-2. 
+RMariaDB is a database interface and MariaDB driver for R. This version is aimed at full compliance with the [DBI specification](https://cran.r-project.org/web/packages/DBI/vignettes/spec.html).
 
 ## Hello World
 
 ```R
 library(DBI)
 # Connect to my-db as defined in ~/.my.cnf
-con <- dbConnect(RMySQL::MySQL(), group = "my-db")
+con <- dbConnect(RMariaDB::MariaDB(), group = "my-db")
 
 dbListTables(con)
 dbWriteTable(con, "mtcars", mtcars)
@@ -54,7 +50,7 @@ dbDisconnect(con)
 Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
 
 ```r
-install.packages("RMySQL")
+install.packages("RMariaDB")
 ```
 
 The development version from github:
@@ -62,7 +58,7 @@ The development version from github:
 ```R
 # install.packages("devtools")
 devtools::install_github("rstats-db/DBI")
-devtools::install_github("rstats-db/RMySQL")
+devtools::install_github("rstats-db/RMariaDB")
 ```
 
 Installation from source on Linux or OSX requires [`MariaDB Connector/C`](https://downloads.mariadb.org/connector-c/). On some older platforms you can also link against Oracle's [libmysqlclient](https://packages.debian.org/testing/libmysqlclient-dev) driver but the mariadb implementation is much better.
@@ -86,9 +82,9 @@ brew install mariadb-connector-c
 ```
 
 
-## MySQL configuration file
+## MariaDB configuration file
 
-Instead of specifying a username and password in calls to `dbConnect()`, it's better to set up a MySQL configuration file that names the databases that you connect to most commonly. This file should live in `~/.my.cnf` and look like:
+Instead of specifying a username and password in calls to `dbConnect()`, it's better to set up a MariaDB configuration file that names the databases that you connect to most commonly. This file should live in `~/.my.cnf` and look like:
 
 ```
 [database_name]
@@ -96,7 +92,7 @@ option1=value1
 option2=value2
 ```
 
-If you want to run the examples, you'll need to set the proper options in the `[rs-dbi]` group of any MySQL option file, such as /etc/my.cnf or the .my.cnf file in your home directory. For a default single user install of MySQL, the following code should work:
+If you want to run the examples, you'll need to set the proper options in the `[rs-dbi]` group of any MariaDB option file, such as /etc/my.cnf or the .my.cnf file in your home directory. For a default single user install of MariaDB, the following code should work:
 
 ```
 [rs-dbi]
