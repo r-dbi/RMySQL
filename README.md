@@ -1,14 +1,10 @@
 RMySQL
 ======
 
+NOTE: this package is being phased out in favor of the new [RMariaDB](https://github.com/rstats-db/RMariaDB) package.
+
 > Database Interface and MySQL Driver for R
 
-DEVELOPMENT / [@master](https://github.com/rstats-db/RMySQL/tree/master):
-[![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=master)](https://travis-ci.org/rstats-db/RMySQL)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMySQL?branch=master&svg=true)](https://ci.appveyor.com/project/jeroen/RMySQL?branch=master)
-[![Coverage Status](https://codecov.io/github/rstats-db/RMySQL/coverage.svg?branch=master)](https://codecov.io/github/rstats-db/RMySQL?branch=master)
-
-PRODUCTION / [@stable](https://github.com/rstats-db/RMySQL/tree/stable):
 [![Build Status](https://travis-ci.org/rstats-db/RMySQL.svg?branch=stable)](https://travis-ci.org/rstats-db/RMySQL/branches)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/rstats-db/RMySQL?branch=stable&svg=true)](https://ci.appveyor.com/project/jeroen/RMySQL?branch=stable)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/RMySQL)](https://cran.r-project.org/package=RMySQL)
