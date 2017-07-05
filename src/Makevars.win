@@ -1,5 +1,5 @@
-PKG_CPPFLAGS= -I../windows/libmariadbclient-2.3.2/include/mariadb
-PKG_LIBS= -L../windows/libmariadbclient-2.3.2/lib${R_ARCH} \
+PKG_CPPFLAGS= -I../windows/libmariadbclient-2.3.3/include/mariadb
+PKG_LIBS= -L../windows/libmariadbclient-2.3.3/lib${R_ARCH} \
 	-lmariadbclient -lssl -lcrypto -lgdi32 -lz -lws2_32 -pthread
 
 all: clean winlibs
