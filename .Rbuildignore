@@ -24,3 +24,4 @@ src\/RCS
 ^a\.out\.dSYM$
 ^revdep$
 ^appveyor.yml$
+^README.md$
