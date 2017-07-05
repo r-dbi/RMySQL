@@ -26,7 +26,11 @@ elif [ $(command -v mysql_config) ]; then
 fi
 
 # Note that cflags may be empty in case of success
-if [ "$INCLUDE_DIR" ] || [ "$LIB_DIR" ]; then
+if [ "$CFLAGS" ] || [ "$LIBS" ]; then
+  echo "Found CFLAGS and/or LIBS!"
+  PKG_CFLAGS="$CFLAGS"
+  PKG_LIBS="$LIBS"
+elif [ "$INCLUDE_DIR" ] || [ "$LIB_DIR" ]; then
   echo "Found INCLUDE_DIR and/or LIB_DIR!"
   PKG_CFLAGS="-I$INCLUDE_DIR $PKG_CFLAGS"
   PKG_LIBS="-L$LIB_DIR $PKG_LIBS"
