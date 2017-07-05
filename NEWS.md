@@ -1,3 +1,7 @@
+# Version 0.10.12
+
+ * Windows: update libmariadbclient to v2.3.3 (fixes a timeout bug)
+ 
 # Version 0.10.11
 
  * Fix for OSX Mavericks
