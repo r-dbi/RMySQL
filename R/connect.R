@@ -33,6 +33,7 @@ NULL
 #'   the trusted SSL CA certificates in PEM format.
 #' @param ssl.cipher (optional) string list of permitted ciphers to use for SSL
 #'   encryption.
+#' @param timeout (optional) the timeout in seconds for each attempt to read or write from the server.
 #' @param ... Unused, needed for compatibility with generic.
 #' @export
 #' @examples
@@ -62,11 +63,11 @@ setMethod("dbConnect", "MySQLDriver",
   function(drv, dbname = NULL, username = NULL, password = NULL, host = NULL,
     unix.socket = NULL, port = 0, client.flag = 0,
     groups = "rs-dbi", default.file = NULL, ssl.key = NULL, ssl.cert = NULL,
-    ssl.ca = NULL, ssl.capath = NULL, ssl.cipher = NULL, ...) {
+    ssl.ca = NULL, ssl.capath = NULL, ssl.cipher = NULL, timeout=3600, ...) {
 
     ptr <- connection_create(host, username, password, dbname, port, unix.socket,
       client.flag, groups, default.file, ssl.key, ssl.cert, ssl.ca, ssl.capath,
-      ssl.cipher)
+      ssl.cipher, timeout)
 
     info <- connection_info(ptr)
 
