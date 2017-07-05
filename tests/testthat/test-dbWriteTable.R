@@ -23,6 +23,27 @@ test_that("throws error if constraint violated", {
   dbDisconnect(con)
 })
 
+test_that("ignore duplicate entries if `onexists=replace`", {
+  con <- mysqlDefault()
+
+  x <- data.frame(col1 = 1:10, col2 = letters[1:10])
+
+  dbWriteTable(con, "t1", x, overwrite = TRUE)
+  dbGetQuery(con, "ALTER TABLE t1 ADD PRIMARY KEY (`col1`)")
+
+  x2 <- data.frame(col1 = 1, col2 = letters[2])
+
+  dbWriteTable(con, "t1", x2, append = TRUE, onduplicate = "ignore")
+  expect_equal(dbGetQuery(con, "SELECT * FROM t1 WHERE col1 = 1")$col2,
+               letters[1])
+
+  dbWriteTable(con, "t1", x2, append = TRUE, onduplicate = "replace")
+  expect_equal(dbGetQuery(con, "SELECT * FROM t1 WHERE col1 = 1")$col2,
+               letters[2])
+
+  dbDisconnect(con)
+})
+
 # Available only in MySQL
 test_that("can read file from disk", {
   con <- mysqlDefault()
