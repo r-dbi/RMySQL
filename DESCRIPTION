@@ -3,7 +3,7 @@ Version: 0.10.12
 Title: Database Interface and 'MySQL' Driver for R
 Description: A 'DBI' interface to 'MySQL' / 'MariaDB'. The 'RMySQL' package contains an 
     old implementation based on legacy code from S-PLUS which being phased out. A modern
-    'MySQL' client based on 'Rcpp' is available in the 'RMariaDB' package from Github:
+    'MySQL' client based on 'Rcpp' is available in the 'RMariaDB' package from 'Github':
     <https://github.com/rstats-db/RMariaDB>.
 Authors@R: c(person("Jeroen", "Ooms", email = "jeroen@berkeley.edu", role = c("aut", "cre")),
     person("David", "James", role = "aut"),
