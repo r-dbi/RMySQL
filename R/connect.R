@@ -24,6 +24,7 @@ NULL
 #'   for setting authentication parameters (see \code{\link{MySQL}}).
 #' @param default.file string of the filename with MySQL client options.
 #'   Defaults to \code{\$HOME/.my.cnf}
+#' @param ssl (optional) string with any value to enable SSL.
 #' @param ssl.key (optional) string of the filename of the SSL key file to use.
 #' @param ssl.cert (optional) string of the filename of the SSL certificate to
 #'   use.
@@ -61,11 +62,11 @@ NULL
 setMethod("dbConnect", "MySQLDriver",
   function(drv, dbname = NULL, username = NULL, password = NULL, host = NULL,
     unix.socket = NULL, port = 0, client.flag = 0,
-    groups = "rs-dbi", default.file = NULL, ssl.key = NULL, ssl.cert = NULL,
+    groups = "rs-dbi", default.file = NULL, ssl = NULL, ssl.key = NULL, ssl.cert = NULL,
     ssl.ca = NULL, ssl.capath = NULL, ssl.cipher = NULL, ...) {
 
     ptr <- connection_create(host, username, password, dbname, port, unix.socket,
-      client.flag, groups, default.file, ssl.key, ssl.cert, ssl.ca, ssl.capath,
+      client.flag, groups, default.file, ssl, ssl.key, ssl.cert, ssl.ca, ssl.capath,
       ssl.cipher)
 
     info <- connection_info(ptr)

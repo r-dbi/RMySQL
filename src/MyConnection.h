@@ -27,6 +27,7 @@ public:
                unsigned long client_flag,
                const Rcpp::Nullable<std::string>& groups,
                const Rcpp::Nullable<std::string>& default_file,
+               const Rcpp::Nullable<std::string>& ssl,
                const Rcpp::Nullable<std::string>& ssl_key,
                const Rcpp::Nullable<std::string>& ssl_cert,
                const Rcpp::Nullable<std::string>& ssl_ca,
@@ -46,7 +47,7 @@ public:
       mysql_options(pConn_, MYSQL_READ_DEFAULT_FILE,
                     Rcpp::as<std::string>(default_file).c_str());
 
-    if (!ssl_key.isNull() || !ssl_cert.isNull() || !ssl_ca.isNull() ||
+    if (!ssl.isNull() || !ssl_key.isNull() || !ssl_cert.isNull() || !ssl_ca.isNull() ||
         !ssl_capath.isNull() || !ssl_cipher.isNull()) {
       mysql_ssl_set(
         pConn_,
