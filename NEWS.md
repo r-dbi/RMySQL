@@ -1,3 +1,7 @@
+# Version 0.10.13
+
+ * Add cleanup script (requested by CRAN)
+
 # Version 0.10.12
 
  * Windows: update libmariadbclient to v2.3.3 (fixes a timeout bug)
