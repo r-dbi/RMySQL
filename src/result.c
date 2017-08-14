@@ -79,7 +79,7 @@ RS_DBI_resultSet* RS_DBI_getResultSet(SEXP rsHandle) {
 
 SEXP RS_DBI_resultSetInfo(SEXP rsHandle) {
   RS_DBI_resultSet       *result;
-  SEXP output, flds;
+  SEXP flds;
   int  n = (int) 6;
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
     "rowCount", "completed", "fields"};
@@ -90,7 +90,7 @@ SEXP RS_DBI_resultSetInfo(SEXP rsHandle) {
   result = RS_DBI_getResultSet(rsHandle);
   flds = R_NilValue;
 
-  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
+  SEXP output = PROTECT(RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
 
   SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
   LST_INT_EL(output,1,0) = result->isSelect;
@@ -98,7 +98,7 @@ SEXP RS_DBI_resultSetInfo(SEXP rsHandle) {
   LST_INT_EL(output,3,0) = result->rowCount;
   LST_INT_EL(output,4,0) = result->completed;
   SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
-
+  UNPROTECT(1);
   return output;
 }
 
@@ -390,7 +390,7 @@ SEXP RS_MySQL_closeResultSet(SEXP resHandle) {
 
 SEXP RS_MySQL_resultSetInfo(SEXP rsHandle) {
   RS_DBI_resultSet   *result;
-  SEXP output, flds;
+  SEXP flds;
   int  n = 6;
   char  *rsDesc[] = {"statement", "isSelect", "rowsAffected",
     "rowCount", "completed", "fieldDescription"};
@@ -401,7 +401,7 @@ SEXP RS_MySQL_resultSetInfo(SEXP rsHandle) {
   result = RS_DBI_getResultSet(rsHandle);
   flds = R_NilValue;
 
-  output = RS_DBI_createNamedList(rsDesc, rsType, rsLen, n);
+  SEXP output = PROTECT(RS_DBI_createNamedList(rsDesc, rsType, rsLen, n));
 
   SET_LST_CHR_EL(output,0,0,mkChar(result->statement));
   LST_INT_EL(output,1,0) = result->isSelect;
@@ -410,7 +410,7 @@ SEXP RS_MySQL_resultSetInfo(SEXP rsHandle) {
   LST_INT_EL(output,4,0) = result->completed;
   if(flds != R_NilValue)
     SET_ELEMENT(LST_EL(output, 5), (int) 0, flds);
-
+  UNPROTECT(1);
   return output;
 }
 

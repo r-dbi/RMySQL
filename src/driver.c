@@ -17,6 +17,7 @@ SEXP rmysql_driver_valid() {
 SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_) {
   SEXP mgrHandle = ScalarInteger(0);
   if (dbManager) return mgrHandle;
+  PROTECT(mgrHandle);
 
   int max_con = asInteger(max_con_),
       fetch_default_rec = asInteger(fetch_default_rec_);
@@ -51,7 +52,7 @@ SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_) {
   }
 
   dbManager = mgr;
-
+  UNPROTECT(1);
   return mgrHandle;
 }
 

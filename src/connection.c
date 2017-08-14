@@ -181,7 +181,6 @@ RS_DBI_connection* RS_DBI_getConnection(SEXP conHandle) {
 SEXP RS_DBI_connectionInfo(SEXP conHandle) {
 
   RS_DBI_connection  *con;
-  SEXP output;
   int     i;
   int  n = (int) 8;
   char *conDesc[] = {"host", "user", "dbname", "conType",
@@ -195,7 +194,7 @@ SEXP RS_DBI_connectionInfo(SEXP conHandle) {
   con = RS_DBI_getConnection(conHandle);
   conLen[7] = con->num_res;   /* number of resultSets opened */
 
-  output = RS_DBI_createNamedList(conDesc, conType, conLen, n);
+  SEXP output = PROTECT(RS_DBI_createNamedList(conDesc, conType, conLen, n));
 
   /* dummy */
   SET_LST_CHR_EL(output,0,0,mkChar("NA"));        /* host */
@@ -209,7 +208,8 @@ SEXP RS_DBI_connectionInfo(SEXP conHandle) {
 
   for(i=0; i < con->num_res; i++)
     LST_INT_EL(output,7,(int) i) = con->resultSetIds[i];
-
+  
+  UNPROTECT(1);
   return output;
 }
 

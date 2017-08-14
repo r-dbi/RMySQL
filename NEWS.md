@@ -1,6 +1,7 @@
 # Version 0.10.13
 
  * Add cleanup script (requested by CRAN)
+ * Fix PROTECT() bugs from rchk
 
 # Version 0.10.12
 
