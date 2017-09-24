@@ -18,17 +18,17 @@ matrix:
           packages:
             - libmysqlclient-dev
     - os: osx
-      osx_image: xcode8.3
+      osx_image: xcode9
       before_install:
         - brew install mariadb
         - mysql.server start
     - os: osx
-      osx_image: xcode8.3
+      osx_image: xcode9
       before_install:
         - brew install mysql
         - mysql.server start
     - os: osx
-      osx_image: xcode8.3
+      osx_image: xcode9
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
