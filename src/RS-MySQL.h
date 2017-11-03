@@ -32,6 +32,11 @@ extern  "C" {
 #include <mysql_com.h>
 #include <string.h>
 
+// PATCH MARIA DB ==============================================================
+#if defined MARIADB_CLIENT_VERSION_STR && !defined MYSQL_SERVER_VERSION
+  #define MYSQL_SERVER_VERSION MARIADB_CLIENT_VERSION_STR
+#endif
+
 // Objects =====================================================================
 
 typedef struct RMySQLFields {
