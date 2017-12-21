@@ -1,8 +1,8 @@
 # Link against mariadb native client static libraries
 # Info and source code: https://downloads.mariadb.org/client-native/
-if(!file.exists("../windows/libmariadbclient-2.3.3/include/mariadb/mysql.h")){
+if(!file.exists("../windows/libmariadbclient-2.3.4/include/mariadb/mysql.h")){
   if(getRversion() < "3.3.0") setInternet2()
-  download.file("https://github.com/rwinlib/libmariadbclient/archive/v2.3.3.zip", "lib.zip", quiet = TRUE)
+  download.file("https://github.com/rwinlib/libmariadbclient/archive/v2.3.4.zip", "lib.zip", quiet = TRUE)
   dir.create("../windows", showWarnings = FALSE)
   unzip("lib.zip", exdir = "../windows")
   unlink("lib.zip")
