@@ -4,6 +4,8 @@ PKG_LIBS= -L../windows/libmariadbclient-2.3.4/lib${R_ARCH} \
 
 $(OBJECTS): winlibs
 
+all: clean winlibs
+
 winlibs:
 	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
 
