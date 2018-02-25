@@ -4,14 +4,18 @@ latex: false
 
 matrix:
   include:
-    - os: linux
-      dist: trusty
+    - dist: trusty
       env: R_CODECOV=true
       service: mysql
       addons:
         apt:
           packages:
             - libmysqlclient-dev
+    - dist: trusty
+      addons:
+        apt:
+          packages:
+            - libmariadbclient-dev
     - os: osx
       osx_image: xcode9.2
       before_install:
@@ -28,7 +32,7 @@ matrix:
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
     - os: osx
-      osx_image: beta-xcode7.3
+      osx_image: xcode7.3
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
