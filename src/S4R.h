@@ -8,8 +8,9 @@
 extern "C" {
 #endif
 
-#  include "R.h"
-#  include "Rdefines.h"
+#include <stdlib.h>
+#include <Rinternals.h>
+#include <Rdefines.h>
 
 /* We simplify one- and two-level access to object and list
  * (mostly built on top of jmc's macros)
