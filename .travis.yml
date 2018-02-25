@@ -1,12 +1,11 @@
 language: r
 cache: packages
 latex: false
+fortran: false
 
 matrix:
   include:
     - dist: trusty
-      env: R_CODECOV=true
-      service: mysql
       addons:
         apt:
           packages:
@@ -49,6 +48,3 @@ before_script:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
   - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';" -uroot
   - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
-
-after_success:
-  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
