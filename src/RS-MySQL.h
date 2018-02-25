@@ -20,10 +20,6 @@
 extern  "C" {
 #endif
 
-#if defined WIN32
-# include <windows.h>
-# undef ERROR
-#endif
 
 #include "S4R.h"
 
