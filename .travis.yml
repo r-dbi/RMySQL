@@ -1,39 +1,37 @@
 language: r
 cache: packages
 latex: false
+fortran: false
 
 matrix:
   include:
-    - os: linux
-      dist: precise
-      sudo: false
-      service: mysql
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: R_CODECOV=true
-      service: mysql
+    - dist: trusty
       addons:
         apt:
           packages:
             - libmysqlclient-dev
+    - dist: trusty
+      addons:
+        apt:
+          packages:
+            - libmariadbclient-dev
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode9.2
       before_install:
         - brew install mariadb
         - mysql.server start
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode9.2
       before_install:
         - brew install mysql
         - mysql.server start
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode9.2
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
     - os: osx
-      osx_image: beta-xcode7.3
+      osx_image: xcode7.3
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
@@ -50,6 +48,3 @@ before_script:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
   - mysql -e "CREATE USER 'billy'@'localhost' IDENTIFIED BY 'supersecret';" -uroot
   - printf "[rs-dbi]\nusername=billy\npassword=supersecret\n" > ~/.my.cnf
-
-after_success:
-  - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi

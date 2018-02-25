@@ -263,7 +263,12 @@ SEXP rmysql_version() {
   SET_NAMES(output, output_nms);
   UNPROTECT(1);
 
+#ifdef MARIADB_BASE_VERSION
+  SET_STRING_ELT(output_nms, 0, mkChar(MARIADB_BASE_VERSION));
+#else 
   SET_STRING_ELT(output_nms, 0, mkChar(MYSQL_SERVER_VERSION));
+#endif
+  
   INTEGER(output)[0] = MYSQL_VERSION_ID;
 
   SET_STRING_ELT(output_nms, 1, mkChar(mysql_get_client_info()));
