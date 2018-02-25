@@ -28,8 +28,6 @@ extern  "C" {
 #include "S4R.h"
 
 #include <mysql.h>
-#include <mysql_version.h>
-#include <mysql_com.h>
 #include <string.h>
 
 // Objects =====================================================================

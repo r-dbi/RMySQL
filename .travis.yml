@@ -5,12 +5,7 @@ latex: false
 matrix:
   include:
     - os: linux
-      dist: precise
-      sudo: false
-      service: mysql
-    - os: linux
       dist: trusty
-      sudo: required
       env: R_CODECOV=true
       service: mysql
       addons:
@@ -18,17 +13,17 @@ matrix:
           packages:
             - libmysqlclient-dev
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode9.2
       before_install:
         - brew install mariadb
         - mysql.server start
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode9.2
       before_install:
         - brew install mysql
         - mysql.server start
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode9.2
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
