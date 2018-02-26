@@ -25,3 +25,4 @@ src\/RCS
 ^revdep$
 ^appveyor.yml$
 ^.github$
+README.md$

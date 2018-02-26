@@ -35,4 +35,4 @@ Collate:
     'transaction.R'
 Suggests:
     testthat,
-    RMariaDB
+    curl
