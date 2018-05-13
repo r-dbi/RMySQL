@@ -1,10 +1,11 @@
 Package: RMySQL
-Version: 0.10.14
+Version: 0.10.15
 Title: Database Interface and 'MySQL' Driver for R
 Description: A 'DBI' interface to 'MySQL' / 'MariaDB'. The 'RMySQL' package contains an 
     old implementation based on legacy code from S-PLUS which being phased out. A modern
     'MySQL' client based on 'Rcpp' is available from the 'RMariaDB' package.
-Authors@R: c(person("Jeroen", "Ooms", email = "jeroen@berkeley.edu", role = c("aut", "cre")),
+Authors@R: c(person("Jeroen", "Ooms", email = "jeroen@berkeley.edu", 
+      role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4035-0289")),
     person("David", "James", role = "aut"),
     person("Saikat", "DebRoy", role = "aut"),
     person("Hadley", "Wickham", email = "hadley@rstudio.com", role = "aut"),

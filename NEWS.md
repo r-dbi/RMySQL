@@ -1,5 +1,9 @@
 # Version 0.10.14
 
+ * Windows: Update mariadbclient to v 2.3.5
+
+# Version 0.10.14
+
  * Windows: Update mariadbclient to v 2.3.4
  * Fix headers and linker flags for mariadb-connector-c 3.0 compatibility
  * Remove some redundant include headers
