@@ -1,4 +1,4 @@
-# Version 0.10.14
+# Version 0.10.15
 
  * Windows: Update mariadbclient to v 2.3.5
 
