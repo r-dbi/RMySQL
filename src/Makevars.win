@@ -1,11 +1,15 @@
-PKG_CPPFLAGS= -I../windows/libmariadbclient-2.3.5/include/mariadb
-PKG_LIBS= -L../windows/libmariadbclient-2.3.5/lib${R_ARCH} \
-	-lmariadbclient -lssl -lcrypto -lgdi32 -lz -lws2_32 -pthread
+VERSION = 2.3.7
+RWINLIB = ../windows/libmariadbclient-$(VERSION)
+
+CXX_STD=CXX11
+PKG_CPPFLAGS = -I$(RWINLIB)/include/mariadb
+PKG_LIBS= -L$(RWINLIB)/lib${R_ARCH} \
+	-lmariadbclient -lssl -lcrypto -lcrypt32 -lgdi32 -lz -lws2_32 -pthread
 
 all: clean winlibs
 
-winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
-
 clean:
-	rm -f $(OBJECTS) $(SHLIB)
+	rm -f $(SHLIB) $(OBJECTS)
+
+winlibs:
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R" $(VERSION)

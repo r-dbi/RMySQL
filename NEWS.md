@@ -1,3 +1,8 @@
+# Version 0.10.16
+
+ * Windows: Update mariadbclient to v2.3.7 + OpenSSL 1.1.1
+ * Fix for MySQL 8 (issue #223)
+
 # Version 0.10.15
 
  * Windows: Update mariadbclient to v 2.3.5
