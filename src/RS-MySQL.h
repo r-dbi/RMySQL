@@ -26,6 +26,10 @@ extern  "C" {
 #include <mysql.h>
 #include <string.h>
 
+#if MYSQL_VERSION_ID >= 80000 && MYSQL_VERSION_ID < 100000
+#define my_bool bool
+#endif
+  
 // Objects =====================================================================
 
 typedef struct RMySQLFields {
