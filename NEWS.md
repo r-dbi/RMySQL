@@ -1,6 +1,7 @@
 # Version 0.10.16
 
- * Windows: Update mariadbclient to v2.3.7 + OpenSSL 1.1.1
+ * Windows: Update mariadb-connector-c to v2.3.7 + OpenSSL 1.1.1
+ * MacOS: Update mariadb-connector-c to 3.0.8
  * Fix for MySQL 8 (issue #223)
 
 # Version 0.10.15
