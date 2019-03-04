@@ -4,6 +4,9 @@ latex: false
 fortran: false
 pandoc: false
 
+services:
+  - mysql
+
 matrix:
   include:
     - dist: trusty
