@@ -35,5 +35,6 @@ Collate:
     'table.R'
     'transaction.R'
 Suggests:
+    RMariaDB,
     testthat,
     curl
