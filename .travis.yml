@@ -27,8 +27,9 @@ matrix:
           packages: libmysqlclient-dev
     - os: osx
       before_install:
+        - rm -f /etc/my.cnf
         - brew install mariadb
-        - mysql.server start
+        - brew services start mariadb
     - os: osx
       before_install:
         - brew install mysql
