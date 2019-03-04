@@ -112,9 +112,10 @@ SEXP RS_DBI_createNamedList(char **names, SEXPTYPE *types, int *lengths, int  n)
     }
     SET_ELEMENT(output, (int)j, obj);
     SET_CHR_EL(output_names, j, mkChar(names[j]));
+    UNPROTECT(1);
   }
   SET_NAMES(output, output_names);
-  UNPROTECT(n+2);
+  UNPROTECT(2);
   return(output);
 }
 
