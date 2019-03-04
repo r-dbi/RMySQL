@@ -217,7 +217,7 @@ SEXP RS_MySQL_exec(SEXP conHandle, SEXP statement) {
   }
 
   /* we now create the wrapper and copy values */
-  rsHandle = RS_DBI_allocResultSet(conHandle);
+  rsHandle = PROTECT(RS_DBI_allocResultSet(conHandle));
   result = RS_DBI_getResultSet(rsHandle);
   result->statement = RS_DBI_copyString(dyn_statement);
   result->drvResultSet = (void *) my_result;
@@ -236,6 +236,7 @@ SEXP RS_MySQL_exec(SEXP conHandle, SEXP statement) {
     result->fields = RS_MySQL_createDataMappings(rsHandle);
 
   free(dyn_statement);
+  UNPROTECT(1);
   return rsHandle;
 }
 
