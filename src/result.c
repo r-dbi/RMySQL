@@ -133,7 +133,7 @@ SEXP RS_MySQL_nextResultSet(SEXP conHandle) {
   }
 
   /* we now create the wrapper and copy values */
-  rsHandle = RS_DBI_allocResultSet(conHandle);
+  rsHandle = PROTECT(RS_DBI_allocResultSet(conHandle));
   result = RS_DBI_getResultSet(rsHandle);
   result->statement = RS_DBI_copyString("<UNKNOWN>");
   result->drvResultSet = (void *) my_result;
@@ -149,7 +149,7 @@ SEXP RS_MySQL_nextResultSet(SEXP conHandle) {
 
   if (is_select)
     result->fields = RS_MySQL_createDataMappings(rsHandle);
-
+  UNPROTECT(1);
   return rsHandle;
 }
 

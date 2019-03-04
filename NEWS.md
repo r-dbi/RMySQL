@@ -1,3 +1,7 @@
+# Version 0.10.17
+
+ * Fix rcheck problems requested by CRAN
+
 # Version 0.10.16
 
  * Windows: Update mariadb-connector-c to v2.3.7 + OpenSSL 1.1.1

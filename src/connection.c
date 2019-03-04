@@ -233,10 +233,11 @@ SEXP RS_MySQL_moreResultSets(SEXP conHandle) {
 
 /* open a connection with the same parameters used for in conHandle */
 SEXP RS_MySQL_cloneConnection(SEXP conHandle) {
-
-  return RS_MySQL_createConnection(
-    ScalarInteger(0),
+  SEXP out = RS_MySQL_createConnection(
+    PROTECT(ScalarInteger(0)),
     RS_MySQL_cloneConParams(RS_DBI_getConnection(conHandle)->conParams));
+  UNPROTECT(1);
+  return out;
 }
 
 
