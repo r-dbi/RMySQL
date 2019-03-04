@@ -6,7 +6,9 @@ PKG_CPPFLAGS = -I$(RWINLIB)/include/mariadb
 PKG_LIBS= -L$(RWINLIB)/lib${R_ARCH} \
 	-lmariadbclient -lssl -lcrypto -lcrypt32 -lgdi32 -lz -lws2_32 -pthread
 
-all: clean winlibs
+#all: clean
+
+$(OBJECTS): winlibs
 
 clean:
 	rm -f $(SHLIB) $(OBJECTS)
