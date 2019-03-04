@@ -2,6 +2,7 @@ language: r
 cache: packages
 latex: false
 fortran: false
+pandoc: false
 
 matrix:
   include:
@@ -10,23 +11,20 @@ matrix:
         apt:
           packages:
             - libmysqlclient-dev
-    - dist: trusty
+    - dist: xenial
       addons:
         apt:
           packages:
             - libmariadbclient-dev
     - os: osx
-      osx_image: xcode9.2
       before_install:
         - brew install mariadb
         - mysql.server start
     - os: osx
-      osx_image: xcode9.2
       before_install:
         - brew install mysql
         - mysql.server start
     - os: osx
-      osx_image: xcode9.2
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
