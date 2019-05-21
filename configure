@@ -33,8 +33,8 @@ elif [ "$PKGCONFIG_CFLAGS" ] || [ "$PKGCONFIG_LIBS" ]; then
   PKG_CFLAGS=${PKGCONFIG_CFLAGS}
   PKG_LIBS=${PKGCONFIG_LIBS}
   # Workaround for homebrew linkin bug
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    PKG_LIBS="-L/usr/local/opt/openssl/lib $PKG_LIBS"
+  if [[ "$OSTYPE" == "darwin"* && -n "$(command -v brew)" ]]; then
+    PKG_LIBS="-L$(brew --prefix)/opt/openssl/lib $PKG_LIBS"
   fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   if [ $(command -v brew) ]; then
