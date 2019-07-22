@@ -7,8 +7,9 @@ pandoc: false
 matrix:
   include:
     - os: osx
+      osx_image: xcode10.2
       before_install:
-        - rm -f /etc/my.cnf
+        - rm -Rf /etc/my.cnf /usr/local/etc/my.cnf
         - brew install mariadb
         - brew services start mariadb
         - mkdir -p /usr/local/etc/my.cnf.d
