@@ -8,6 +8,7 @@ matrix:
   include:
     - os: osx
       before_install:
+        - rm -f /etc/my.cnf
         - brew install mariadb
         - brew services start mariadb
         - mkdir -p /usr/local/etc/my.cnf.d
