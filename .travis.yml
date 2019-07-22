@@ -4,24 +4,25 @@ latex: false
 fortran: false
 pandoc: false
 
-services:
-  - mysql
-
 matrix:
   include:
     - dist: trusty
+      services: mysql
       addons:
         apt:
           packages: libmariadbclient-dev
     - dist: trusty
+      services: mysql    
       addons:
         apt:
           packages: libmysqlclient-dev
     - dist: xenial
+      services: mysql    
       addons:
         apt:
           packages: libmariadbd-dev
     - dist: xenial
+      services: mysql    
       addons:
         apt:
           packages: libmysqlclient-dev
