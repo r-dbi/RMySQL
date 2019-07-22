@@ -8,9 +8,9 @@ matrix:
   include:
     - os: osx
       before_install:
-        - mkdir -p /usr/local/etc/my.cnf.d
         - brew install mariadb
         - brew services start mariadb
+        - mkdir -p /usr/local/etc/my.cnf.d
 
 before_script:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
