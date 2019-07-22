@@ -43,14 +43,7 @@ matrix:
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
-
-warnings_are_errors: true
-#r_check_revdep: true
-
-notifications:
-  email:
-    on_success: change
-    on_failure: change
+      before_install: sed -i.bak 's/-isysroot /-I/g' $(R RHOME)/etc/Makeconf
 
 before_script:
   - mysql -e "create database IF NOT EXISTS test;" -uroot
