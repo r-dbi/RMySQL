@@ -12,7 +12,6 @@ PKG_CSW_NAME="mysql56_dev"
 PKG_BREW_NAME="mariadb-connector-c"
 PKG_TEST_HEADER="<mysql.h>"
 PKG_LIBS="-lmysqlclient"
-PKG_LIBS_STATIC="-lmariadbclient -lssl -lcrypto -lz"
 
 # Use mysql_config (on Solaris /opt/csw/bin must be in PATH)
 if [ $(command -v mariadb_config) ]; then
@@ -43,8 +42,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     curl -sfL "https://jeroen.github.io/autobrew/$PKG_BREW_NAME" > autobrew
     source autobrew
   fi
-  PKG_CFLAGS="-I$BREWDIR/opt/mariadb-connector-c/include/mariadb"
-  PKG_LIBS="-L$BREWDIR/opt/{openssl/lib,mariadb-connector-c/lib/mariadb} $PKG_LIBS_STATIC"
 fi
 
 # Find compiler
