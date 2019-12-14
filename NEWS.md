@@ -1,3 +1,7 @@
+# Version 0.10.18
+
+ * MacOS: CRAN binaries have been updated to mariadb-connector-c to 3.1.6
+
 # Version 0.10.17
 
  * Fix rcheck problems requested by CRAN
