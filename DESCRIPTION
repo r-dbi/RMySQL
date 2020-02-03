@@ -1,5 +1,5 @@
 Package: RMySQL
-Version: 0.10.18
+Version: 0.10.19
 Title: Database Interface and 'MySQL' Driver for R
 Description: Legacy 'DBI' interface to 'MySQL' / 'MariaDB' based on old code
     ported from S-PLUS. A modern 'MySQL' client based on 'Rcpp' is available 
@@ -38,3 +38,4 @@ Suggests:
     RMariaDB,
     testthat,
     curl
+RoxygenNote: 7.0.2

@@ -1,3 +1,8 @@
+# Version 0.10.19
+
+ * Fix new warning for CRAN
+ * Small tweaks for configure script
+
 # Version 0.10.18
 
  * MacOS: CRAN binaries have been updated to mariadb-connector-c to 3.1.6
