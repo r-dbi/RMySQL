@@ -5,7 +5,6 @@
 #'
 #' @param dbObj A \code{MySQLDriver} or \code{MySQLConnection}.
 #' @param obj R/S-Plus object whose SQL type we want to determine.
-#' @param \dots any other parameters that individual methods may need.
 #' @export
 #' @examples
 #' dbDataType(RMySQL::MySQL(), "a")
