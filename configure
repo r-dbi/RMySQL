@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Anticonf script by Jeroen Ooms (2018)
+# Anticonf script by Jeroen Ooms (2020)
 # The script will try 'mariadb_config' and 'mysql_config' to find required
 # cflags and ldflags. Make sure this executable is in PATH when installing
 # the package. Alternatively, you can set INCLUDE_DIR and LIB_DIR manually:
@@ -54,12 +54,12 @@ echo "Using PKG_CFLAGS=$PKG_CFLAGS"
 echo "Using PKG_LIBS=$PKG_LIBS"
 
 # Test configuration
-echo "#include $PKG_TEST_HEADER" | ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E -xc - >/dev/null 2>&1 || R_CONFIG_ERROR=1;
+echo "#include $PKG_TEST_HEADER" | ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E -xc - >/dev/null 2> configure.log
 
 # Customize the error
-if [ $R_CONFIG_ERROR ]; then
-  echo "------------------------- ANTICONF ERROR ---------------------------"
-  echo "Configuration failed because no mysql client library was found. Try installing:"
+if [ $? -ne 0 ]; then
+  echo "-----------------------------[ ANTICONF ]-----------------------------"
+  echo "Configure could not find suitable mysql/mariadb client library. Try installing:"
   echo " * deb: $PKG_DEB_NAME (Debian, Ubuntu)"
   echo " * rpm: $PKG_RPM_NAME (Fedora, CentOS, RHEL)"
   echo " * csw: $PKG_CSW_NAME (Solaris)"
@@ -68,8 +68,10 @@ if [ $R_CONFIG_ERROR ]; then
   echo "mariadb_config or mysql_config is on your PATH. If these are unavailable"
   echo "you can also set INCLUDE_DIR and LIB_DIR manually via:"
   echo "R CMD INSTALL --configure-vars='INCLUDE_DIR=... LIB_DIR=...'"
-  echo "--------------------------------------------------------------------"
-  exit 1;
+  echo "--------------------------[ ERROR MESSAGE ]----------------------------"
+  cat configure.log
+  echo "-----------------------------------------------------------------------"
+  exit 1
 fi
 
 # Write to Makevars

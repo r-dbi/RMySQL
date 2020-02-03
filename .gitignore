@@ -10,3 +10,4 @@ config.status
 a.out.dSYM
 homebrew
 windows
+configure.log
