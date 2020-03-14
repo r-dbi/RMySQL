@@ -368,3 +368,25 @@ setMethod("dbQuoteIdentifier", c("MySQLConnection", "character"),
     SQL(paste('`', x, '`', sep = ""))
   }
 )
+
+#' Quote method for MySQL strings
+#'
+#' In MySQL, strings are enclosed in single quotes, e.g. \code{'x'}.
+#'
+#' @export
+#' @keywords internal
+setMethod("dbQuoteString", c("MySQLConnection", "character"),
+  function(conn, x, ...) {
+    ret <- paste("'", dbEscapeStrings(conn, x), "'", sep = "")
+    ret[is.na(x)] <- "NULL"
+    SQL(ret)
+  }
+)
+
+#' @export
+#' @keywords internal
+setMethod("dbQuoteString", c("MySQLConnection", "SQL"),
+  function(conn, x, ...) {
+    x
+  }
+)

@@ -1,3 +1,7 @@
+# Version 0.10.20
+
+ * Fixed improper escaping with dbQuoteString and dbQuoteLiteral, which can lead to SQL injection (Found and patched by Andrew Kane, CVE-2020-10380).
+
 # Version 0.10.19
 
  * Fix new warning for CRAN
