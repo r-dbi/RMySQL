@@ -1,6 +1,6 @@
 # Version 0.10.20
 
- * Fixed improper escaping with dbQuoteString and dbQuoteLiteral, which can lead to SQL injection (Found and patched by Andrew Kane, CVE-2020-10380).
+ * Fixed improper escaping with dbQuoteString and dbQuoteLiteral, which can lead to SQL injection (Found by Nikolay Simakov and patched by Andrew Kane, CVE-2020-10380).
 
 # Version 0.10.19
 
