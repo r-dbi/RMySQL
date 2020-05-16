@@ -36,6 +36,12 @@ matrix:
         - brew install mysql
         - mysql.server start
     - os: osx
+      xcode: 11.4
+      disable_homebrew: true
+      r_check_args: '--no-tests'
+      before_script: 'echo no sql server, only testing build'
+    - os: osx
+      xcode: 10.1
       disable_homebrew: true
       r_check_args: '--no-tests'
       before_script: 'echo no sql server, only testing build'
