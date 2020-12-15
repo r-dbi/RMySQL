@@ -1,10 +1,10 @@
-VERSION = 2.3.7
+VERSION = 3.1.11
 RWINLIB = ../windows/libmariadbclient-$(VERSION)
 
 CXX_STD=CXX11
 PKG_CPPFLAGS = -I$(RWINLIB)/include/mariadb
 PKG_LIBS= -L$(RWINLIB)/lib${R_ARCH} \
-	-lmariadbclient -lssl -lcrypto -lcrypt32 -lgdi32 -lz -lws2_32 -pthread
+	-lmariadbclient -lssl -lcrypto -lz -lsecur32 -lshlwapi -lcrypt32 -lgdi32 -lws2_32 -pthread
 
 #all: clean
 all: $(SHLIB)
