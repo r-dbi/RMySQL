@@ -7,9 +7,7 @@ PKG_LIBS= -L$(RWINLIB)/lib${R_ARCH} \
 	-lmariadbclient -lssl -lcrypto -lz -lsecur32 -lshlwapi -lcrypt32 -lgdi32 -lws2_32 -pthread
 
 #all: clean
-all: $(SHLIB)
-
-$(OBJECTS): winlibs
+all: winlibs
 
 clean:
 	rm -f $(SHLIB) $(OBJECTS)
