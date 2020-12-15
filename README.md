@@ -63,13 +63,12 @@ devtools::install_github("r-dbi/RMySQL")
 
 Installation from source on Linux or OSX requires [`MariaDB Connector/C`](https://downloads.mariadb.org/connector-c/). On some older platforms you can also link against Oracle's [libmysqlclient](https://packages.debian.org/testing/libmysqlclient-dev) driver but the mariadb implementation is much better.
 
-On recent __Debian or Ubuntu__ install [libmariadb-client-lgpl-dev](https://packages.debian.org/testing/libmariadb-client-lgpl-dev). In Ubuntu 14.04 this was called [libmariadbclient-dev](http://packages.ubuntu.com/trusty/libmariadbclient-dev).
-
+On recent __Debian or Ubuntu__ install [libmariadbclient-dev](https://packages.debian.org/testing/libmariadbclient-dev)
 ```
-sudo apt-get install -y libmariadb-client-lgpl-dev
+sudo apt-get install -y libmariadbclient-dev
 ```
 
-On __Fedora__,  __CentOS or RHEL__ we need [mariadb-devel](https://apps.fedoraproject.org/packages/mariadb-devel):
+On __Fedora__,  __CentOS or RHEL__ we need [mariadb-devel](https://src.fedoraproject.org/rpms/mariadb):
 
 ```
 sudo yum install mariadb-devel
