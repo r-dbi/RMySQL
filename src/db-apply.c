@@ -423,9 +423,7 @@ unsigned int
         return (END_GROUP|BEGIN_GROUP);
       break;
     default:
-      PROBLEM
-      "un-regongnized R/S data type %d", fld_Sclass[jcol]
-    ERROR;
+      error("un-regongnized R/S data type %d", fld_Sclass[jcol]);
     break;
     }
 
