@@ -27,3 +27,4 @@ src\/RCS
 ^.github$
 README.md$
 ^configure.log$
+^\.github$
