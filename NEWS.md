@@ -1,3 +1,7 @@
+# Version 0.10.22
+
+ * Windows: add support for UCRT builds
+
 # Version 0.10.21
 
  * Windows: update to libmariadbclient 3.1.11
