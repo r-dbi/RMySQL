@@ -35,7 +35,6 @@ Collate:
     'table.R'
     'transaction.R'
 Suggests:
-    RMariaDB,
     testthat,
     curl
 RoxygenNote: 7.0.2

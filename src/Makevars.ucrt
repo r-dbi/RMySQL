@@ -1,2 +1,3 @@
 CRT=-ucrt
+TLS_LIBS=-lbcrypt
 include Makevars.win
