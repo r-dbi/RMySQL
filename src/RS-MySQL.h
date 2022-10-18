@@ -101,9 +101,9 @@ typedef struct MySQLDriver {
 
 // Driver ----------------------------------------------------------------------
 
-MySQLDriver* rmysql_driver();
+MySQLDriver* rmysql_driver(void);
 SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_);
-SEXP rmysql_driver_info();
+SEXP rmysql_driver_info(void);
 
 SEXP rmysql_exception_info(SEXP conHandle);
 

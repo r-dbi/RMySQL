@@ -258,7 +258,7 @@ SEXP rmysql_escape_strings(SEXP conHandle, SEXP strings) {
   return output;
 }
 
-SEXP rmysql_version() {
+SEXP rmysql_version(void) {
   SEXP output = PROTECT(allocVector(INTSXP, 2));
   SEXP output_nms = PROTECT(allocVector(STRSXP, 2));
   SET_NAMES(output, output_nms);

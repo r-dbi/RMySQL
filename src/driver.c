@@ -1,12 +1,12 @@
 #include "RS-MySQL.h"
 
 static MySQLDriver* dbManager = NULL;
-MySQLDriver* rmysql_driver() {
+MySQLDriver* rmysql_driver(void) {
   if (!dbManager) error("Corrupt MySQL handle");
   return dbManager;
 }
 
-SEXP rmysql_driver_valid() {
+SEXP rmysql_driver_valid(void) {
   if(!dbManager || !dbManager->connections) {
     return ScalarLogical(FALSE);
   } else {
@@ -56,7 +56,7 @@ SEXP rmysql_driver_init(SEXP max_con_, SEXP fetch_default_rec_) {
   return mgrHandle;
 }
 
-SEXP rmysql_driver_close() {
+SEXP rmysql_driver_close(void) {
   MySQLDriver *mgr = rmysql_driver();
 
   if(mgr->num_con)
@@ -75,7 +75,7 @@ SEXP rmysql_driver_close() {
   return ScalarLogical(TRUE);
 }
 
-SEXP rmysql_driver_info() {
+SEXP rmysql_driver_info(void) {
   MySQLDriver *mgr = rmysql_driver();
 
   // Allocate output

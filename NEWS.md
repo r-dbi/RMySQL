@@ -1,3 +1,7 @@
+# Version 0.10.24
+
+ * Fix strict-prototypes warnings
+
 # Version 0.10.23
 
  * Windows: update to mariadb-connector-c 3.2.5. This new version still uses OpenSSL for R <= 4.1 but R 4.2 (ucrt) it switches to the new native Windows schannel TLS.
