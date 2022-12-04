@@ -1,3 +1,7 @@
+# Version 0.10.25
+
+ * Replace sprintf with snprintf for CRAN
+ 
 # Version 0.10.24
 
  * Fix strict-prototypes warnings

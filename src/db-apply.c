@@ -442,13 +442,13 @@ void
     switch((int) fld_Sclass[group_field]){
 
     case LGLSXP:
-      (void) sprintf(buff, "%ld", (long) LOGICAL(col)[i]);
+      (void) snprintf(buff, 1024, "%ld", (long) LOGICAL(col)[i]);
       break;
     case INTSXP:
-      (void) sprintf(buff, "%ld", (long) INTEGER(col)[i]);
+      (void) snprintf(buff, 1024, "%ld", (long) INTEGER(col)[i]);
       break;
     case REALSXP:
-      (void) sprintf(buff, "%f", (double) REAL(col)[i]);
+      (void) snprintf(buff, 1024, "%f", (double) REAL(col)[i]);
       break;
     case STRSXP:
       strcpy(buff, CHAR(STRING_ELT(col, i)));
