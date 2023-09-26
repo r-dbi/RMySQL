@@ -1,3 +1,7 @@
+# Version 0.10.26
+
+ * Windows: update libs with arm support
+ 
 # Version 0.10.25
 
  * Replace sprintf with snprintf for CRAN

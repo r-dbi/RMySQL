@@ -1,14 +1,17 @@
-VERSION = 3.2.5
-RWINLIB = ../windows/libmariadbclient-$(VERSION)
-TLS_LIBS ?= -lssl -lcrypto 
+RWINLIB = ../windows/libmariadbclient
+
+ifeq ($(R_COMPILED_BY),gcc 8.3.0)
+TLS_LIBS = -lssl -lcrypto 
+endif
 
 CXX_STD=CXX11
 PKG_CPPFLAGS = -I$(RWINLIB)/include/mariadb
-PKG_LIBS= -L$(RWINLIB)/lib${R_ARCH}${CRT} \
-	-lmariadbclient $(TLS_LIBS) -lz -lsecur32 -lshlwapi -lcrypt32 -lgdi32 -lws2_32 -pthread
+PKG_LIBS = \
+	-L$(RWINLIB)/lib$(R_ARCH) \
+	-L$(RWINLIB)/lib \
+	-lmariadbclient $(TLS_LIBS) -lz -lbcrypt -lsecur32 -lshlwapi -lcrypt32 -lgdi32 -lws2_32 -pthread
 
-#all: clean
-all: winlibs
+all: clean winlibs
 
 clean:
 	rm -f $(SHLIB) $(OBJECTS)
