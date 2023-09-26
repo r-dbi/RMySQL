@@ -1,6 +1,7 @@
 # Version 0.10.26
 
  * Windows: update libs with arm support
+ * Drop CXX11 in Makevars.win
  
 # Version 0.10.25
 
