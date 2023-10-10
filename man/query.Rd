@@ -20,7 +20,7 @@
 
 \S4method{fetch}{MySQLResult,missing}(res, n = -1, ...)
 
-\S4method{dbSendQuery}{MySQLConnection,character}(conn, statement)
+\S4method{dbSendQuery}{MySQLConnection,character}(conn, statement, ...)
 
 \S4method{dbClearResult}{MySQLResult}(res, ...)
 
