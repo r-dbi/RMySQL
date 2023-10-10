@@ -93,7 +93,7 @@ setMethod("fetch", c("MySQLResult", "missing"), function(res, n, ...) {
 #' @export
 #' @useDynLib RMySQL RS_MySQL_exec
 setMethod("dbSendQuery", c("MySQLConnection", "character"),
-  function(conn, statement) {
+  function(conn, statement, ...) {
     checkValid(conn)
 
     rsId <- .Call(RS_MySQL_exec, conn@Id, as.character(statement))
