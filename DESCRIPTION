@@ -2,7 +2,7 @@ Package: RMySQL
 Version: 0.10.26
 Title: Database Interface and 'MySQL' Driver for R
 Description: Legacy 'DBI' interface to 'MySQL' / 'MariaDB' based on old code
-    ported from S-PLUS. A modern 'MySQL' client based on 'Rcpp' is available 
+    ported from S-PLUS. A modern 'MySQL' client written in 'C++' is available
     from the 'RMariaDB' package.
 Authors@R: c(person("Jeroen", "Ooms", email = "jeroen@berkeley.edu", 
       role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4035-0289")),
