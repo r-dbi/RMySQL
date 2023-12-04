@@ -268,7 +268,7 @@ SEXP                                /* output is a named list */
               SET_LST_CHR_EL(data,j,i,NA_STRING);
             else {
               if((size_t) lens[j] != strlen(row[j])){
-                warning("internal error: row %ld field %ld truncated", i, j);
+                warning("internal error: row %d field %d truncated", i, j);
               }
               SET_LST_CHR_EL(data,j,i,mkChar(row[j]));
             }
@@ -377,7 +377,7 @@ SEXP                                /* output is a named list */
           (void) strcat(buf, "output group was computed with partial data. ");
           (void) strcat(buf, "The remaining data were left un-read in the ");
           (void) strcat(buf, "result set.");
-          warning(buf);
+          warning("%s", buf);
         }
       }
 

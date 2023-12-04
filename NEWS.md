@@ -1,3 +1,7 @@
+# Version 0.10.27
+
+ * Fix some printf warnings for CRAN
+ 
 # Version 0.10.26
 
  * Windows: update libs with arm support
