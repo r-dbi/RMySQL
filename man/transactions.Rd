@@ -15,7 +15,7 @@
 }
 \arguments{
 \item{conn}{a \code{MySQLConnection} object, as produced by
-\code{\link{dbConnect}}.}
+\code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
 
 \item{...}{Unused.}
 }
