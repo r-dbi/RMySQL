@@ -1,3 +1,7 @@
+# Version 0.10.28
+
+ * Fix anchor link note for CRAN
+ 
 # Version 0.10.27
 
  * Fix some printf warnings for CRAN
