@@ -17,7 +17,8 @@ Depends:
 Imports:
     methods
 License: GPL-2
-URL: https://r-dbi.r-universe.dev/RMySQL, https://downloads.mariadb.org/connector-c/ 
+URL: https://r-dbi.r-universe.dev/RMySQL
+    https://downloads.mariadb.org/connector-c/ 
 BugReports: https://github.com/r-dbi/rmysql/issues
 SystemRequirements: libmariadb-client-dev | libmariadb-client-lgpl-dev | libmysqlclient-dev (deb),
     mariadb-devel (rpm), mariadb | mysql-connector-c (brew), mysql56_dev (csw)
