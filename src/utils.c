@@ -129,13 +129,15 @@ int RS_DBI_newEntry(int *table, int length)   {
   int i, indx, empty_val;
 
   indx = empty_val = (int) -1;
-  for(i = 0; i < length; i++)
+  for(i = 0; i < length; i++){
     if(table[i] == empty_val){
       indx = i;
       break;
     }
-    return indx;
+  }
+  return indx;
 }
+
 int RS_DBI_lookup(int *table, int length, int obj_id) {
   int i, indx;
 
