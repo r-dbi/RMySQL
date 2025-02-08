@@ -1,3 +1,7 @@
+# Version 0.11.0
+
+ * Windows: use libmariadbclient from Rtools if found
+ 
 # Version 0.10.28
 
  * Fix anchor link note for CRAN
