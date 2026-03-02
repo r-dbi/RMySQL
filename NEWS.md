@@ -1,3 +1,7 @@
+# Version 0.11.2
+ 
+ * MacOS: update to libmariadbclient 3.4.8
+ 
 # Version 0.11.0
 
  * Windows: use libmariadbclient from Rtools if found

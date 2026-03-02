@@ -30,10 +30,6 @@ elif [ "$PKGCONFIG_CFLAGS" ] || [ "$PKGCONFIG_LIBS" ]; then
   echo "Found mysql_config cflags and libs!"
   PKG_CFLAGS=${PKGCONFIG_CFLAGS}
   PKG_LIBS=${PKGCONFIG_LIBS}
-  # Workaround for homebrew linkin bug
-  if [ `uname` = "Darwin" ]; then
-    PKG_LIBS="-L/usr/local/opt/openssl/lib $PKG_LIBS"
-  fi
 elif [ `uname` = "Darwin" ]; then
   test ! "$CI" && brew --version 2>/dev/null
   if [ $? -eq 0 ]; then
