@@ -1,6 +1,8 @@
 # Version 0.11.2
  
- * MacOS: update to libmariadbclient 3.4.8
+ * MacOS: update to libmariadbclient 3.4.8. NB: this version seems to enforce
+   stricter validation of SSL certs. To disable this new behavior set
+   MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
  
 # Version 0.11.0
 
