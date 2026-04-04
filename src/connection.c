@@ -39,10 +39,12 @@ SEXP RS_MySQL_createConnection(SEXP mgrHandle, RS_MySQL_conParams *conParams) {
     conParams->port, conParams->unix_socket, conParams->client_flag)){
 
     RS_MySQL_freeConParams(conParams);
+//#define CR_SSL_CONNECTION_ERROR 2026
+    char * hint = mysql_errno(my_connection) == 2026 ? "\nTo suppress this try seting envvar MARIADB_TLS_DISABLE_PEER_VERIFICATION=1" : "";
 
     error(
-      "Failed to connect to database: Error: %s\n",
-      mysql_error(my_connection)
+      "Failed to connect to database: Error: %s%s",
+      mysql_error(my_connection), hint
     );
   }
 
