@@ -1,3 +1,7 @@
+# Version 0.11.3
+
+ * Show a hint about MARIADB_TLS_DISABLE_PEER_VERIFICATION when failing to connect.
+
 # Version 0.11.2
  
  * MacOS: update to libmariadbclient 3.4.8. NB: this version seems to enforce
